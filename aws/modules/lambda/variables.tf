@@ -1,14 +1,3 @@
-variable "vpc_id" {
-  description = "The ID of the VPC to which the subnet belongs"
-  type        = string
-}
-
-
-variable "cidr_block" {
-  description = "The CIDR block for the VPC"
-  type        = string
-}
-
 variable "environment" {
   description = "The environment (dev, prod, test)"
   type        = string
@@ -17,5 +6,30 @@ variable "environment" {
 
 variable "subnet_id" {
   description = "The ID of the subnet"
+  type        = string
+}
+
+
+variable "security_group_id" {
+  description = "SG Id"
+  type        = string
+}
+
+variable "runtime" {
+  description = "Runtime"
+  type        = string
+}
+variable "name" {
+  description = "Name of the lambda function"
+  type        = string
+}
+
+variable "handler" {
+  description = "Handler name"
+  type        = string
+}
+
+variable "iam_role" {
+  description = "IAM role"
   type        = string
 }

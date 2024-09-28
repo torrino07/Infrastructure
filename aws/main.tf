@@ -4,7 +4,7 @@ module "vpc" {
   environment = var.environment
 }
 
-module "subnet" {
+module "lambda_subnet" {
   source              = "./modules/subnets"
   vpc_id              = module.vpc.vpc_id
   cidr_block          = "10.0.1.0/24"
@@ -14,7 +14,7 @@ module "subnet" {
   name                = "lambda"
 }
 
-module "security_group" {
+module "lambda_security_group" {
   source             = "./modules/sg"
   vpc_id             = module.vpc.vpc_id
   ingress_from_port  = 443
@@ -29,15 +29,23 @@ module "security_group" {
   environment        = var.environment
 }
 
+module "lambda_iam" {
+  source             = "./modules/iam"
+  policy_path        = "./metadata/LambdaAssumeRolePolicy.json"
+  role_name          = "lambda_exec_role"
+  policy_arn         = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
 
-# module "lambda" {
-#   source              = "./modules/lambda"
-#   vpc_id              = module.vpc.vpc_id
-#   subnet_id           = module.subnet.subnet_id
-#   cidr_block          = var.subnet_cidr_block
-#   environment         = var.environment
-#   depends_on = [module.subnet]
-# }
+module "lambda" {
+  source             = "./modules/lambda"
+  name               = "lambda"
+  handler            = "index.handler"
+  runtime            = "python3.11"
+  iam_role           = module.lambda_iam.role_name
+  subnet_id          = module.lambda_subnet.subnet_id
+  security_group_id  = module.lambda_security_group.security_group_id
+  environment        = var.environment
+}
 
 # module "routes" {
 #   source                 = "./modules/routes"

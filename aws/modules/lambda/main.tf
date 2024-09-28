@@ -1,31 +1,21 @@
-resource "aws_security_group" "elastic_beanstalk_sg" {
-  name        = "${var.environment}-eb-sg"
-  description = "Security group for Elastic Beanstalk in private subnet"
-  vpc_id      = var.vpc_id
+resource "aws_lambda_function" "this" {
+  function_name = var.name
+  handler       = var.handler
+  runtime       = var.runtime
+  role          = var.iam_role
 
-  ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = [var.cidr_block]
+  vpc_config {
+    subnet_ids         = [var.subnet_id]
+    security_group_ids = [var.security_group_id]
   }
 
-  ingress {
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = [var.cidr_block]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = [var.cidr_block]
+  environment {
+    variables = {
+      ENVIRONMENT = var.environment
+    }
   }
 
   tags = {
-    Name        = "${var.environment}-eb-sg"
-    Environment = var.environment
+    Name = "${var.environment}-${var.name}-lambda"
   }
 }
