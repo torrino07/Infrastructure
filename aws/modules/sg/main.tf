@@ -1,23 +1,21 @@
-resource "aws_security_group" "elastic_beanstalk_private_sg" {
-  name        = "elastic-beanstalk-sg"
-  description = "Allow VPN access only"
-  vpc_id      = var.vpc_id
+resource "aws_security_group" "this" {
+  vpc_id = var.vpc_id
 
   ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = [var.cidr_block]
+    from_port   = var.ingress_from_port
+    to_port     = var.ingress_to_port
+    protocol    = var.ingress_protocol
+    cidr_blocks = var.ingress_cidr_blocks
   }
 
   egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    from_port   = var.egress_from_port
+    to_port     = var.egress_to_port
+    protocol    = var.egress_protocol
+    cidr_blocks = var.egress_cidr_blocks
   }
 
   tags = {
-    Name        = "${var.environment}-elastic-beanstalk-sg"
+    Name = "${var.environment}-${var.name}-sg"
   }
 }

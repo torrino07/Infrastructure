@@ -13,7 +13,7 @@ variable "availability_zone" {
   type        = string
 }
 
-variable "map_public_ip_on_launch" {
+variable "is_public" {
   description = "Should instances launched in this subnet be assigned a public IP address?"
   type        = bool
   default     = false
@@ -24,7 +24,7 @@ variable "environment" {
   type        = string
 }
 
-variable "resource" {
+variable "name" {
   description = "The resource name"
   type        = string
 }
