@@ -1,1 +1,7 @@
 .env
+.terraform
+terraform.tfstate.d
+.terraform.lock.hcl
+dev-plan.out
+test-plan.out
+prod-plan.out
