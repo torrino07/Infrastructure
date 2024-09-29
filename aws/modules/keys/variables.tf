@@ -9,20 +9,9 @@ variable "key_rsa_bits" {
   default     = 4096
   type        = number
 }
-variable "key_name_dev" {
+
+variable "key_name" {
   description = "Name for the AWS key pair in the development environment"
   type        = string
   default     = "dev"
-}
-
-variable "key_name_test" {
-  description = "Name for the AWS key pair in the test environment"
-  default     = "test"
-  type        = string
-}
-
-variable "key_name_prod" {
-  description = "Name for the AWS key pair in the production environment"
-  default     = "prod"
-  type        = string
 }

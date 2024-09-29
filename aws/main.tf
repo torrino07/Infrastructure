@@ -4,29 +4,16 @@ module "vpc" {
   environment = var.environment
 }
 
-# module "lambda_subnet" {
-#   source              = "./modules/subnets"
-#   vpc_id              = module.vpc.vpc_id
-#   cidr_block          = "10.0.1.0/24"
-#   availability_zone   = "us-east-1a" 
-#   is_public           = false
-#   environment         = var.environment
-#   name                = "lambda"
-# }
 
-# module "lambda_security_group" {
-#   source             = "./modules/sg"
-#   vpc_id             = module.vpc.vpc_id
-#   ingress_from_port  = 443
-#   ingress_to_port    = 443
-#   ingress_protocol   = "tcp"
-#   ingress_cidr_blocks = ["0.0.0.0/0"]
-#   egress_from_port   = 0
-#   egress_to_port     = 0
-#   egress_protocol    = "-1"
-#   egress_cidr_blocks = ["0.0.0.0/0"]
-#   name               = "lambda"
-#   environment        = var.environment
+# module "amplify" {
+#   source             = "./modules/amplify"
+#   name               = "amplify"
+#   region             = "us-east-1"
+#   repository_url     = ""
+#   github_token       = ""
+#   domain_name        = "amplify"
+#   branch_name        = var.environment
+#   subdomain_prefix   = "www"
 # }
 
 # module "lambda_iam" {
