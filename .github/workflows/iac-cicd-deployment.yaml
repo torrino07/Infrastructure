@@ -30,29 +30,24 @@ jobs:
       - name: Run Terraform Init
         working-directory: terraform
         run: |
-          ls
           terraform init -backend-config="key=${{ env.BRANCH_NAME }}/terraform.tfstate"
 
       - name: Select or Create Workspace
         working-directory: terraform
         run: |
-          ls
           terraform workspace select ${{ env.BRANCH_NAME }} || terraform workspace new ${{ env.BRANCH_NAME }}
-          ls
-  
+
       - name: Run Plan
         working-directory: terraform
         id: plan
         run: |
-          terraform plan -var-file="terraform/environments/${{ env.BRANCH_NAME }}/terraform.tfvars" -out=${{ env.BRANCH_NAME }}-plan.out
-          ls
+          terraform plan -var-file="environments/${{ env.BRANCH_NAME }}/terraform.tfvars" -out=${{ env.BRANCH_NAME }}-plan.out
       
       - name: Run Apply
         working-directory: terraform
         if: steps.plan.outputs.changes == 'true'
         run: |
           terraform apply ${{ env.BRANCH_NAME }}-plan.out
-          ls
 
   infra-destroy:
     name: Destroy Infra on Branch Deletion
@@ -76,4 +71,4 @@ jobs:
       - name: Run Destroy
         working-directory: terraform
         run: |
-          terraform destroy -var-file="terraform/environments/environments/${{ env.BRANCH_NAME }}/terraform.tfvars" -auto-approve
+          terraform destroy -var-file="environments/environments/${{ env.BRANCH_NAME }}/terraform.tfvars" -auto-approve
