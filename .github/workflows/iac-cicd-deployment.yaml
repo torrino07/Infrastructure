@@ -1,10 +1,15 @@
-name: Build/Destroy Infrastructure AWS
+name: Build/Destroy Infrastructure
 
 on:
   push:
     branches:
       - dev
   workflow_dispatch:
+    inputs:
+      action:
+        description: "Terraform Action"
+        required: true
+        default: "build"
 
 env:
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -17,6 +22,7 @@ jobs:
   infra-build:
     name: Build Infra
     runs-on:  ${{ vars.RUNNER }}
+    if: ${{ github.event.inputs.action == 'build'}}
 
     steps:
       - name: Checkout repository
@@ -50,7 +56,7 @@ jobs:
   infra-destroy:
     name: Destroy Infra on Branch Deletion
     runs-on: ${{ vars.RUNNER }}
-    if: github.event_name == 'workflow_dispatch'
+    if: ${{ github.event.inputs.action == 'destroy'}}
 
     steps:
       - name: Checkout repository
