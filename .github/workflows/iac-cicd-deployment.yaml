@@ -1,4 +1,4 @@
-name: Build and Upload React App
+name: Build/Destroy Infrastructure
 
 on:
   push:
@@ -14,25 +14,49 @@ env:
   AWS_REGION: ${{ github.event.inputs.region || 'us-east-1' }}
   AWS_DOMAIN: ${{ github.event.inputs.domain || 'artifacts' }} 
   AWS_REPO: ${{ github.event.inputs.repo || 'Artifacts' }}
-  BRANCH_NAME: ${{ github.ref_name }}
+  BRANCH_NAME: ${{ github.ref_name == 'refs/heads/main' && 'prod' || github.ref_name }}
 
 jobs:
-  build:
-    name: Build Static Files
-    runs-on: ubuntu-latest
+  infra-build:
+    name: Build Infra
+    runs-on:  ${{ vars.RUNNER }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      
+      - name: Change Folder
+        run: |
+          cd Infrastructure/terraform
+      
+      # - name: Create New Workspace
+      #   run: |
+      #     terraform workspace new ${{ env.BRANCH_NAME }}
+      
+      # - name: Select Workspace
+      #   run: |
+      #     terraform workspace select ${{ env.BRANCH_NAME }}
+      
+      # - name: Run Plan
+      #   run: |
+      #     terraform plan -var-file="environments/${{ env.BRANCH_NAME }}/terraform.tfvars" -out=${{ env.BRANCH_NAME }}-plan.out
+      
+      # - name: Run Apply
+      #   run: |
+      #     terraform apply ${{ env.BRANCH_NAME }}-plan.out
+
+  infra-destroy:
+    name: Destroy Infra
+    runs-on: ${{ vars.RUNNER }}
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-
-  publish:
-    name: Deploy to AWS Amplify
-    runs-on: ubuntu-latest
-    needs: build
-
-    steps:
-      - name: Download build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: ${{ env.ARTIFACT }}
+      - name: Change Folder
+        run: |
+          cd Infrastructure/terraform
+      
+      # - name: Run Destroy
+      #   run: |
+      #     terraform destroy -var-file="environments/${{ env.BRANCH_NAME }}/terraform.tfvars" -auto-approve
