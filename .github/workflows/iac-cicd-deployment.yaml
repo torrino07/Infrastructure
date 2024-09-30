@@ -29,7 +29,11 @@ jobs:
       
       - name: Change Folder
         run: |
-          cd Infrastructure/terraform
+          cd terraform
+      
+      - name: Terraform Init
+        run: |
+          terraform init
       
       - name: Select or Create Workspace
         run: |
@@ -56,7 +60,11 @@ jobs:
 
       - name: Change Folder
         run: |
-          cd Infrastructure/terraform
+          cd terraform
+      
+      - name: Terraform Init
+        run: |
+          terraform init
       
       - name: Select or Create Workspace
         run: |
