@@ -29,6 +29,7 @@ jobs:
       
       - name: Change Folder
         run: |
+          ls
           cd terraform
       
       - name: Terraform Init
