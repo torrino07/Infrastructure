@@ -56,4 +56,5 @@ module "erc_iam" {
   policy_path        = "./metadata/ERCAssumeRolePolicy.json"
   role_name          = "erc_put_role"
   policy_arn         = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryPowerUser"
+  environment        = var.environment
 }

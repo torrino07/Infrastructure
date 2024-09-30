@@ -12,3 +12,8 @@ variable "policy_arn" {
   description = "Policy Arn"
   type        = string
 }
+
+variable "environment" {
+  description = "The environment (dev, prod, test)"
+  type        = string
+}
