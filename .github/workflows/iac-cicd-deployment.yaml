@@ -39,6 +39,7 @@ jobs:
       - name: Terraform Init
         run: |
           terraform init
+          ls
 
       - name: Run Plan
         id: plan
