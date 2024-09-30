@@ -32,14 +32,14 @@ jobs:
           cd terraform
           ls
       
-      - name: Terraform Init
-        run: |
-          terraform init
-      
       - name: Select or Create Workspace
         run: |
           terraform workspace select ${{ env.BRANCH_NAME }} || terraform workspace new ${{ env.BRANCH_NAME }}
       
+      - name: Terraform Init
+        run: |
+          terraform init
+
       - name: Run Plan
         id: plan
         run: |
@@ -63,14 +63,14 @@ jobs:
         run: |
           cd terraform
       
-      - name: Terraform Init
-        run: |
-          terraform init
-      
       - name: Select or Create Workspace
         run: |
           terraform workspace select ${{ env.BRANCH_NAME }}
-        
+      
+      - name: Terraform Init
+        run: |
+          terraform init
+
       - name: Run Destroy
         run: |
           terraform destroy -var-file="terraform/environments/environments/${{ env.BRANCH_NAME }}/terraform.tfvars" -auto-approve
