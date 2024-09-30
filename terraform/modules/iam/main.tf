@@ -1,5 +1,5 @@
 resource "aws_iam_role" "this" {
-  name = var.role_name
+  name = "${var.environment}-${var.role_name}"
   assume_role_policy = file("${var.policy_path}")
 }
 
