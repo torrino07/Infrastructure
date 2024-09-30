@@ -27,25 +27,30 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
       
-      - name: Change Folder
-        run: |
-          cd terraform
-          terraform init
-          ls
-      
       - name: Select or Create Workspace
         run: |
+          ls
           terraform workspace select ${{ env.BRANCH_NAME }} || terraform workspace new ${{ env.BRANCH_NAME }}
+          ls
+      
+      - name: Run Terraform Init
+        run: |
+          ls
+          # cd terraform
+          # terraform init
+  
       
       - name: Run Plan
         id: plan
         run: |
-          terraform plan -var-file="terraform/environments/${{ env.BRANCH_NAME }}/terraform.tfvars" -out=${{ env.BRANCH_NAME }}-plan.out
+          # terraform plan -var-file="terraform/environments/${{ env.BRANCH_NAME }}/terraform.tfvars" -out=${{ env.BRANCH_NAME }}-plan.out
+          ls
       
       - name: Run Apply
         if: steps.plan.outputs.changes == 'true'
         run: |
-          terraform apply ${{ env.BRANCH_NAME }}-plan.out
+          # terraform apply ${{ env.BRANCH_NAME }}-plan.out
+          ls
 
   infra-destroy:
     name: Destroy Infra on Branch Deletion
