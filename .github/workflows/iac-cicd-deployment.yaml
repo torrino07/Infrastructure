@@ -28,7 +28,7 @@ jobs:
             -backend-config="region=${{ env.AWS_REGION }}" \
             -backend-config="bucket="terraformstate001-${{ env.BRANCH_NAME }}" \
             -backend-config="key=${{ env.BRANCH_NAME }}/terraform.tfstate" \
-            -backend-config="dynamodb_table="terraform-locks-${{ env.BRANCH_NAME }}"
+            -backend-config="dynamodb_table=terraform-locks-${{ env.BRANCH_NAME }}"
 
       - name: Select or Create Workspace
         working-directory: terraform
