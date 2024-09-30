@@ -29,7 +29,7 @@ jobs:
       
       - name: Change Folder
         run: |
-          cd terraform/environments/dev
+          cd terraform
           ls
       
       - name: Terraform Init
@@ -43,7 +43,7 @@ jobs:
       - name: Run Plan
         id: plan
         run: |
-          terraform plan -var-file="./environments/${{ env.BRANCH_NAME }}/terraform.tfvars" -out=${{ env.BRANCH_NAME }}-plan.out
+          terraform plan -var-file="terraform/environments/${{ env.BRANCH_NAME }}/terraform.tfvars" -out=${{ env.BRANCH_NAME }}-plan.out
       
       - name: Run Apply
         if: steps.plan.outputs.changes == 'true'
@@ -73,4 +73,4 @@ jobs:
         
       - name: Run Destroy
         run: |
-          terraform destroy -var-file="./environments/environments/${{ env.BRANCH_NAME }}/terraform.tfvars" -auto-approve
+          terraform destroy -var-file="terraform/environments/environments/${{ env.BRANCH_NAME }}/terraform.tfvars" -auto-approve
