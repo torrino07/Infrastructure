@@ -17,7 +17,7 @@ jobs:
   infra-build:
     name: Build Infra
     runs-on:  ${{ vars.RUNNER }}
-    if: github.event_name == push'
+    if: github.event_name == 'push'
 
     steps:
       - name: Checkout repository
