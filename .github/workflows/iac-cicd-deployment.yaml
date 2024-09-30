@@ -6,14 +6,16 @@ on:
       - dev
       - staging
       - main
+  delete:
+    branches:
+      - dev
+      - staging
 
 env:
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
   AWS_REGION: ${{ github.event.inputs.region || 'us-east-1' }}
-  AWS_DOMAIN: ${{ github.event.inputs.domain || 'artifacts' }} 
-  AWS_REPO: ${{ github.event.inputs.repo || 'Artifacts' }}
   BRANCH_NAME: ${{ github.ref_name == 'refs/heads/main' && 'prod' || github.ref_name }}
 
 jobs:
@@ -25,38 +27,47 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
       
-      - name: Change Folder
+      - name: Run Terraform Init
+        working-directory: terraform
         run: |
-          cd Infrastructure/terraform
+          terraform init -backend-config="key=${{ env.BRANCH_NAME }}/terraform.tfstate"
+
+      - name: Select or Create Workspace
+        working-directory: terraform
+        run: |
+          terraform workspace select ${{ env.BRANCH_NAME }} || terraform workspace new ${{ env.BRANCH_NAME }}
+
+      - name: Run Plan
+        working-directory: terraform
+        id: plan
+        run: |
+          terraform plan -var-file="environments/${{ env.BRANCH_NAME }}/terraform.tfvars" -out=${{ env.BRANCH_NAME }}-plan.out
       
-      # - name: Create New Workspace
-      #   run: |
-      #     terraform workspace new ${{ env.BRANCH_NAME }}
-      
-      # - name: Select Workspace
-      #   run: |
-      #     terraform workspace select ${{ env.BRANCH_NAME }}
-      
-      # - name: Run Plan
-      #   run: |
-      #     terraform plan -var-file="environments/${{ env.BRANCH_NAME }}/terraform.tfvars" -out=${{ env.BRANCH_NAME }}-plan.out
-      
-      # - name: Run Apply
-      #   run: |
-      #     terraform apply ${{ env.BRANCH_NAME }}-plan.out
+      - name: Run Apply
+        working-directory: terraform
+        run: |
+          terraform apply ${{ env.BRANCH_NAME }}-plan.out
 
   infra-destroy:
-    name: Destroy Infra
+    name: Destroy Infra on Branch Deletion
     runs-on: ${{ vars.RUNNER }}
+    if: github.event.ref_type == 'branch' && github.event.deleted == 'true'
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-
-      - name: Change Folder
-        run: |
-          cd Infrastructure/terraform
       
-      # - name: Run Destroy
-      #   run: |
-      #     terraform destroy -var-file="environments/${{ env.BRANCH_NAME }}/terraform.tfvars" -auto-approve
+      - name: Terraform Init
+        working-directory: terraform
+        run: |
+          terraform init -backend-config="key=${{ env.BRANCH_NAME }}/terraform.tfstate"
+
+      - name: Select or Create Workspace
+        working-directory: terraform
+        run: |
+          terraform workspace select ${{ env.BRANCH_NAME }}
+
+      - name: Run Destroy
+        working-directory: terraform
+        run: |
+          terraform destroy -var-file="environments/${{ env.BRANCH_NAME }}/terraform.tfvars" -auto-approve
