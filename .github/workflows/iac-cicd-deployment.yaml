@@ -45,7 +45,6 @@ jobs:
       
       - name: Run Apply
         working-directory: terraform
-        if: steps.plan.outputs.changes == 'true'
         run: |
           terraform apply ${{ env.BRANCH_NAME }}-plan.out
 
@@ -61,7 +60,7 @@ jobs:
       - name: Terraform Init
         working-directory: terraform
         run: |
-          terraform init
+          terraform init -backend-config="key=${{ env.BRANCH_NAME }}/terraform.tfstate"
 
       - name: Select or Create Workspace
         working-directory: terraform
@@ -71,4 +70,4 @@ jobs:
       - name: Run Destroy
         working-directory: terraform
         run: |
-          terraform destroy -var-file="environments/environments/${{ env.BRANCH_NAME }}/terraform.tfvars" -auto-approve
+          terraform destroy -var-file="environments/${{ env.BRANCH_NAME }}/terraform.tfvars" -auto-approve
