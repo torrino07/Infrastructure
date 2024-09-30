@@ -17,13 +17,12 @@ env:
   AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
   AWS_REGION: ${{ github.event.inputs.region || 'us-east-1' }}
   BRANCH_NAME: ${{ github.ref_name == 'main' && 'prod' || github.ref_name }}
-  ACTION: ${{ github.event.inputs.action }}
 
 jobs:
   infra-build:
     name: Build Infra
     runs-on:  ${{ vars.RUNNER }}
-    if: ${{ env.ACTION == 'build'}}
+    if: ${{ github.event.inputs.action == 'build'}}
 
     steps:
       - name: Checkout repository
@@ -57,7 +56,7 @@ jobs:
   infra-destroy:
     name: Destroy Infra on Branch Deletion
     runs-on: ${{ vars.RUNNER }}
-    if: ${{ env.ACTION == 'destroy'}}
+    if: ${{ github.event.inputs.action == 'destroy'}}
 
     steps:
       - name: Checkout repository
