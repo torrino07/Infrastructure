@@ -3,13 +3,11 @@ name: Build/Destroy Infrastructure AWS
 on:
   push:
     branches:
-      - test
       - dev
       - staging
       - main
   delete:
     branches:
-      - test
       - dev
       - staging
 
