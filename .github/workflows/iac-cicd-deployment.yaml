@@ -27,18 +27,18 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
       
+      - name: Run Terraform Init
+        working-directory: terraform
+        run: |
+          ls
+          terraform init
+
       - name: Select or Create Workspace
         working-directory: terraform
         run: |
           ls
           terraform workspace select ${{ env.BRANCH_NAME }} || terraform workspace new ${{ env.BRANCH_NAME }}
           ls
-      
-      - name: Run Terraform Init
-        working-directory: terraform
-        run: |
-          ls
-          terraform init
   
       - name: Run Plan
         working-directory: terraform
@@ -63,15 +63,15 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
       
-      - name: Select or Create Workspace
-        working-directory: terraform
-        run: |
-          terraform workspace select ${{ env.BRANCH_NAME }}
-
       - name: Terraform Init
         working-directory: terraform
         run: |
           terraform init
+
+      - name: Select or Create Workspace
+        working-directory: terraform
+        run: |
+          terraform workspace select ${{ env.BRANCH_NAME }}
 
       - name: Run Destroy
         working-directory: terraform
