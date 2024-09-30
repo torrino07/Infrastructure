@@ -6,10 +6,6 @@ on:
       - dev
       - staging
       - main
-  delete:
-    branches:
-      - dev
-      - staging
 
 env:
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
