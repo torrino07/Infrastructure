@@ -31,7 +31,7 @@ jobs:
         working-directory: terraform
         run: |
           ls
-          terraform init -backend-config="key/${{ env.BRANCH_NAME }}/terraform.tfstate"
+          terraform init -backend-config="key=${{ env.BRANCH_NAME }}/terraform.tfstate"
 
       - name: Select or Create Workspace
         working-directory: terraform
