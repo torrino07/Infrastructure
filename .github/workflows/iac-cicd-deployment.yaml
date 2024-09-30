@@ -30,17 +30,13 @@ jobs:
       - name: Change Folder
         run: |
           cd terraform
+          terraform init
           ls
       
       - name: Select or Create Workspace
         run: |
           terraform workspace select ${{ env.BRANCH_NAME }} || terraform workspace new ${{ env.BRANCH_NAME }}
       
-      - name: Terraform Init
-        run: |
-          terraform init
-          ls
-
       - name: Run Plan
         id: plan
         run: |
@@ -59,18 +55,15 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-
-      - name: Change Folder
+      
+      - name: Terraform Init
         run: |
           cd terraform
+          terraform init
       
       - name: Select or Create Workspace
         run: |
           terraform workspace select ${{ env.BRANCH_NAME }}
-      
-      - name: Terraform Init
-        run: |
-          terraform init
 
       - name: Run Destroy
         run: |
