@@ -8,8 +8,8 @@ resource "aws_cognito_user_pool" "this" {
         developer_only_attribute = false
     }
 
-    email_configuration {
-        email_sending_account = "COGNITO_DEFAULT"
+    admin_create_user_config {
+      allow_admin_create_user_only = true
     }
 
     auto_verified_attributes = ["email"]
