@@ -1,15 +1,16 @@
 resource "aws_cognito_user_pool" "this" {
     name = "${var.environment}-${var.name}-userpool"
 
+    admin_create_user_config {
+      allow_admin_create_user_only = false
+    }
+    
     schema {
         name = "Email"
         attribute_data_type = "String"
         mutable = true
         developer_only_attribute = false
-    }
-
-    admin_create_user_config {
-      allow_admin_create_user_only = true
+        required = true
     }
 
     auto_verified_attributes = ["email"]
