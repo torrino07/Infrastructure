@@ -14,14 +14,14 @@ module "vpc" {
 #   depends_on = [module.subnet]
 # }
 
-module "erc" {
+module "erc_fastapi" {
   source       = "./modules/ecr"
   mutable      = "MUTABLE"
   name         = "fastapi-app"
   environment  = var.environment
 }
 
-module "erc" {
+module "erc_react" {
   source       = "./modules/ecr"
   mutable      = "MUTABLE"
   name         = "react-app"
