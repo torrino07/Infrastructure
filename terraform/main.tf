@@ -21,6 +21,13 @@ module "erc" {
   environment  = var.environment
 }
 
+module "erc" {
+  source       = "./modules/ecr"
+  mutable      = "MUTABLE"
+  name         = "react-app"
+  environment  = var.environment
+}
+
 module "erc_iam" {
   source             = "./modules/iam"
   policy_path        = "./metadata/ERCAssumeRolePolicy.json"
