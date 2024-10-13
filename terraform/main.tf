@@ -6,7 +6,7 @@ locals {
   }
   subnets_modules = {
     "ec2_subnet" = { name = "trading-server", cidr_block = "10.0.1.0/24", availability_zone = "us-east-1a" }
-    "ni_subnet"  = { name = "vpn-network-interface", cidr_block = "10.0.1.0/24", availability_zone = "us-east-1a" }
+    "ni_subnet"  = { name = "vpn-network-interface", cidr_block = "10.8.0.0/16", availability_zone = "us-east-1a" }
   }
   sg_modules = {
     "ec2_sg" = {
