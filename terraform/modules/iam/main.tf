@@ -3,7 +3,7 @@ resource "aws_iam_role" "this" {
   assume_role_policy = file("${var.assume_role_policy_path}")
 }
 
-resource "aws_iam_role_policy" "ec2_inline_policy" {
+resource "aws_iam_role_policy" "this" {
   name   =  "${var.environment}-${var.name}-iam-role-policy"
   role   = aws_iam_role.this.id
   policy = file("${var.policy_path}")
