@@ -29,7 +29,7 @@ module "ec2_sg" {
       from_port   = 80
       to_port     = 80
       protocol    = "tcp"
-      ingress_cidr_blocks = ["10.0.2.0/24"]
+      cidr_blocks = ["10.0.2.0/24"]
     }
   ]
   
