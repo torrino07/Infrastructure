@@ -65,7 +65,7 @@ module "vpc" {
 locals {
   ecr_modules = {
     "erc_react_app"      = { name = "fastapi-app" }
-    "erc_fastapi_app"    = { name = "react-app"}
+    "erc_fastapi_app"    = { name = "react-app" }
     "erc_postgresql_server" = { name = "postgresql_server" }
   }
 }
