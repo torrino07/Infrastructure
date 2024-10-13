@@ -20,25 +20,25 @@ module "ec2_sg" {
 
   ingress_rules = [
     {
-      ingress_from_port   = 22
-      ingress_to_port     = 22
-      ingress_protocol    = "tcp"
-      ingress_cidr_blocks = ["10.8.0.0/16"]
+      from_port   = 22
+      to_port     = 22
+      protocol    = "tcp"
+      cidr_blocks = ["10.8.0.0/16"]
     },
     {
-      ingress_from_port   = 80
-      ingress_to_port     = 80
-      ingress_protocol    = "tcp"
+      from_port   = 80
+      to_port     = 80
+      protocol    = "tcp"
       ingress_cidr_blocks = ["10.0.2.0/24"]
     }
   ]
   
   egress_rules = [
     {
-      egress_from_port    = 0
-      egress_to_port      = 0
-      egress_protocol     = "-1"
-      egress_cidr_blocks  = ["10.0.2.0/24"]
+      from_port    = 0
+      to_port      = 0
+      protocol     = "-1"
+      cidr_blocks  = ["10.0.2.0/24"]
     }
   ]
   name                    = "trading-server"
