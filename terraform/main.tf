@@ -46,7 +46,7 @@ module "ec2_sg" {
 
 module "ec2_iam_profile" {
   source                  = "./modules/iam"
-  assume_role_policy_path = "./metadata/EC2AssumeRoloPolicy.json"
+  assume_role_policy_path = "./metadata/EC2AssumeRolePolicy.json"
   policy_path             = "./metadata/EC2Policy.json"
   name                    = "ec2"
   environment             = var.environment
