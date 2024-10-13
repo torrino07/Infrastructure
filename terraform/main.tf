@@ -57,7 +57,7 @@ module "ec2" {
   ami                    = "ami-053b0d53c279acc90"
   environment            = var.environment
   private_subnet_id      = module.ec2_subnet.subnet_id
-  s3_profile             = module.ec2_s3_iam_profile.ss_profile_name
+  s3_profile             = module.ec2_iam_profile.ss_profile_name
   sg_private             = module.ec2_sg.security_group_id
   instance_type          = "t2.micro"
 }
