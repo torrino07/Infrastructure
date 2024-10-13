@@ -72,7 +72,7 @@ locals {
 
 module "ecr_modules" {
   for_each = local.ecr_modules
-  source   = "../modules/ecr"
+  source   = "./modules/ecr"
   mutable  = "MUTABLE"
   name     = each.value.name
   environment = each.value.environment
