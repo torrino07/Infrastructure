@@ -64,9 +64,9 @@ module "vpc" {
 
 locals {
   ecr_modules = {
-    "erc_react_app"      = { name = "fastapi-app", environment = var.environment }
-    "erc_fastapi_app"    = { name = "react-app", environment = var.environment }
-    "erc_postgresql_server" = { name = "postgresql_server", environment = var.environment }
+    "erc_react_app"      = { name = "fastapi-app" }
+    "erc_fastapi_app"    = { name = "react-app"}
+    "erc_postgresql_server" = { name = "postgresql_server" }
   }
 }
 
@@ -75,7 +75,6 @@ module "ecr_modules" {
   source   = "./modules/ecr"
   mutable  = "MUTABLE"
   name     = each.value.name
-  environment = each.value.environment
 }
 # module "erc_react_app" {
 #   source       = "./modules/ecr"
