@@ -26,6 +26,7 @@ jobs:
       - name: Run Terraform Init
         working-directory: terraform
         run: |
+          ls
           terraform init \
             -backend-config="region=${{ env.AWS_REGION }}" \
             -backend-config="bucket=terraformstate001-${{ env.BRANCH_NAME }}" \
