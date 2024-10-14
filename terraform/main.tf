@@ -5,23 +5,18 @@ locals {
     "erc_postgresql_server" = { name = "postgresql_server" }
   }
   subnets_modules = {
-    "ec2_subnet" = { name = "trading-server", cidr_block = "10.0.1.0/24", availability_zone = "us-east-1a" }
-    "ni_subnet"  = { name = "vpn-network-interface", cidr_block = "10.8.0.0/16", availability_zone = "us-east-1a" }
+    "vpn_ni_subnet"  = { name = "vpn-network-interface", cidr_block = "10.0.1.0/24", availability_zone = "us-east-1a" }
+    "ec2_subnet" = { name = "trading-server", cidr_block = "10.0.2.0/24", availability_zone = "us-east-1a" }
+    "k8s_subnet"  = { name = "kubernetes-cluster", cidr_block = "10.0.3.0/24", availability_zone = "us-east-1a" }
   }
   sg_modules = {
-    "ec2_sg" = {
+    "vpn_ni" = {
       ingress_rules = [
         {
           from_port   = 22
           to_port     = 22
           protocol    = "tcp"
-          cidr_blocks = ["10.8.0.0/16"]
-        },
-        {
-          from_port   = 80
-          to_port     = 80
-          protocol    = "tcp"
-          cidr_blocks = ["10.0.2.0/24"]
+          cidr_blocks = ["10.0.1.0/24"]
         }
       ]
       egress_rules = [
@@ -29,7 +24,37 @@ locals {
           from_port   = 0
           to_port     = 0
           protocol    = "-1"
-          cidr_blocks = ["10.0.2.0/24"]
+          cidr_blocks = ["0.0.0.0/0"]
+        },
+      ]
+    }
+    "ec2_sg" = {
+      ingress_rules = [
+        {
+          from_port   = 22
+          to_port     = 22
+          protocol    = "tcp"
+          cidr_blocks = ["10.0.1.0/24"]
+        },
+        {
+          from_port   = 80
+          to_port     = 80
+          protocol    = "tcp"
+          cidr_blocks = ["10.0.3.0/24"]
+        }
+      ]
+      egress_rules = [
+        {
+          from_port   = 80
+          to_port     = 80
+          protocol    = "tcp"
+          cidr_blocks = ["10.0.3.0/24"]
+        },
+        {
+          from_port   = 443
+          to_port     = 443
+          protocol    = "tcp"
+          cidr_blocks = ["10.0.3.0/24"]
         }
       ]
       name = "trading-server"
@@ -92,6 +117,16 @@ module "ec2" {
   s3_profile        = module.iam_profiles["ec2_iam_profiles"].ss_profile_name
   sg_private        = module.sg["ec2_sg"].security_group_id
   instance_type     = each.value.instance_type
+}
+
+module "vpn" {
+  source                = "./modules/vpn"
+  vpc_cidr_block        = "10.0.0.0/16"
+  client_cidr_block     = "172.16.0.0/22"
+  ec2_subnet_cidr_block = module.subnets["ec2_subnet"].cidr_block
+  vpn_subnet_id         = module.subnets["vpn_ni_subnet"].subnet_id
+  environment           = var.environment
+  name                  = "turbo-x"
 }
 
 module "ecr" {
