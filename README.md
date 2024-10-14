@@ -26,5 +26,9 @@ If you want to learn more about creating good readme files then refer the follow
 - terraform plan -var-file="environments/dev/terraform.tfvars" -out=dev-plan.out
 - terraform apply dev-plan.out
 - terraform destroy -var-file="environments/dev/terraform.tfvars" -auto-approve
-
 - aws ssm start-session --target 
+
+## Generate Certificates
+mkdir certs
+openssl genrsa -out certs/vpn-private-key.pem 2048
+openssl req -new -x509 -key certs/vpn-private-key.pem -out certs/vpn-certificate.pem -days 365

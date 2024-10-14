@@ -5,3 +5,4 @@ terraform.tfstate.d
 dev-plan.out
 test-plan.out
 prod-plan.out
+certs/
