@@ -7,7 +7,6 @@ locals {
   subnets_modules = {
     "vpn_ni_subnet"  = { name = "vpn-network-interface", cidr_block = "10.0.1.0/24", availability_zone = "us-east-1a" }
     "ec2_subnet" = { name = "trading-server", cidr_block = "10.0.2.0/24", availability_zone = "us-east-1a" }
-    "k8s_subnet"  = { name = "kubernetes-cluster", cidr_block = "10.0.3.0/24", availability_zone = "us-east-1a" }
   }
   sg_modules = {
     "vpn_ni" = {
@@ -16,7 +15,13 @@ locals {
           from_port   = 22
           to_port     = 22
           protocol    = "tcp"
-          cidr_blocks = ["10.0.1.0/24"]
+          cidr_blocks = ["172.16.0.0/22"]
+        },
+        {
+          from_port   = 443
+          to_port     = 443
+          protocol    = "tcp"
+          cidr_blocks = ["0.0.0.0/0"]
         }
       ]
       egress_rules = [
@@ -35,28 +40,16 @@ locals {
           from_port   = 22
           to_port     = 22
           protocol    = "tcp"
-          cidr_blocks = ["10.0.1.0/24"]
-        },
-        {
-          from_port   = 80
-          to_port     = 80
-          protocol    = "tcp"
-          cidr_blocks = ["10.0.3.0/24"]
+          cidr_blocks = ["172.16.0.0/22"]
         }
       ]
       egress_rules = [
         {
-          from_port   = 80
-          to_port     = 80
-          protocol    = "tcp"
-          cidr_blocks = ["10.0.3.0/24"]
+          from_port   = 0
+          to_port     = 0
+          protocol    = "-1"
+          cidr_blocks = ["0.0.0.0/0"]
         },
-        {
-          from_port   = 443
-          to_port     = 443
-          protocol    = "tcp"
-          cidr_blocks = ["10.0.3.0/24"]
-        }
       ]
       name = "trading-server"
     }

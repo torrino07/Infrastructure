@@ -16,6 +16,7 @@ resource "aws_ec2_client_vpn_endpoint" "this" {
 
   transport_protocol = "udp"
   dns_servers        = ["8.8.8.8"]
+  vpn_port =         443
 
   split_tunnel = true
 
