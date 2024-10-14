@@ -27,6 +27,7 @@ locals {
           cidr_blocks = ["0.0.0.0/0"]
         },
       ]
+      name = "vpn"
     }
     "ec2_sg" = {
       ingress_rules = [
