@@ -123,7 +123,7 @@ module "vpn" {
   source                = "./modules/vpn"
   vpc_cidr_block        = "10.0.0.0/16"
   client_cidr_block     = "172.16.0.0/22"
-  ec2_subnet_cidr_block = module.subnets["ec2_subnet"].cidr_block
+  ec2_subnet_cidr_block = "10.0.2.0/24"
   vpn_subnet_id         = module.subnets["vpn_ni_subnet"].subnet_id
   environment           = var.environment
   name                  = "turbo-x"
