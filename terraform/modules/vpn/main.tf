@@ -39,4 +39,8 @@ resource "aws_ec2_client_vpn_route" "this" {
   client_vpn_endpoint_id = aws_ec2_client_vpn_endpoint.this.id
   destination_cidr_block = var.ec2_subnet_cidr_block
   target_vpc_subnet_id   = var.vpn_subnet_id
+
+  timeouts {
+    create = "10"
+  }
 }
