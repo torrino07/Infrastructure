@@ -41,6 +41,6 @@ resource "aws_ec2_client_vpn_route" "this" {
   target_vpc_subnet_id   = var.vpn_subnet_id
 
   timeouts {
-    create = "10"
+    create = "10m"
   }
 }
