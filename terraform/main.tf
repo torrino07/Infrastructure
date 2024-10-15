@@ -5,18 +5,12 @@ locals {
     "erc_postgresql_server" = { name = "postgresql_server" }
   }
   subnets_modules = {
-    "vpn_ni_subnet"  = { name = "vpn-network-interface", cidr_block = "10.0.1.0/24", availability_zone = "us-east-1a" }
-    "ec2_subnet" = { name = "trading-server", cidr_block = "10.0.2.0/24", availability_zone = "us-east-1a" }
+    "vpn_ni_subnet"  = { name = "vpn-network-interface", cidr_block = "10.1.1.0/24", availability_zone = "us-east-1a" }
+    "ec2_subnet" = { name = "trading-server", cidr_block = "10.1.3.0/24", availability_zone = "us-east-1b" }
   }
   sg_modules = {
     "vpn_ni" = {
       ingress_rules = [
-        {
-          from_port   = 22
-          to_port     = 22
-          protocol    = "tcp"
-          cidr_blocks = ["172.16.0.0/22"]
-        },
         {
           from_port   = 443
           to_port     = 443
@@ -40,7 +34,7 @@ locals {
           from_port   = 22
           to_port     = 22
           protocol    = "tcp"
-          cidr_blocks = ["172.16.0.0/22"]
+          cidr_blocks = ["10.1.1.0/24"]
         }
       ]
       egress_rules = [
@@ -69,7 +63,7 @@ locals {
 
 module "vpc" {
   source      = "./modules/vpc"
-  cidr_block  = "10.0.0.0/16"
+  cidr_block  = "10.1.0.0/16"
   environment = var.environment
 }
 
@@ -115,9 +109,9 @@ module "ec2" {
 
 module "vpn" {
   source                = "./modules/vpn"
-  vpc_cidr_block        = "10.0.0.0/16"
+  vpc_cidr_block        = "10.1.0.0/16"
   client_cidr_block     = "172.16.0.0/22"
-  ec2_subnet_cidr_block = "10.0.2.0/24"
+  ec2_subnet_cidr_block = "10.1.3.0/24"
   vpn_subnet_id         = module.subnets["vpn_ni_subnet"].subnet_id
   environment           = var.environment
   name                  = "turbo-x"
