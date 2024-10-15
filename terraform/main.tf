@@ -4,6 +4,7 @@ locals {
     "erc_fastapi_app"       = { name = "react-app" }
     "erc_postgresql_server" = { name = "postgresql_server" }
   }
+  
   subnets_modules = {
     "vpn_ni_subnet"  = { name = "vpn-network-interface", cidr_block = "10.1.1.0/24", availability_zone = "us-east-1a" }
     "ec2_subnet" = { name = "trading-server", cidr_block = "10.1.3.0/24", availability_zone = "us-east-1b" }
