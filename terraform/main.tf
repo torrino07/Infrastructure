@@ -105,7 +105,7 @@ module "iam_profiles" {
 
 module "keys" {
   source                  = "./modules/keys"
-  key_name                = var.environment + "-pem"
+  key_name                = "${var.environment}-key"
 }
 
 module "secret_manager" {
