@@ -1,11 +1,11 @@
 resource "aws_ec2_client_vpn_endpoint" "this" {
   client_cidr_block = var.client_cidr_block
 
-  server_certificate_arn = "arn:aws:acm:us-east-1:160945804984:certificate/a651affd-962d-4ef9-be0f-05bf7e5fd4af"
+  server_certificate_arn = "arn:aws:acm:us-east-1:160945804984:certificate/8f9f369e-65e7-417a-9ff2-01ce9c94e15a"
 
   authentication_options {
     type = "certificate-authentication"
-    root_certificate_chain_arn = "arn:aws:acm:us-east-1:160945804984:certificate/523cb12c-d0b8-410a-bf23-9c4606dcba3a"
+    root_certificate_chain_arn = ""
   }
 
   connection_log_options {
