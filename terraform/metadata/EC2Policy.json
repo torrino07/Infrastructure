@@ -15,17 +15,10 @@
     {
       "Effect": "Allow",
       "Action": [
-        "ssm:DescribeInstanceInformation",
-        "ssm:SendCommand",
-        "ssm:GetCommandInvocation",
-        "ssm:ListCommandInvocations"
-      ],
-      "Resource": "*"
-    },
-    {
-      "Effect": "Allow",
-      "Action": [
           "ssm:DescribeInstanceInformation",
+          "ssm:SendCommand",
+          "ssm:GetCommandInvocation",
+          "ssm:ListCommandInvocations",
           "ssm:GetDeployablePatchSnapshotForInstance",
           "ssm:GetDocument",
           "ssm:DescribeDocument",
@@ -52,6 +45,6 @@
           "ec2messages:SendReply"
       ],
       "Resource": "*"
-  }
+    }
   ]
 }

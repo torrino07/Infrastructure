@@ -103,6 +103,17 @@ module "iam_profiles" {
   environment             = var.environment
 }
 
+module "keys" {
+  source                  = "./modules/keys"
+  key_name                = var.environment
+}
+
+module "secret_manager" {
+  source                  = "./modules/secretmanager"
+  key_name                = module.keys.key_pair_name
+  private_key_pem         = module.keys.private_key_pem    
+}
+
 module "ec2" {
   for_each          = local.ec2_modules
   source            = "./modules/ec2"

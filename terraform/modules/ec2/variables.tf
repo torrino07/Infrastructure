@@ -25,13 +25,3 @@ variable "s3_profile" {
   description = "The IAM instance profile for S3 access"
   type        = any
 }
-
-# variable "username" {
-#   description = "The username for the development PostgreSQL database"
-#   type        = string
-# }
-
-# variable "password" {
-#   description = "The password for the development PostgreSQL database"
-#   type        = string
-# }
