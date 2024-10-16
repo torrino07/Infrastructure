@@ -105,7 +105,7 @@ module "iam_profiles" {
 
 module "keys" {
   source                  = "./modules/keys"
-  key_name                = var.environment
+  key_name                = var.environment + "-pem"
 }
 
 module "secret_manager" {
@@ -123,6 +123,7 @@ module "ec2" {
   s3_profile        = module.iam_profiles["ec2_iam_profiles"].ss_profile_name
   sg_private        = module.sg["ec2_sg"].security_group_id
   instance_type     = each.value.instance_type
+  key_name          = module.keys.key_pair_name
 }
 
 module "vpn" {

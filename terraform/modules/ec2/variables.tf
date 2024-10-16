@@ -25,3 +25,8 @@ variable "s3_profile" {
   description = "The IAM instance profile for S3 access"
   type        = any
 }
+
+variable "key_name" {
+  description = "Name for the AWS key pair in the development environment"
+  type        = string
+}
