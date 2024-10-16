@@ -29,6 +29,4 @@ If you want to learn more about creating good readme files then refer the follow
 - aws ssm start-session --target 
 
 ## Generate Certificates
-mkdir certs
-openssl genrsa -out certs/vpn-private-key.pem 2048
-openssl req -new -x509 -key certs/vpn-private-key.pem -out certs/vpn-certificate.pem -days 365
+aws secretsmanager delete-secret --secret-id dev --force-delete-without-recovery --region us-east-1
