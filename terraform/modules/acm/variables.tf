@@ -9,3 +9,7 @@ variable "private_body"{
 variable "private_chain"{
     type = string
 }
+
+variable "domain_name"{
+    type = string
+}
