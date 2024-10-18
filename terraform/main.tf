@@ -109,85 +109,85 @@ module "client_certs"  {
   domain_name   = "client1.domain.tld"
 }
 
-# module "vpc" {
-#   source      = "./modules/vpc"
-#   cidr_block  = "10.1.0.0/16"
-#   environment = var.environment
-# }
+module "vpc" {
+  source      = "./modules/vpc"
+  cidr_block  = "10.1.0.0/16"
+  environment = var.environment
+}
 
-# module "subnets" {
-#   for_each          = local.subnets_modules
-#   source            = "./modules/subnets"
-#   environment       = var.environment
-#   vpc_id            = module.vpc.vpc_id
-#   cidr_block        = each.value.cidr_block
-#   availability_zone = each.value.availability_zone
-#   name              = each.value.name
-# }
+module "subnets" {
+  for_each          = local.subnets_modules
+  source            = "./modules/subnets"
+  environment       = var.environment
+  vpc_id            = module.vpc.vpc_id
+  cidr_block        = each.value.cidr_block
+  availability_zone = each.value.availability_zone
+  name              = each.value.name
+}
 
-# module "sg" {
-#   for_each      = local.sg_modules
-#   source        = "./modules/sg"
-#   environment   = var.environment
-#   vpc_id        = module.vpc.vpc_id
-#   ingress_rules = each.value.ingress_rules
-#   egress_rules  = each.value.egress_rules
-#   name          = each.value.name
-# }
+module "sg" {
+  for_each      = local.sg_modules
+  source        = "./modules/sg"
+  environment   = var.environment
+  vpc_id        = module.vpc.vpc_id
+  ingress_rules = each.value.ingress_rules
+  egress_rules  = each.value.egress_rules
+  name          = each.value.name
+}
 
-# module "iam_profiles" {
-#   for_each                = local.iam_profiles_modules
-#   source                  = "./modules/iam"
-#   assume_role_policy_path = each.value.assume_role_policy_path
-#   policy_path             = each.value.policy_path
-#   name                    = each.value.name
-#   environment             = var.environment
-# }
+module "iam_profiles" {
+  for_each                = local.iam_profiles_modules
+  source                  = "./modules/iam"
+  assume_role_policy_path = each.value.assume_role_policy_path
+  policy_path             = each.value.policy_path
+  name                    = each.value.name
+  environment             = var.environment
+}
 
-# module "keys" {
-#   source                  = "./modules/keys"
-#   key_name                = "${var.environment}-key"
-# }
+module "keys" {
+  source                  = "./modules/keys"
+  key_name                = "${var.environment}-key"
+}
 
-# module "secret_manager" {
-#   source                  = "./modules/secretmanager"
-#   key_name                = module.keys.key_pair_name
-#   private_key_pem         = module.keys.private_key_pem    
-# }
+module "secret_manager" {
+  source                  = "./modules/secretmanager"
+  key_name                = module.keys.key_pair_name
+  private_key_pem         = module.keys.private_key_pem    
+}
 
-# module "ec2" {
-#   for_each          = local.ec2_modules
-#   source            = "./modules/ec2"
-#   ami               = each.value.ami
-#   environment       = var.environment
-#   private_subnet_id = module.subnets["ec2_subnet"].subnet_id
-#   s3_profile        = module.iam_profiles["ec2_iam_profiles"].ss_profile_name
-#   sg_private        = module.sg["ec2_sg"].security_group_id
-#   instance_type     = each.value.instance_type
-#   key_name          = module.keys.key_pair_name
-# }
+module "ec2" {
+  for_each          = local.ec2_modules
+  source            = "./modules/ec2"
+  ami               = each.value.ami
+  environment       = var.environment
+  private_subnet_id = module.subnets["ec2_subnet"].subnet_id
+  s3_profile        = module.iam_profiles["ec2_iam_profiles"].ss_profile_name
+  sg_private        = module.sg["ec2_sg"].security_group_id
+  instance_type     = each.value.instance_type
+  key_name          = module.keys.key_pair_name
+}
 
-# module "vpn" {
-#   source                = "./modules/vpn"
-#   vpc_cidr_block        = "10.1.0.0/16"
-#   client_cidr_block     = "172.16.0.0/22"
-#   ec2_subnet_cidr_block = "10.1.3.0/24"
-#   vpn_subnet_id         = module.subnets["vpn_ni_subnet"].subnet_id
-#   environment           = var.environment
-#   name                  = "turbo-x"
-#   server_arn            = module.server_certs.client_cert_arn
-#   client_arn            = module.client_certs.client_cert_arn
-# }
+module "vpn" {
+  source                = "./modules/vpn"
+  vpc_cidr_block        = "10.1.0.0/16"
+  client_cidr_block     = "172.16.0.0/22"
+  ec2_subnet_cidr_block = "10.1.3.0/24"
+  vpn_subnet_id         = module.subnets["vpn_ni_subnet"].subnet_id
+  environment           = var.environment
+  name                  = "turbo-x"
+  server_arn            = module.server_certs.cert_arn
+  client_arn            = module.client_certs.cert_arn
+}
 
-# module "ecr" {
-#   for_each = local.ecr_modules
-#   source   = "./modules/ecr"
-#   mutable  = "MUTABLE"
-#   name     = each.value.name
-# }
+module "ecr" {
+  for_each = local.ecr_modules
+  source   = "./modules/ecr"
+  mutable  = "MUTABLE"
+  name     = each.value.name
+}
 
-# module "cognito" {
-#   source      = "./modules/cognito"
-#   name        = "cognito"
-#   environment = var.environment
-# }
+module "cognito" {
+  source      = "./modules/cognito"
+  name        = "cognito"
+  environment = var.environment
+}
