@@ -27,3 +27,11 @@ variable "vpn_subnet_id" {
   description = "VPN subnet ID"
   type        = string
 }
+
+variable "server_arn" {
+  type        = string
+}
+
+variable "client_arn" {
+  type        = string
+}
