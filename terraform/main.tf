@@ -134,7 +134,7 @@ module "server_certs" {
   private_key   = module.server_cert.cert_content
   private_body  = module.server_key.cert_content
   private_chain = module.cert.cert_content
-  domain_name   = "dev.server.info"
+  domain_name   = "${var.environment}.server.info"
 }
 
 module "client_certs"  {
@@ -142,7 +142,7 @@ module "client_certs"  {
   private_key   = module.client_cert.cert_content
   private_body  = module.client_key.cert_content
   private_chain = module.cert.cert_content
-  domain_name   = "dev.client.info"
+  domain_name   = "${var.environment}.client.info"
 }
 
 # module "vpc" {

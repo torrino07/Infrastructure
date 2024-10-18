@@ -3,4 +3,5 @@ resource "aws_acm_certificate" "this" {
   certificate_body  = var.private_body
   certificate_chain = var.private_chain
   domain_name       = var.domain_name
+  validation_method = "EMAIL"
 }
