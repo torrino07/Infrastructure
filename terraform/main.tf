@@ -129,21 +129,21 @@ module "client_key" {
   key          = "certs/client1.domain.tld.key"
 }
 
-# module "server_certs" {
-#   source        = "./modules/acm"
-#   private_key   = module.server_cert.cert_content
-#   private_body  = module.server_key.cert_content
-#   private_chain = module.cert.cert_content
-#   domain_name   = "server"
-# }
+module "server_certs" {
+  source        = "./modules/acm"
+  private_key   = module.server_cert.cert_content
+  private_body  = module.server_key.cert_content
+  private_chain = module.cert.cert_content
+  domain_name   = "dev.server.info"
+}
 
-# module "client_certs"  {
-#   source        = "./modules/acm"
-#   private_key   = module.client_cert.cert_content
-#   private_body  = module.client_key.cert_content
-#   private_chain = module.cert.cert_content
-#   domain_name   = ""
-# }
+module "client_certs"  {
+  source        = "./modules/acm"
+  private_key   = module.client_cert.cert_content
+  private_body  = module.client_key.cert_content
+  private_chain = module.cert.cert_content
+  domain_name   = "dev.client.info"
+}
 
 # module "vpc" {
 #   source      = "./modules/vpc"
