@@ -99,50 +99,14 @@ locals {
   }
 }
 
-module "cert" {
-  source       = "./modules/s3"
-  bucket       = "artifactstore001"
-  key          = "certs/ca.crt"
-}
-
-module "server_cert" {
-  source       = "./modules/s3"
-  bucket       = "artifactstore001"
-  key          = "certs/server.crt"
-}
-
-module "server_key" {
-  source       = "./modules/s3"
-  bucket       = "artifactstore001"
-  key          = "certs/server.key"
-}
-
-module "client_cert" {
-  source       = "./modules/s3"
-  bucket       = "artifactstore001"
-  key          = "certs/client1.domain.tld.crt"
-}
-
-module "client_key" {
-  source       = "./modules/s3"
-  bucket       = "artifactstore001"
-  key          = "certs/client1.domain.tld.key"
-}
-
 module "server_certs" {
   source        = "./modules/acm"
-  private_key   = module.server_cert.cert_content
-  private_body  = module.server_key.cert_content
-  private_chain = module.cert.cert_content
-  domain_name   = "${var.environment}.server.info"
+  domain_name   = "server"
 }
 
 module "client_certs"  {
   source        = "./modules/acm"
-  private_key   = module.client_cert.cert_content
-  private_body  = module.client_key.cert_content
-  private_chain = module.cert.cert_content
-  domain_name   = "${var.environment}.client.info"
+  domain_name   = "client1.domain.tld"
 }
 
 # module "vpc" {
