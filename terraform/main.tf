@@ -19,6 +19,20 @@ locals {
     client_cidr_block     = "172.16.0.0/22"
     ec2_subnet_cidr_block = "10.1.3.0/24"
     }
+  
+  vpc_endpoints = {
+    ecr_dkr = {
+      service_name = "com.amazonaws.us-east-1.ecr.dkr",
+      vpc_endpoint_type = "Interface"
+      name = "ecr-dkr"
+    },
+
+    ecr_api = {
+      service_name = "com.amazonaws.us-east-1.ecr.api",
+      vpc_endpoint_type = "Interface"
+      name = "ecr-api"
+    }
+  }
 
   vpc_cidr_block  = "10.1.0.0/16"
   
@@ -264,16 +278,21 @@ module "vpn" {
   client_arn            = module.client_certs.cert_arn
 }
 
+module "endpoints" {
+  for_each      = local.vpc_endpoints
+  source        = "./modules/endpoints"
+  vpc_id        = module.vpc.vpc_id
+  subnet_id     = module.subnets["ecr_subnet"].subnet_id
+  sg_private_id = module.sg["ecr_sg"].security_group_id
+  environment   = var.environment
+  name          = each.value.name
+}
+
 module "ecr" {
   for_each      = local.ecr_modules
   source        = "./modules/ecr"
   mutable       = each.value.mutable
   name          = each.value.name
-  region        = local.region
-  vpc_id        = module.vpc.vpc_id
-  subnet_id     = module.subnets["ecr_subnet"].subnet_id
-  sg_private_id = module.sg["ecr_sg"].security_group_id
-  environment   = var.environment
 }
 
 module "cognito" {
