@@ -5,6 +5,11 @@ locals {
     "erc_postgresql_server" = { name = "postgresql-server" }
   }
 
+  certs = {
+    server = { domain_name = "server" }
+    client = { domain_name = "client1.domain.tld" }
+  }
+
   vpc_cidr_block  = "10.1.0.0/16"
   
   subnets_modules = {
@@ -90,15 +95,15 @@ locals {
       name = "control"
     }
   }
-  iam_profiles_modules = {
-    ec2_iam_profiles = {
-      assume_role_policy_path = "./metadata/EC2AssumeRolePolicy.json",
-      policy_path             = "./metadata/EC2Policy.json",
-      name                    = "ec2"
-    }
-  }
-
   arn_modules = {
+    ec2 = {
+      assume_role_policy_path  = "./metadata/EC2AssumeRolePolicy.json",
+      policy_arns              = [
+         "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
+         "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"
+      ],
+      name                     = "trading-server"
+    },
     ks_clusters = {
       assume_role_policy_path  = "./metadata/EKSClusterAssumeRolePolicy.json",
       policy_arns              = [
@@ -133,15 +138,15 @@ locals {
   }
 }
 
-# module "server_certs" {
-#   source        = "./modules/acm"
-#   domain_name   = "server"
-# }
+module "server_certs" {
+  source        = "./modules/acm"
+  domain_name   = local.certs.server.domain_name
+}
 
-# module "client_certs"  {
-#   source        = "./modules/acm"
-#   domain_name   = "client1.domain.tld"
-# }
+module "client_certs"  {
+  source        = "./modules/acm"
+  domain_name   = local.certs.client.domain_name
+}
 
 module "vpc" {
   source      = "./modules/vpc"
@@ -178,53 +183,44 @@ module "arns" {
   policy_arns             = each.value.policy_arns
 }
 
-# module "iam_profiles" {
-#   for_each                = local.iam_profiles_modules
-#   source                  = "./modules/iam"
-#   assume_role_policy_path = each.value.assume_role_policy_path
-#   policy_path             = each.value.policy_path
-#   name                    = each.value.name
-#   environment             = var.environment
-# }
-
-# module "keys" {
-#   source                  = "./modules/keys"
-#   key_name                = "${var.environment}-key007"
-# }
-
-# module "secret_manager" {
-#   source                  = "./modules/secretmanager"
-#   key_name                = module.keys.key_pair_name
-#   private_key_pem         = module.keys.private_key_pem    
-# }
-
-# module "ec2" {
-#   for_each          = local.ec2_modules
-#   source            = "./modules/ec2"
-#   ami               = each.value.ami
-#   environment       = var.environment
-#   private_subnet_id = module.subnets["ec2_subnet"].subnet_id
-#   s3_profile        = module.iam_profiles["ec2_iam_profiles"].ss_profile_name
-#   sg_private        = module.sg["ec2_sg"].security_group_id
-#   instance_type     = each.value.instance_type
-#   key_name          = module.keys.key_pair_name
-# }
-
-module "kubernetes" {
-  for_each             = local.ks_modules
-  source               = "./modules/eks"
-  environment          = var.environment
-  eks_cluster_role_arn = module.arns["ks_clusters"].policy_arn
-  eks_node_role_arn    = module.arns["ks_node_group"].policy_arn
-  subnet_ids           = [module.subnets["ks_subnet_a"].subnet_id, module.subnets["ks_subnet_b"].subnet_id]
-  sg_id                = module.sg["ks_sg"].security_group_id
-  cluster_name         = each.value.cluster_name 
-  node_group_name      = each.value.node_group_name
-  desired_capacity     = each.value.desired_capacity
-  max_size             = each.value.max_size
-  min_size             = each.value.min_size
-  instance_type        = each.value.instance_type
+module "keys" {
+  source                  = "./modules/keys"
+  key_name                = "${var.environment}-key009"
 }
+
+module "secret_manager" {
+  source                  = "./modules/secretmanager"
+  key_name                = module.keys.key_pair_name
+  private_key_pem         = module.keys.private_key_pem    
+}
+
+module "ec2" {
+  for_each               = local.ec2_modules
+  source                 = "./modules/ec2"
+  ami                    = each.value.ami
+  environment            = var.environment
+  private_subnet_id      = module.subnets["ec2_subnet"].subnet_id
+  iam_instance_profile   = module.arns["ec2"].iam_profile_name
+  sg_private             = module.sg["ec2_sg"].security_group_id
+  instance_type          = each.value.instance_type
+  key_name               = module.keys.key_pair_name
+}
+
+# module "kubernetes" {
+#   for_each             = local.ks_modules
+#   source               = "./modules/eks"
+#   environment          = var.environment
+#   subnet_ids           = [module.subnets["ks_subnet_a"].subnet_id, module.subnets["ks_subnet_b"].subnet_id]
+#   sg_id                = module.sg["ks_sg"].security_group_id
+#   eks_cluster_role_arn = module.arns["ks_clusters"].policy_arn
+#   eks_node_role_arn    = module.arns["ks_node_group"].policy_arn
+#   cluster_name         = each.value.cluster_name 
+#   node_group_name      = each.value.node_group_name
+#   desired_capacity     = each.value.desired_capacity
+#   max_size             = each.value.max_size
+#   min_size             = each.value.min_size
+#   instance_type        = each.value.instance_type
+# }
 
 # module "vpn" {
 #   source                = "./modules/vpn"

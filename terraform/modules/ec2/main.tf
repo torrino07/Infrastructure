@@ -4,7 +4,7 @@ resource "aws_instance" "this" {
   subnet_id              = var.private_subnet_id
   vpc_security_group_ids = [var.sg_private]
   key_name               = var.key_name
-  iam_instance_profile   = var.s3_profile
+  iam_instance_profile   = var.iam_instance_profile
 
   tags = {
     Name        = "${var.environment}-trading-server"

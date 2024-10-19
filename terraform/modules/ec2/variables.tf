@@ -21,8 +21,8 @@ variable "sg_private" {
   type        = any
 }
 
-variable "s3_profile" {
-  description = "The IAM instance profile for S3 access"
+variable "iam_instance_profile" {
+  description = "The IAM instance profile"
   type        = any
 }
 
