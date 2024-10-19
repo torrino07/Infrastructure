@@ -156,7 +156,7 @@ module "subnets" {
   for_each          = local.subnets_modules
   source            = "./modules/subnets"
   environment       = var.environment
-  vpc_id            = module.vpc.vpc_id
+  vpc_id            = each.value.vpc_id
   cidr_block        = each.value.cidr_block
   availability_zone = each.value.availability_zone
   name              = each.value.name
