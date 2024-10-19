@@ -5,9 +5,7 @@ locals {
     "erc_postgresql_server" = { name = "postgresql-server" }
   }
 
-  vpc_modules = {
-    vpc = { cidr_block = "10.1.0.0/16" }
-  }
+  vpc_cidr_block  = "10.1.0.0/16"
   
   subnets_modules = {
     "vpn_ni_subnet"  = { name = "vpn-network-interface", cidr_block = "10.1.1.0/24", availability_zone = "us-east-1a" }
@@ -102,14 +100,14 @@ locals {
   arn_modules = {
     ks_clusters = {
       assume_role_policy_path = "./metadata/EKSClusterAssumeRolePolicy.json",
-      policy_arns             = [
+      policy_arns              = [
          "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
       ],
       name                    = "eks-cluster"
     },
     ks_node_group = {
       assume_role_policy_path = "./metadata/EKSNodeGroupAssumeRolePolicy.json",
-      policy_arns             = [
+      policy_arns              = [
         "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy",
         "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy",
         "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
@@ -146,9 +144,8 @@ locals {
 # }
 
 module "vpc" {
-  for_each    = local.vpc_modules
   source      = "./modules/vpc"
-  cidr_block  = each.value.cidr_block
+  cidr_block  = local.vpc_cidr_block
   environment = var.environment
 }
 
@@ -156,7 +153,7 @@ module "subnets" {
   for_each          = local.subnets_modules
   source            = "./modules/subnets"
   environment       = var.environment
-  vpc_id            = each.value.vpc_id
+  vpc_id            = module.vpc.vpc_id
   cidr_block        = each.value.cidr_block
   availability_zone = each.value.availability_zone
   name              = each.value.name
@@ -166,7 +163,7 @@ module "sg" {
   for_each      = local.sg_modules
   source        = "./modules/sg"
   environment   = var.environment
-  vpc_id        = each.value.vpc_id
+  vpc_id        = module.vpc.vpc_id
   ingress_rules = each.value.ingress_rules
   egress_rules  = each.value.egress_rules
   name          = each.value.name
