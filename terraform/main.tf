@@ -2,7 +2,7 @@ locals {
   ecr_modules = {
     "erc_react_app"         = { name = "fastapi-app" }
     "erc_fastapi_app"       = { name = "react-app" }
-    "erc_postgresql_server" = { name = "postgresql_server" }
+    "erc_postgresql_server" = { name = "postgresql-server" }
   }
   
   subnets_modules = {
@@ -61,7 +61,7 @@ locals {
       ]
       name = "trading-server"
     },
-    "kubernetes_sg" = {
+    "ks_sg" = {
       ingress_rules = [
         {
           from_port   = 443
@@ -84,7 +84,7 @@ locals {
           cidr_blocks = ["0.0.0.0/0"]
         },
       ]
-      name = "trading-server"
+      name = "control"
     }
   }
   iam_profiles_modules = {
@@ -92,11 +92,23 @@ locals {
       assume_role_policy_path = "./metadata/EC2AssumeRolePolicy.json",
       policy_path             = "./metadata/EC2Policy.json",
       name                    = "ec2"
+    },
+    kubernetes_iam_profiles_clusters = {
+      assume_role_policy_path = "./metadata/EC2AssumeRolePolicy.json",
+      policy_path             = "./metadata/EKSClusterPolicy.json",
+      name                    = "eks-cluster"
+    },
+    ks_iam_profiles_node_group = {
+      assume_role_policy_path = "./metadata/EC2AssumeRolePolicy.json",
+      policy_path             = "./metadata/EKSNodeGroupPolicy.json",
+      name                    = "eks-node-group"
     }
   }
   ec2_modules = {
     "ec2_trading_server"      = { ami = "ami-053b0d53c279acc90", instance_type = "t2.micro"}  
   }
+
+  ks_modules = { cluster_name = "eks-cluster", node_group_name  = "eks-node-group",  instance_type = "t3.medium" }
 }
 
 module "server_certs" {
@@ -146,7 +158,7 @@ module "iam_profiles" {
 
 module "keys" {
   source                  = "./modules/keys"
-  key_name                = "${var.environment}-key003"
+  key_name                = "${var.environment}-key005"
 }
 
 module "secret_manager" {
@@ -166,6 +178,23 @@ module "ec2" {
   instance_type     = each.value.instance_type
   key_name          = module.keys.key_pair_name
 }
+
+module "kubernetes" {
+  for_each             = local.ks_modules
+  source               = "./modules/kubernetes"
+  environment          = var.environment
+  eks_cluster_role_arn = module.iam_profiles["ks_iam_profiles_clusters"].arn
+  eks_node_role_arn    = module.iam_profiles["ks_iam_profiles_node_group"].arn
+  subnet_id            = module.subnets["ks_subnet"].subnet_id
+  sg_id                = module.sg["ks_sg"].security_group_id
+  cluster_name         = each.value.cluster_name 
+  node_group_name      = each.value.node_group_name
+  desired_capacity     = 3
+  max_size             = 5
+  min_size             = 2
+  instance_type        = each.value.instance_type
+}
+
 
 module "vpn" {
   source                = "./modules/vpn"
