@@ -1,14 +1,23 @@
 locals {
   ecr_modules = {
-    "erc_react_app"         = { name = "fastapi-app" }
-    "erc_fastapi_app"       = { name = "react-app" }
-    "erc_postgresql_server" = { name = "postgresql-server" }
+    "erc_react_app"         = { name = "fastapi-app", mutable = "MUTABLE"}
+    "erc_fastapi_app"       = { name = "react-app", mutable = "MUTABLE" }
+    "erc_postgresql_server" = { name = "postgresql-server", mutable = "MUTABLE" }
   }
+
+  cognito = { name = "cognito" }
 
   certs = {
     server = { domain_name = "server" }
     client = { domain_name = "client1.domain.tld" }
   }
+
+  vpn = {
+    name                  = "turbo-x"
+    vpc_cidr_block        = "10.1.0.0/16"
+    client_cidr_block     = "172.16.0.0/22"
+    ec2_subnet_cidr_block = "10.1.3.0/24"
+    }
 
   vpc_cidr_block  = "10.1.0.0/16"
   
@@ -138,6 +147,19 @@ locals {
   }
 }
 
+module "cognito" {
+  source      = "./modules/cognito"
+  name        = local.cognito.name
+  environment = var.environment
+}
+
+module "ecr" {
+  for_each = local.ecr_modules
+  source   = "./modules/ecr"
+  mutable  = each.value.mutable
+  name     = each.value.name
+}
+
 module "server_certs" {
   source        = "./modules/acm"
   domain_name   = local.certs.server.domain_name
@@ -222,27 +244,14 @@ module "ec2" {
 #   instance_type        = each.value.instance_type
 # }
 
-# module "vpn" {
-#   source                = "./modules/vpn"
-#   vpc_cidr_block        = "10.1.0.0/16"
-#   client_cidr_block     = "172.16.0.0/22"
-#   ec2_subnet_cidr_block = "10.1.3.0/24"
-#   vpn_subnet_id         = module.subnets["vpn_ni_subnet"].subnet_id
-#   environment           = var.environment
-#   name                  = "turbo-x"
-#   server_arn            = module.server_certs.cert_arn
-#   client_arn            = module.client_certs.cert_arn
-# }
-
-# module "ecr" {
-#   for_each = local.ecr_modules
-#   source   = "./modules/ecr"
-#   mutable  = "MUTABLE"
-#   name     = each.value.name
-# }
-
-# module "cognito" {
-#   source      = "./modules/cognito"
-#   name        = "cognito"
-#   environment = var.environment
-# }
+module "vpn" {
+  source                = "./modules/vpn"
+  vpc_cidr_block        = local.vpn.vpc_cidr_block
+  client_cidr_block     = local.vpn.client_cidr_block
+  ec2_subnet_cidr_block = local.vpn.ec2_subnet_cidr_block
+  vpn_subnet_id         = module.subnets["vpn_ni_subnet"].subnet_id
+  environment           = var.environment
+  name                  = local.vpn.name
+  server_arn            = module.server_certs.cert_arn
+  client_arn            = module.client_certs.cert_arn
+}
