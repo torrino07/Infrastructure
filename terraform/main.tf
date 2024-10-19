@@ -93,7 +93,7 @@ locals {
       policy_path             = "./metadata/EC2Policy.json",
       name                    = "ec2"
     },
-    kubernetes_iam_profiles_clusters = {
+    ks_iam_profiles_clusters = {
       assume_role_policy_path = "./metadata/EC2AssumeRolePolicy.json",
       policy_path             = "./metadata/EKSClusterPolicy.json",
       name                    = "eks-cluster"
@@ -109,7 +109,14 @@ locals {
   }
 
   ks_modules = { 
-    ks_control = { cluster_name = "eks-cluster", node_group_name  = "eks-node-group",  instance_type = "t3.medium" }
+    ks_control = { 
+      cluster_name = "eks-cluster", 
+      node_group_name  = "eks-node-group",  
+      instance_type = "t3.medium",
+      desired_capacity = 3,
+      max_size = 5,
+      min_size = 2
+      }
   }
 }
 
@@ -191,9 +198,9 @@ module "kubernetes" {
   sg_id                = module.sg["ks_sg"].security_group_id
   cluster_name         = each.value.cluster_name 
   node_group_name      = each.value.node_group_name
-  desired_capacity     = 3
-  max_size             = 5
-  min_size             = 2
+  desired_capacity     = each.value.desired_capacity
+  max_size             = each.value.max_size
+  min_size             = each.value.min_size
   instance_type        = each.value.instance_type
 }
 
