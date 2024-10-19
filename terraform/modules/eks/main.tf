@@ -25,6 +25,6 @@ resource "aws_eks_node_group" "this" {
   instance_types = [var.instance_type]
 
   depends_on = [
-    aws_eks_cluster
+    aws_eks_cluster.this
   ]
 }
