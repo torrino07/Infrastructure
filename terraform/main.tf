@@ -279,13 +279,15 @@ module "vpn" {
 }
 
 module "endpoints" {
-  for_each      = local.vpc_endpoints
-  source        = "./modules/endpoints"
-  vpc_id        = module.vpc.vpc_id
-  subnet_id     = module.subnets["ecr_subnet"].subnet_id
-  sg_private_id = module.sg["ecr_sg"].security_group_id
-  environment   = var.environment
-  name          = each.value.name
+  for_each          = local.vpc_endpoints
+  source            = "./modules/endpoints"
+  vpc_id            = module.vpc.vpc_id
+  subnet_id         = module.subnets["ecr_subnet"].subnet_id
+  sg_private_id     = module.sg["ecr_sg"].security_group_id
+  environment       = var.environment
+  name              = each.value.name
+  service_name      = each.value.service_name
+  vpc_endpoint_type = each.value.vpc_endpoint_type
 }
 
 module "ecr" {

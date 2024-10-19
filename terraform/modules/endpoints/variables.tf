@@ -27,11 +27,9 @@ variable "sg_private_id" {
 variable "service_name" {
   description = "The resource name"
   type        = string
-  default     = "com.amazonaws.us-east-1.ecr.dkr"
 }
 
 variable "vpc_endpoint_type" {
   description = "The resource name"
   type        = string
-  default     = "Interface"
 }
