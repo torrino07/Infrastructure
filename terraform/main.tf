@@ -207,7 +207,7 @@ module "arns" {
 
 module "keys" {
   source                  = "./modules/keys"
-  key_name                = "${var.environment}-key009"
+  key_name                = "${var.environment}-key0010"
 }
 
 module "secret_manager" {
@@ -222,7 +222,7 @@ module "ec2" {
   ami                    = each.value.ami
   environment            = var.environment
   private_subnet_id      = module.subnets["ec2_subnet"].subnet_id
-  iam_instance_profile   = module.arns["ec2"].iam_profile_name
+  iam_instance_profile   = module.arns["ec2"].iam_instance_profile_name
   sg_private             = module.sg["ec2_sg"].security_group_id
   instance_type          = each.value.instance_type
   key_name               = module.keys.key_pair_name

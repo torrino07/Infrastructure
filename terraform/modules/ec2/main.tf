@@ -10,23 +10,4 @@ resource "aws_instance" "this" {
     Name        = "${var.environment}-trading-server"
     Environment = var.environment
   }
-  
-  # Create the EC2 instance using the generated key pair
-
-  # provisioner "remote-exec" {
-  #   inline = [
-  #     "sudo mkdir -p /home/ubuntu/downloads",
-  #     "sudo chown ubuntu:ubuntu /home/ubuntu/downloads",
-  #     "echo 'USERNAME=${var.username_dev}' | sudo tee -a /etc/environment",
-  #     "echo 'PASSWORD=${var.password_dev}' | sudo tee -a /etc/environment",
-  #     "echo 'HOST=${var.db_endpoint_dev}' | sudo tee -a /etc/environment",
-  #   ]
-
-  #   connection {
-  #     type        = "ssh"
-  #     user        = "ubuntu"
-  #     private_key = var.private_key_pem_dev
-  #     host        = self.public_ip
-  #   }
-  # }
 }
