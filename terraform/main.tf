@@ -94,7 +94,7 @@ locals {
       name                    = "ec2"
     },
     ks_iam_profiles_clusters = {
-      assume_role_policy_path = "./metadata/EC2AssumeRolePolicy.json",
+      assume_role_policy_path = "./metadata/EKSAssumeRolePolicy.json",
       policy_path             = "./metadata/EKSClusterPolicy.json",
       name                    = "eks-cluster"
     },
