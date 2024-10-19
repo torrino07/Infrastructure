@@ -10,7 +10,8 @@ locals {
   subnets_modules = {
     "vpn_ni_subnet"  = { name = "vpn-network-interface", cidr_block = "10.1.1.0/24", availability_zone = "us-east-1a" }
     "ec2_subnet" = { name = "trading-server", cidr_block = "10.1.3.0/24", availability_zone = "us-east-1b" }
-    "ks_subnet" = { name = "kubernetes", cidr_block = "10.1.2.0/24", availability_zone = "us-east-1b" }
+    "ks_subnet_a" = { name = "kubernetes_a", cidr_block = "10.1.2.0/24", availability_zone = "us-east-1b" }
+    "ks_subnet_b" = { name = "kubernetes_b", cidr_block = "10.1.4.0/24", availability_zone = "us-east-1c" }
   }
   sg_modules = {
     "vpn_ni" = {
@@ -50,7 +51,7 @@ locals {
           from_port   = 8000
           to_port     = 8000
           protocol    = "tcp"
-          cidr_blocks = ["10.1.2.0/24"]
+          cidr_blocks = ["10.1.2.0/24", "10.1.4.0/24"]
         }
       ]
       egress_rules = [
@@ -215,7 +216,7 @@ module "kubernetes" {
   environment          = var.environment
   eks_cluster_role_arn = module.arns["ks_clusters"].policy_arn
   eks_node_role_arn    = module.arns["ks_node_group"].policy_arn
-  subnet_id            = module.subnets["ks_subnet"].subnet_id
+  subnet_ids           = [module.subnets["ks_subnet_a"].subnet_id, module.subnets["ks_subnet_b"].subnet_id]
   sg_id                = module.sg["ks_sg"].security_group_id
   cluster_name         = each.value.cluster_name 
   node_group_name      = each.value.node_group_name

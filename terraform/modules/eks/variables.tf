@@ -48,7 +48,7 @@ variable "node_group_name" {
   type        = string
 }
 
-variable "subnet_id" {
+variable "subnet_ids" {
   description = "The ID of the subnet"
-  type        = string
+  type        = list(string)
 }
