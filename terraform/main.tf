@@ -108,7 +108,9 @@ locals {
     "ec2_trading_server"      = { ami = "ami-053b0d53c279acc90", instance_type = "t2.micro"}  
   }
 
-  ks_modules = { cluster_name = "eks-cluster", node_group_name  = "eks-node-group",  instance_type = "t3.medium" }
+  ks_modules = { 
+    ks_control = { cluster_name = "eks-cluster", node_group_name  = "eks-node-group",  instance_type = "t3.medium" }
+  }
 }
 
 module "server_certs" {
