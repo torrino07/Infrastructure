@@ -99,11 +99,11 @@ locals {
 
   arn_modules = {
     ks_clusters = {
-      assume_role_policy_path = "./metadata/EKSClusterAssumeRolePolicy.json",
+      assume_role_policy_path  = "./metadata/EKSClusterAssumeRolePolicy.json",
       policy_arns              = [
          "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
       ],
-      name                    = "eks-cluster"
+      name                     = "eks-cluster"
     },
     ks_node_group = {
       assume_role_policy_path = "./metadata/EKSNodeGroupAssumeRolePolicy.json",
@@ -112,10 +112,9 @@ locals {
         "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy",
         "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
       ]
-      name                    = "eks-node-group"
+      name                     = "eks-node-group"
     }
   }
-
 
   ec2_modules = {
     "ec2_trading_server"      = { ami = "ami-053b0d53c279acc90", instance_type = "t2.micro"}  
@@ -174,7 +173,7 @@ module "arns" {
   source                  = "./modules/arns"
   environment             = var.environment
   name                    = each.value.name
-  assume_role_policy_path = each.value.policy_path
+  assume_role_policy_path = each.value.assume_role_policy_path
   policy_arns             = each.value.policy_arns
 }
 
