@@ -12,14 +12,29 @@ resource "aws_ecr_repository" "this" {
   }
 }
 
-resource "aws_vpc_endpoint" "ecr_api" {
-  vpc_id       = var.vpc_id
-  service_name = "com.amazonaws.${var.region}.ecr.api"
-  subnet_ids   = [var.subnet_id]
-}
-
 resource "aws_vpc_endpoint" "ecr_dkr" {
-  vpc_id       = var.vpc_id
-  service_name = "com.amazonaws.${var.region}.ecr.dkr"
-  subnet_ids   = [var.subnet_id]
+  vpc_id              = var.vpc_id
+  service_name        = "com.amazonaws.${var.region}.ecr.dkr"
+  vpc_endpoint_type   = "Interface"
+  private_dns_enabled = true
+
+  security_group_ids  = [var.sg_private_id]
+  subnet_ids          = [var.subnet_id]
+
+  tags = {
+    "Name" = "${var.environment}-ecr-dkr"
+  }
+}
+resource "aws_vpc_endpoint" "ecr_api" {
+  vpc_id              = var.vpc_id
+  service_name        = "com.amazonaws.${var.region}.ecr.api"
+  vpc_endpoint_type   = "Interface"
+  private_dns_enabled = true
+
+  security_group_ids  = [var.sg_private_id]
+  subnet_ids          = [var.subnet_id]
+
+  tags = {
+    "Name" = "${var.environment}-ecr-api"
+  }
 }
