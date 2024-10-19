@@ -102,14 +102,14 @@ locals {
   arn_modules = {
     ks_clusters = {
       assume_role_policy_path = "./metadata/EKSClusterAssumeRolePolicy.json",
-      policy_arns              = [
+      policy_arns             = [
          "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
       ],
       name                    = "eks-cluster"
     },
     ks_node_group = {
       assume_role_policy_path = "./metadata/EKSNodeGroupAssumeRolePolicy.json",
-      policy_arns              = [
+      policy_arns             = [
         "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy",
         "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy",
         "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
@@ -166,7 +166,7 @@ module "sg" {
   for_each      = local.sg_modules
   source        = "./modules/sg"
   environment   = var.environment
-  vpc_id        = module.vpc.vpc_id
+  vpc_id        = each.value.vpc_id
   ingress_rules = each.value.ingress_rules
   egress_rules  = each.value.egress_rules
   name          = each.value.name
