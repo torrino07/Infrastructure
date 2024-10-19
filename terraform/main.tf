@@ -181,7 +181,7 @@ module "ec2" {
 
 module "kubernetes" {
   for_each             = local.ks_modules
-  source               = "./modules/kubernetes"
+  source               = "./modules/eks"
   environment          = var.environment
   eks_cluster_role_arn = module.iam_profiles["ks_iam_profiles_clusters"].arn
   eks_node_role_arn    = module.iam_profiles["ks_iam_profiles_node_group"].arn
