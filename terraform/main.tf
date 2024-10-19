@@ -265,13 +265,15 @@ module "vpn" {
 }
 
 module "ecr" {
-  for_each   = local.ecr_modules
-  source     = "./modules/ecr"
-  mutable    = each.value.mutable
-  name       = each.value.name
-  region     = local.region
-  vpc_id     = module.vpc.vpc_id
-  subnet_id  = module.subnets["ecr_subnet"].subnet_id
+  for_each      = local.ecr_modules
+  source        = "./modules/ecr"
+  mutable       = each.value.mutable
+  name          = each.value.name
+  region        = local.region
+  vpc_id        = module.vpc.vpc_id
+  subnet_id     = module.subnets["ecr_subnet"].subnet_id
+  sg_private_id = module.sg["ecr_sg"].security_group_id
+  environment   = var.environment
 }
 
 module "cognito" {
