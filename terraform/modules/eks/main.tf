@@ -11,7 +11,7 @@ resource "aws_eks_cluster" "this" {
 
 # EKS Node Group
 resource "aws_eks_node_group" "this" {
-  cluster_name    = "${var.environment}-${var.cluster_name}"
+  cluster_name    = aws_eks_cluster.this.name
   node_group_name = "${var.environment}-${var.node_group_name}"
   node_role_arn   = var.eks_node_role_arn
   subnet_ids      = [var.subnet_id]       # Inject more subnets for high availability
@@ -25,6 +25,6 @@ resource "aws_eks_node_group" "this" {
   instance_types = [var.instance_type]
 
   depends_on = [
-    aws_eks_cluster.eks_cluster,
+    aws_eks_cluster
   ]
 }
