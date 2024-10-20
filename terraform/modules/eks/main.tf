@@ -14,7 +14,7 @@ resource "aws_eks_cluster" "this" {
     authentication_mode                         = "API"
     bootstrap_cluster_creator_admin_permissions = true
   }
-  depends_on = [aws_iam_role_policy_attachment.this]
+  depends_on = [aws_iam_role_policy_attachment]
 }
 
 resource "aws_eks_node_group" "this" {
@@ -37,6 +37,6 @@ resource "aws_eks_node_group" "this" {
   }
 
   depends_on = [
-    aws_iam_role_policy_attachment.this
+    aws_iam_role_policy_attachment
   ]
 }
