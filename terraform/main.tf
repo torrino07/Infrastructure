@@ -18,7 +18,7 @@ locals {
     vpc_cidr_block        = "10.1.0.0/16"
     client_cidr_block     = "172.16.0.0/22"
     ec2_subnet_cidr_block = "10.1.3.0/24"
-    }
+  }
   
   vpc_endpoints = {
     ecr_dkr = {
@@ -249,7 +249,7 @@ module "ec2" {
   ami                    = each.value.ami
   environment            = var.environment
   private_subnet_id      = module.subnets["ec2_subnet"].subnet_id
-  iam_instance_profile   = module.arns["ec2"].iam_instance_profile_name
+  iam_instance_profile   = module.iam["ec2"].iam_instance_profile_name
   sg_private             = module.sg["ec2_sg"].security_group_id
   instance_type          = each.value.instance_type
   key_name               = module.keys.key_pair_name
@@ -261,8 +261,8 @@ module "ec2" {
 #   environment          = var.environment
 #   subnet_ids           = [module.subnets["ks_subnet_a"].subnet_id, module.subnets["ks_subnet_b"].subnet_id]
 #   sg_id                = module.sg["ks_sg"].security_group_id
-#   eks_cluster_role_arn = module.arns["ks_clusters"].policy_arn
-#   eks_node_role_arn    = module.arns["ks_node_group"].policy_arn
+#   eks_cluster_role_arn = module.iam["ks_clusters"].policy_arn
+#   eks_node_role_arn    = module.iam["ks_node_group"].policy_arn
 #   cluster_name         = each.value.cluster_name 
 #   node_group_name      = each.value.node_group_name
 #   desired_capacity     = each.value.desired_capacity
@@ -288,7 +288,7 @@ module "route_table" {
   environment       = var.environment
   vpc_id            = module.vpc.vpc_id
   subnet_ids     = [
-    module.subnets["ec2_subnet_a"].subnet_id,
+    module.subnets["ec2_subnet"].subnet_id,
     module.subnets["ks_subnet_a"].subnet_id,
     module.subnets["ks_subnet_b"].subnet_id,
     module.subnets["ecr_subnet"].subnet_id
