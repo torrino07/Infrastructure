@@ -223,37 +223,37 @@ module "sg" {
   name          = each.value.name
 }
 
-module "iam" {
-  for_each                = local.iam_modules
-  source                  = "./modules/iam"
-  environment             = var.environment
-  name                    = each.value.name
-  assume_role_policy_path = each.value.assume_role_policy_path
-  policy_arns             = each.value.policy_arns
-}
+# module "iam" {
+#   for_each                = local.iam_modules
+#   source                  = "./modules/iam"
+#   environment             = var.environment
+#   name                    = each.value.name
+#   assume_role_policy_path = each.value.assume_role_policy_path
+#   policy_arns             = each.value.policy_arns
+# }
 
-module "keys" {
-  source                  = "./modules/keys"
-  key_name                = "${var.environment}-key0010"
-}
+# module "keys" {
+#   source                  = "./modules/keys"
+#   key_name                = "${var.environment}-key0010"
+# }
 
-module "secret_manager" {
-  source                  = "./modules/secretmanager"
-  key_name                = module.keys.key_pair_name
-  private_key_pem         = module.keys.private_key_pem    
-}
+# module "secret_manager" {
+#   source                  = "./modules/secretmanager"
+#   key_name                = module.keys.key_pair_name
+#   private_key_pem         = module.keys.private_key_pem    
+# }
 
-module "ec2" {
-  for_each               = local.ec2_modules
-  source                 = "./modules/ec2"
-  ami                    = each.value.ami
-  environment            = var.environment
-  private_subnet_id      = module.subnets["ec2_subnet"].subnet_id
-  iam_instance_profile   = module.iam["ec2"].iam_instance_profile_name
-  sg_private             = module.sg["ec2_sg"].security_group_id
-  instance_type          = each.value.instance_type
-  key_name               = module.keys.key_pair_name
-}
+# module "ec2" {
+#   for_each               = local.ec2_modules
+#   source                 = "./modules/ec2"
+#   ami                    = each.value.ami
+#   environment            = var.environment
+#   private_subnet_id      = module.subnets["ec2_subnet"].subnet_id
+#   iam_instance_profile   = module.iam["ec2"].iam_instance_profile_name
+#   sg_private             = module.sg["ec2_sg"].security_group_id
+#   instance_type          = each.value.instance_type
+#   key_name               = module.keys.key_pair_name
+# }
 
 # module "kubernetes" {
 #   for_each             = local.ks_modules
