@@ -289,8 +289,8 @@ module "route_table" {
   vpc_id            = module.vpc.vpc_id
   subnet_ids     = [
     module.subnets["ec2_subnet"].subnet_id,
-    # module.subnets["ks_subnet_a"].subnet_id,
-    # module.subnets["ks_subnet_b"].subnet_id,
+    module.subnets["ks_subnet_a"].subnet_id,
+    module.subnets["ks_subnet_b"].subnet_id,
     module.subnets["ecr_subnet"].subnet_id
   ]
 }
