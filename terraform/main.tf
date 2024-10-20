@@ -304,7 +304,7 @@ module "s3_endpoint" {
   subnet_id          = ""
   environment        = var.environment
   name               = local.vpc_endpoints.s3.name
-  route_table_ids    = module.route_table.route_table_id
+  route_table_id     = module.route_table.route_table_id
 }
 
 module "ecr_dkr_endpoint" {
@@ -316,7 +316,7 @@ module "ecr_dkr_endpoint" {
   subnet_id          = module.subnets["ecr_subnet"].subnet_id
   environment        = var.environment
   name               = local.vpc_endpoints.ecr_dkr.name
-  route_table_ids    = []
+  route_table_id     = ""
 }
 
 module "ecr_api_endpoint" {
@@ -328,7 +328,7 @@ module "ecr_api_endpoint" {
   subnet_id          = module.subnets["ecr_subnet"].subnet_id
   environment        = var.environment
   name               = local.vpc_endpoints.ecr_api.name
-  route_table_ids    = []
+  route_table_id     = ""
 }
 
 # module "ecr" {

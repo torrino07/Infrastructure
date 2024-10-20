@@ -34,7 +34,7 @@ variable "vpc_endpoint_type" {
   type        = string
 }
 
-variable "route_table_ids" {
+variable "route_table_id" {
   description = "route table ids"
-  type        = list(string)
+  type        = string
 }
