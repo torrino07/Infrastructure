@@ -31,6 +31,11 @@ locals {
       service_name = "com.amazonaws.us-east-1.ecr.api",
       vpc_endpoint_type = "Interface"
       name = "ecr-api"
+    },
+    s3 = {
+      service_name = "com.amazonaws.us-east-1.s3",
+      vpc_endpoint_type = "Gateway"
+      name = "s3"
     }
   }
 
@@ -143,15 +148,15 @@ locals {
     ec2 = {
       assume_role_policy_path  = "./metadata/EC2AssumeRolePolicy.json",
       policy_arns              = [
-         "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
-         "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"
+        "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
+        "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"
       ],
       name                     = "trading-server"
     },
     ks_clusters = {
       assume_role_policy_path  = "./metadata/EKSClusterAssumeRolePolicy.json",
       policy_arns              = [
-         "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
+        "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
       ],
       name                     = "eks-cluster"
     },
@@ -278,27 +283,58 @@ module "vpn" {
   client_arn            = module.client_certs.cert_arn
 }
 
-module "endpoints" {
-  for_each          = local.vpc_endpoints
-  source            = "./modules/endpoints"
-  vpc_id            = module.vpc.vpc_id
-  subnet_id         = module.subnets["ecr_subnet"].subnet_id
-  sg_private_id     = module.sg["ecr_sg"].security_group_id
+module "route_table" {
+  source            = "./modules/routes"
   environment       = var.environment
-  name              = each.value.name
-  service_name      = each.value.service_name
-  vpc_endpoint_type = each.value.vpc_endpoint_type
+  vpc_id            = module.vpc.vpc_id
+  subnet_ids        = [for s in module.subnets : s.subnet_id]
 }
 
-module "ecr" {
-  for_each      = local.ecr_modules
-  source        = "./modules/ecr"
-  mutable       = each.value.mutable
-  name          = each.value.name
+module "s3_endpoint" {
+  source             = "./modules/endpoints"
+  vpc_id             = module.vpc.vpc_id
+  service_name       = local.vpc_endpoints.ecr_api.service_name
+  vpc_endpoint_type  = local.vpc_endpoints.ecr_api.vpc_endpoint_type 
+  sg_private_id      = ""
+  subnet_id          = ""
+  environment        = var.environment
+  name               = local.vpc_endpoints.api.name
+  route_table_ids    = module.route_table.route_table_id
 }
 
-module "cognito" {
-  source      = "./modules/cognito"
-  name        = local.cognito.name
-  environment = var.environment
+module "ecr_dkr_endpoint" {
+  source             = "./modules/endpoints"
+  vpc_id             = module.vpc.vpc_id
+  service_name       = local.vpc_endpoints.ecr_dkr.service_name
+  vpc_endpoint_type  = local.vpc_endpoints.ecr_dkr.vpc_endpoint_type 
+  sg_private_id      = module.sg["ecr_sg"].security_group_id
+  subnet_id          = module.subnets["ecr_subnet"].subnet_id
+  environment        = var.environment
+  name               = local.vpc_endpoints.dkr.name
+  route_table_ids    = []
 }
+
+module "ecr_dkr_endpoint" {
+  source             = "./modules/endpoints"
+  vpc_id             = module.vpc.vpc_id
+  service_name       = local.vpc_endpoints.ecr_api.service_name
+  vpc_endpoint_type  = local.vpc_endpoints.ecr_api.vpc_endpoint_type 
+  sg_private_id      = module.sg["ecr_sg"].security_group_id
+  subnet_id          = module.subnets["ecr_subnet"].subnet_id
+  environment        = var.environment
+  name               = local.vpc_endpoints.api.name
+  route_table_ids    = []
+}
+
+# module "ecr" {
+#   for_each      = local.ecr_modules
+#   source        = "./modules/ecr"
+#   mutable       = each.value.mutable
+#   name          = each.value.name
+# }
+
+# module "cognito" {
+#   source      = "./modules/cognito"
+#   name        = local.cognito.name
+#   environment = var.environment
+# }

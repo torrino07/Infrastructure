@@ -1,4 +1,4 @@
-resource "aws_route_table" "private_route_table" {
+resource "aws_route_table" "this" {
   vpc_id = var.vpc_id
 
   tags = {
@@ -7,7 +7,8 @@ resource "aws_route_table" "private_route_table" {
   }
 }
 
-resource "aws_route_table_association" "private_subnet" {
-  subnet_id      = var.subnet_id
-  route_table_id = aws_route_table.private_route_table.id
+resource "aws_route_table_association" "this" {
+  for_each =     toset(var.subnet_ids)
+  subnet_id      = each.value
+  route_table_id = aws_route_table.this.id
 }
