@@ -310,7 +310,7 @@ module "ecr_dkr_endpoint" {
   sg_private_id      = module.sg["ecr_sg"].security_group_id
   subnet_id          = module.subnets["ecr_subnet"].subnet_id
   environment        = var.environment
-  name               = local.vpc_endpoints.dkr.name
+  name               = local.vpc_endpoints.ecr_dkr.name
   route_table_ids    = []
 }
 
@@ -322,7 +322,7 @@ module "ecr_api_endpoint" {
   sg_private_id      = module.sg["ecr_sg"].security_group_id
   subnet_id          = module.subnets["ecr_subnet"].subnet_id
   environment        = var.environment
-  name               = local.vpc_endpoints.api.name
+  name               = local.vpc_endpoints.ecr_api.name
   route_table_ids    = []
 }
 
