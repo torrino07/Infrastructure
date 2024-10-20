@@ -314,7 +314,7 @@ module "ecr_dkr_endpoint" {
   route_table_ids    = []
 }
 
-module "ecr_dkr_endpoint" {
+module "ecr_api_endpoint" {
   source             = "./modules/endpoints"
   vpc_id             = module.vpc.vpc_id
   service_name       = local.vpc_endpoints.ecr_api.service_name
