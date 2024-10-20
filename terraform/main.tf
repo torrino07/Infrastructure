@@ -223,53 +223,53 @@ module "sg" {
   name          = each.value.name
 }
 
-# module "iam" {
-#   for_each                = local.iam_modules
-#   source                  = "./modules/iam"
-#   environment             = var.environment
-#   name                    = each.value.name
-#   assume_role_policy_path = each.value.assume_role_policy_path
-#   policy_arns             = each.value.policy_arns
-# }
+module "iam" {
+  for_each                = local.iam_modules
+  source                  = "./modules/iam"
+  environment             = var.environment
+  name                    = each.value.name
+  assume_role_policy_path = each.value.assume_role_policy_path
+  policy_arns             = each.value.policy_arns
+}
 
-# module "keys" {
-#   source                  = "./modules/keys"
-#   key_name                = "${var.environment}-key0010"
-# }
+module "keys" {
+  source                  = "./modules/keys"
+  key_name                = "${var.environment}-key0011"
+}
 
-# module "secret_manager" {
-#   source                  = "./modules/secretmanager"
-#   key_name                = module.keys.key_pair_name
-#   private_key_pem         = module.keys.private_key_pem    
-# }
+module "secret_manager" {
+  source                  = "./modules/secretmanager"
+  key_name                = module.keys.key_pair_name
+  private_key_pem         = module.keys.private_key_pem    
+}
 
-# module "ec2" {
-#   for_each               = local.ec2_modules
-#   source                 = "./modules/ec2"
-#   ami                    = each.value.ami
-#   environment            = var.environment
-#   private_subnet_id      = module.subnets["ec2_subnet"].subnet_id
-#   iam_instance_profile   = module.iam["ec2"].iam_instance_profile_name
-#   sg_private             = module.sg["ec2_sg"].security_group_id
-#   instance_type          = each.value.instance_type
-#   key_name               = module.keys.key_pair_name
-# }
+module "ec2" {
+  for_each               = local.ec2_modules
+  source                 = "./modules/ec2"
+  ami                    = each.value.ami
+  environment            = var.environment
+  private_subnet_id      = module.subnets["ec2_subnet"].subnet_id
+  iam_instance_profile   = module.iam["ec2"].iam_instance_profile_name
+  sg_private             = module.sg["ec2_sg"].security_group_id
+  instance_type          = each.value.instance_type
+  key_name               = module.keys.key_pair_name
+}
 
-# module "kubernetes" {
-#   for_each             = local.ks_modules
-#   source               = "./modules/eks"
-#   environment          = var.environment
-#   subnet_ids           = [module.subnets["ks_subnet_a"].subnet_id, module.subnets["ks_subnet_b"].subnet_id]
-#   sg_id                = module.sg["ks_sg"].security_group_id
-#   eks_cluster_role_arn = module.iam["ks_clusters"].policy_arn
-#   eks_node_role_arn    = module.iam["ks_node_group"].policy_arn
-#   cluster_name         = each.value.cluster_name 
-#   node_group_name      = each.value.node_group_name
-#   desired_capacity     = each.value.desired_capacity
-#   max_size             = each.value.max_size
-#   min_size             = each.value.min_size
-#   instance_type        = each.value.instance_type
-# }
+module "kubernetes" {
+  for_each             = local.ks_modules
+  source               = "./modules/eks"
+  environment          = var.environment
+  subnet_ids           = [module.subnets["ks_subnet_a"].subnet_id, module.subnets["ks_subnet_b"].subnet_id]
+  sg_id                = module.sg["ks_sg"].security_group_id
+  eks_cluster_role_arn = module.iam["ks_clusters"].policy_arn
+  eks_node_role_arn    = module.iam["ks_node_group"].policy_arn
+  cluster_name         = each.value.cluster_name 
+  node_group_name      = each.value.node_group_name
+  desired_capacity     = each.value.desired_capacity
+  max_size             = each.value.max_size
+  min_size             = each.value.min_size
+  instance_type        = each.value.instance_type
+}
 
 module "vpn" {
   source                = "./modules/vpn"
@@ -331,15 +331,15 @@ module "ecr_api_endpoint" {
   route_table_id     = ""
 }
 
-# module "ecr" {
-#   for_each      = local.ecr_modules
-#   source        = "./modules/ecr"
-#   mutable       = each.value.mutable
-#   name          = each.value.name
-# }
+module "ecr" {
+  for_each      = local.ecr_modules
+  source        = "./modules/ecr"
+  mutable       = each.value.mutable
+  name          = each.value.name
+}
 
-# module "cognito" {
-#   source      = "./modules/cognito"
-#   name        = local.cognito.name
-#   environment = var.environment
-# }
+module "cognito" {
+  source      = "./modules/cognito"
+  name        = local.cognito.name
+  environment = var.environment
+}
