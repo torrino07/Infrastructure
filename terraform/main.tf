@@ -266,6 +266,7 @@ module "kubernetes" {
   max_size             = local.ks_control.max_size
   min_size             = local.ks_control.min_size
   instance_type        = local.ks_control.instance_type
+  depends_on           = [module.iam]
 }
 
 module "vpn" {
