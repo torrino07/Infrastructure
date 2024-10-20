@@ -175,15 +175,13 @@ locals {
     "ec2_trading_server"      = { ami = "ami-053b0d53c279acc90", instance_type = "t2.micro"}  
   }
 
-  ks_modules = { 
-    ks_control = {
-      cluster_name = "eks-cluster", 
-      node_group_name  = "eks-node-group",  
-      instance_type = "t3.medium",
-      desired_capacity = 3,
-      max_size = 5,
-      min_size = 2
-    }
+  ks_control = {
+    cluster_name = "eks-cluster", 
+    node_group_name  = "eks-node-group",  
+    instance_type = "t3.medium",
+    desired_capacity = 3,
+    max_size = 5,
+    min_size = 2
   }
 }
 
@@ -234,7 +232,7 @@ module "iam" {
 
 module "keys" {
   source                  = "./modules/keys"
-  key_name                = "${var.environment}-key0011"
+  key_name                = "${var.environment}-key0012"
 }
 
 module "secret_manager" {
@@ -256,19 +254,18 @@ module "ec2" {
 }
 
 module "kubernetes" {
-  for_each             = local.ks_modules
   source               = "./modules/eks"
   environment          = var.environment
   subnet_ids           = [module.subnets["ks_subnet_a"].subnet_id, module.subnets["ks_subnet_b"].subnet_id]
   sg_id                = module.sg["ks_sg"].security_group_id
   eks_cluster_role_arn = module.iam["ks_clusters"].policy_arn
   eks_node_role_arn    = module.iam["ks_node_group"].policy_arn
-  cluster_name         = each.value.cluster_name 
-  node_group_name      = each.value.node_group_name
-  desired_capacity     = each.value.desired_capacity
-  max_size             = each.value.max_size
-  min_size             = each.value.min_size
-  instance_type        = each.value.instance_type
+  cluster_name         = local.ks_control.cluster_name 
+  node_group_name      = local.ks_control.node_group_name
+  desired_capacity     = local.ks_control.desired_capacity
+  max_size             = local.ks_control.max_size
+  min_size             = local.ks_control.min_size
+  instance_type        = local.ks_control.instance_type
 }
 
 module "vpn" {

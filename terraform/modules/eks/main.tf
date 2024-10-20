@@ -12,6 +12,13 @@ resource "aws_eks_cluster" "this" {
   
 }
 
+resource "null_resource" "wait_for_cluster" {
+  provisioner "local-exec" {
+    command = "aws eks --region us-east-1 update-kubeconfig --name ${aws_eks_cluster.this.name}"
+  }
+  depends_on = [aws_eks_cluster.this]
+}
+
 resource "kubernetes_config_map" "this" {
   depends_on = [aws_eks_cluster.this]
 
