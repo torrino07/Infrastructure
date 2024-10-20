@@ -34,4 +34,5 @@ resource "aws_eks_node_group" "this" {
   update_config {
     max_unavailable = 1
   }
+  depends_on = [aws_eks_cluster.this]
 }
