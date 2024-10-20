@@ -9,35 +9,12 @@ resource "aws_eks_cluster" "this" {
     endpoint_private_access = true
     endpoint_public_access  = false
   }
-  
-}
 
-data "aws_eks_cluster_auth" "this" {
-  name = aws_eks_cluster.this.name
-}
-provider "kubernetes" {
-  host                   = aws_eks_cluster.this.endpoint
-  cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
-  token                  = data.aws_eks_cluster_auth.this.token
-}
-
-resource "kubernetes_config_map" "this" {
-  depends_on = [aws_eks_cluster.this]
-
-  metadata {
-    name      = "aws-auth"
-    namespace = "kube-system"
+  access_config {
+    authentication_mode                         = "API"
+    bootstrap_cluster_creator_admin_permissions = true
   }
-
-  data = {
-    mapRoles = <<YAML
-    - rolearn: arn:aws:iam::160945804984:role/dev-eks-node-group-iam-role" 
-      username: system:node:{{EC2PrivateDNSName}}
-      groups:
-        - system:bootstrappers
-        - system:nodes
-    YAML
-  }
+  depends_on = [aws_iam_role_policy_attachment.this]
 }
 
 resource "aws_eks_node_group" "this" {
@@ -45,15 +22,21 @@ resource "aws_eks_node_group" "this" {
   node_group_name = "${var.environment}-${var.node_group_name}"
   node_role_arn   = var.eks_node_role_arn
   subnet_ids      = var.subnet_ids
+  
+  capacity_type = "ON_DEMAND"
+  instance_types = [var.instance_type]
 
   scaling_config {
     desired_size = var.desired_capacity
     max_size     = var.max_size
     min_size     = var.min_size
   }
-  instance_types = [var.instance_type]
+
+  update_config {
+    max_unavailable = 1
+  }
 
   depends_on = [
-    kubernetes_config_map.this
+    aws_iam_role_policy_attachment.this
   ]
 }
