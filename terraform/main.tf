@@ -293,12 +293,12 @@ module "route_table" {
 module "s3_endpoint" {
   source             = "./modules/endpoints"
   vpc_id             = module.vpc.vpc_id
-  service_name       = local.vpc_endpoints.ecr_api.service_name
-  vpc_endpoint_type  = local.vpc_endpoints.ecr_api.vpc_endpoint_type 
+  service_name       = local.vpc_endpoints.s3.service_name
+  vpc_endpoint_type  = local.vpc_endpoints.s3.vpc_endpoint_type 
   sg_private_id      = ""
   subnet_id          = ""
   environment        = var.environment
-  name               = local.vpc_endpoints.api.name
+  name               = local.vpc_endpoints.s3.name
   route_table_ids    = module.route_table.route_table_id
 }
 
