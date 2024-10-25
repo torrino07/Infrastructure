@@ -46,7 +46,7 @@ locals {
 
     ec2 = {
       service_name = "com.amazonaws.us-east-1.ec2",
-      vpc_endpoint_type = "Gateway"
+      vpc_endpoint_type =  "Interface"
       name = "ec2"
     }
   }
@@ -294,11 +294,11 @@ module "ec2_endpoint" {
   vpc_id             = module.vpc.vpc_id
   service_name       = local.vpc_endpoints.ec2.service_name
   vpc_endpoint_type  = local.vpc_endpoints.ec2.vpc_endpoint_type 
-  sg_private_id      = ""
-  subnet_ids         = []
+  sg_private_id      = module.sg["ks_sg"].security_group_id
+  subnet_ids         = [module.subnets["ks_subnet_a"].subnet_id, module.subnets["ks_subnet_b"].subnet_id]
   environment        = var.environment
   name               = local.vpc_endpoints.ec2.name
-  route_table_id     = module.route_table.route_table_id
+  route_table_id     = ""
 }
 
 module "s3_endpoint" {
@@ -364,7 +364,7 @@ module "kubernetes" {
   max_size             = local.ks_control.max_size
   min_size             = local.ks_control.min_size
   instance_type        = local.ks_control.instance_type
-  depends_on           = [module.iam]
+  depends_on           = [module.ecr_api_endpoint]
 }
 
 # module "vpn" {
