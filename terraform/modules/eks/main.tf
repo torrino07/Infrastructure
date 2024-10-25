@@ -5,8 +5,8 @@ module "eks" {
   cluster_name    = "${var.environment}-${var.cluster_name}"
   cluster_version = "1.31"
 
-  cluster_endpoint_public_access  = true
-  # cluster_endpoint_private_access = true
+  cluster_endpoint_public_access  = false
+  cluster_endpoint_private_access = true
 
   vpc_id                   = var.vpc_id
   subnet_ids               = var.subnet_ids
@@ -35,7 +35,6 @@ module "eks" {
       ami_type             = "AL2023_x86_64_STANDARD"
       instance_types       = [var.instance_type]
       capacity_type        = "ON_DEMAND"
-      
       name                 = "${var.environment}-general"
       desired_size         = var.desired_capacity
       max_size             = var.max_size
