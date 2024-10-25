@@ -295,7 +295,7 @@ module "ec2_endpoint" {
   service_name       = local.vpc_endpoints.ec2.service_name
   vpc_endpoint_type  = local.vpc_endpoints.ec2.vpc_endpoint_type 
   sg_private_id      = ""
-  subnet_ids         = ""
+  subnet_ids         = []
   environment        = var.environment
   name               = local.vpc_endpoints.ec2.name
   route_table_id     = module.route_table.route_table_id
@@ -307,7 +307,7 @@ module "s3_endpoint" {
   service_name       = local.vpc_endpoints.s3.service_name
   vpc_endpoint_type  = local.vpc_endpoints.s3.vpc_endpoint_type 
   sg_private_id      = ""
-  subnet_ids         = ""
+  subnet_ids         = []
   environment        = var.environment
   name               = local.vpc_endpoints.s3.name
   route_table_id     = module.route_table.route_table_id
