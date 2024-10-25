@@ -282,8 +282,8 @@ module "eks_endpoint" {
   vpc_id             = module.vpc.vpc_id
   service_name       = local.vpc_endpoints.eks.service_name
   vpc_endpoint_type  = local.vpc_endpoints.eks.vpc_endpoint_type 
-  sg_private_id      = module.sg["eks_sg"].security_group_id
-  subnet_id          = module.subnets["eks_subnet"].subnet_id
+  sg_private_id      = module.sg["ks_sg"].security_group_id
+  subnet_id          = module.subnets["ks_subnet"].subnet_id
   environment        = var.environment
   name               = local.vpc_endpoints.eks.name
   route_table_id     = ""
