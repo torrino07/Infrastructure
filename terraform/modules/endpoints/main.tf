@@ -5,7 +5,7 @@ resource "aws_vpc_endpoint" "this" {
 
   private_dns_enabled = var.vpc_endpoint_type == "Interface" ? true : false
   security_group_ids  = var.vpc_endpoint_type == "Interface" ? [var.sg_private_id] : null
-  subnet_ids          = var.vpc_endpoint_type == "Interface" ? [var.subnet_id] : null
+  subnet_ids          = var.vpc_endpoint_type == "Interface" ? var.subnet_ids : null
   route_table_ids     = var.vpc_endpoint_type == "Gateway" ? [var.route_table_id] : null
 
   tags = {

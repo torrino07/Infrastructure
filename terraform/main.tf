@@ -283,7 +283,7 @@ module "eks_endpoint" {
   service_name       = local.vpc_endpoints.eks.service_name
   vpc_endpoint_type  = local.vpc_endpoints.eks.vpc_endpoint_type 
   sg_private_id      = module.sg["ks_sg"].security_group_id
-  subnet_id          = module.subnets["ks_subnet"].subnet_id
+  subnet_ids         = [module.subnets["ks_subnet_a"].subnet_id, module.subnets["ks_subnet_b"].subnet_id]
   environment        = var.environment
   name               = local.vpc_endpoints.eks.name
   route_table_id     = ""
@@ -295,7 +295,7 @@ module "ec2_endpoint" {
   service_name       = local.vpc_endpoints.ec2.service_name
   vpc_endpoint_type  = local.vpc_endpoints.ec2.vpc_endpoint_type 
   sg_private_id      = ""
-  subnet_id          = ""
+  subnet_ids         = ""
   environment        = var.environment
   name               = local.vpc_endpoints.ec2.name
   route_table_id     = module.route_table.route_table_id
@@ -307,7 +307,7 @@ module "s3_endpoint" {
   service_name       = local.vpc_endpoints.s3.service_name
   vpc_endpoint_type  = local.vpc_endpoints.s3.vpc_endpoint_type 
   sg_private_id      = ""
-  subnet_id          = ""
+  subnet_ids         = ""
   environment        = var.environment
   name               = local.vpc_endpoints.s3.name
   route_table_id     = module.route_table.route_table_id
@@ -319,7 +319,7 @@ module "ecr_dkr_endpoint" {
   service_name       = local.vpc_endpoints.ecr_dkr.service_name
   vpc_endpoint_type  = local.vpc_endpoints.ecr_dkr.vpc_endpoint_type 
   sg_private_id      = module.sg["ecr_sg"].security_group_id
-  subnet_id          = module.subnets["ecr_subnet"].subnet_id
+  subnet_ids         = [module.subnets["ecr_subnet"].subnet_id]
   environment        = var.environment
   name               = local.vpc_endpoints.ecr_dkr.name
   route_table_id     = ""
@@ -331,7 +331,7 @@ module "ecr_api_endpoint" {
   service_name       = local.vpc_endpoints.ecr_api.service_name
   vpc_endpoint_type  = local.vpc_endpoints.ecr_api.vpc_endpoint_type 
   sg_private_id      = module.sg["ecr_sg"].security_group_id
-  subnet_id          = module.subnets["ecr_subnet"].subnet_id
+  subnet_ids         = [module.subnets["ecr_subnet"].subnet_id]
   environment        = var.environment
   name               = local.vpc_endpoints.ecr_api.name
   route_table_id     = ""

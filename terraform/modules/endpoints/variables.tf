@@ -13,9 +13,9 @@ variable "name" {
   type        = string
 }
 
-variable "subnet_id" {
+variable "subnet_ids" {
   description = "The resource name"
-  type        = string
+  type        = list(string)
 }
 
 
