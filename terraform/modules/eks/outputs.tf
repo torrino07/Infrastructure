@@ -1,4 +1,4 @@
-output "eks_cluster_endpoint" {
+output "cluster_endpoint" {
   description = "The endpoint of the EKS cluster"
-  value       = aws_eks_cluster.this.endpoint
+  value       = module.eks.cluster_endpoint
 }
