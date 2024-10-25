@@ -256,6 +256,7 @@ module "iam" {
 module "kubernetes" {
   source               = "./modules/eks"
   environment          = var.environment
+  vpc_id               = module.vpc.vpc_id
   subnet_ids           = [module.subnets["ks_subnet_a"].subnet_id, module.subnets["ks_subnet_b"].subnet_id]
   sg_id                = module.sg["ks_sg"].security_group_id
   eks_cluster_role_arn = module.iam["ks_clusters"].policy_arn
