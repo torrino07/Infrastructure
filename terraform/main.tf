@@ -1,380 +1,82 @@
-locals {
-  region = "us-east-1"
-  ecr_modules = {
-    "erc_react_app"         = { name = "fastapi-app", mutable = "MUTABLE"}
-    "erc_fastapi_app"       = { name = "react-app", mutable = "MUTABLE" }
-    "erc_postgresql_server" = { name = "postgresql-server", mutable = "MUTABLE" }
+resource "aws_vpc" "main" {
+  cidr_block           = "10.0.0.0/16"
+  enable_dns_hostnames = true
+}
+
+resource "aws_internet_gateway" "main" {
+  vpc_id = aws_vpc.main.id
+}
+
+resource "aws_route_table" "main" {
+  vpc_id = aws_vpc.main.id
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.main.id
   }
 
-  cognito = { name = "cognito" }
-
-  certs = {
-    server = { domain_name = "server" }
-    client = { domain_name = "client1.domain.tld" }
+  route {
+    cidr_block = "10.0.0.0/16"
+    gateway_id = "local"
   }
+}
 
-  vpn = {
-    name                  = "turbo-x"
-    vpc_cidr_block        = "10.1.0.0/16"
-    client_cidr_block     = "172.16.0.0/22"
-    ec2_subnet_cidr_block = "10.1.3.0/24"
-  }
-  
-  vpc_endpoints = {
-    ecr_dkr = {
-      service_name = "com.amazonaws.us-east-1.ecr.dkr",
-      vpc_endpoint_type = "Interface"
-      name = "ecr-dkr"
-    },
+resource "aws_subnet" "subnet_1" {
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = "10.0.0.0/20"
+  availability_zone       = "us-east-1b"
+  map_public_ip_on_launch = true
+}
 
-    ecr_api = {
-      service_name = "com.amazonaws.us-east-1.ecr.api",
-      vpc_endpoint_type = "Interface"
-      name = "ecr-api"
-    },
-    s3 = {
-      service_name = "com.amazonaws.us-east-1.s3",
-      vpc_endpoint_type = "Gateway"
-      name = "s3"
-    }
+resource "aws_subnet" "subnet_2" {
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = "10.0.16.0/20"
+  availability_zone       = "us-east-1c"
+  map_public_ip_on_launch = true
+}
 
-    eks = {
-      service_name = "com.amazonaws.us-east-1.eks",
-      vpc_endpoint_type = "Interface"
-      name = "eks"
-    }
+resource "aws_subnet" "subnet_3" {
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = "10.0.32.0/20"
+  availability_zone       = "us-east-1d"
+  map_public_ip_on_launch = true
+}
 
-    ec2 = {
-      service_name = "com.amazonaws.us-east-1.ec2",
-      vpc_endpoint_type =  "Interface"
-      name = "ec2"
-    }
-  }
+module "eks" {
+  source  = "terraform-aws-modules/eks/aws"
+  version = "~> 19.0"
 
-  vpc_cidr_block  = "10.1.0.0/16"
-  
-  subnets_modules = {
-    "vpn_ni_subnet"  = { name = "vpn-network-interface", cidr_block = "10.1.1.0/24", availability_zone = "us-east-1a" }
-    "ec2_subnet" = { name = "trading-server", cidr_block = "10.1.3.0/24", availability_zone = "us-east-1b" }
-    "ks_subnet_a" = { name = "kubernetes_a", cidr_block = "10.1.2.0/24", availability_zone = "us-east-1b" }
-    "ks_subnet_b" = { name = "kubernetes_b", cidr_block = "10.1.4.0/24", availability_zone = "us-east-1c" }
-    "ecr_subnet" = { name = "ecr", cidr_block = "10.1.5.0/24", availability_zone = "us-east-1b" }
-  }
-  sg_modules = {
-    "vpn_ni" = {
-      ingress_rules = [
-        {
-          from_port   = 443
-          to_port     = 443
-          protocol    = "tcp"
-          cidr_blocks = ["0.0.0.0/0"]
-        },
-        {
-          from_port   = 1194
-          to_port     = 1194
-          protocol    = "udp"
-          cidr_blocks = ["0.0.0.0/0"]
-        }
-      ]
-      egress_rules = [
-        {
-          from_port   = 0
-          to_port     = 0
-          protocol    = "-1"
-          cidr_blocks = ["0.0.0.0/0"]
-        },
-      ]
-      name = "vpn"
-    }
-    "ec2_sg" = {
-      ingress_rules = [
-        {
-          from_port   = 22
-          to_port     = 22
-          protocol    = "tcp"
-          cidr_blocks = ["10.1.1.0/24"]
-        },
-        {
-          from_port   = 8000
-          to_port     = 8000
-          protocol    = "tcp"
-          cidr_blocks = ["10.1.2.0/24", "10.1.4.0/24"]
-        }
-      ]
-      egress_rules = [
-        {
-          from_port   = 0
-          to_port     = 0
-          protocol    = "-1"
-          cidr_blocks = ["0.0.0.0/0"]
-        },
-      ]
-      name = "trading-server"
-    },
-    "ks_sg" = {
-      ingress_rules = [
-        {
-          from_port   = 443
-          to_port     = 443
-          protocol    = "tcp"
-          cidr_blocks = ["10.1.1.0/24", "10.1.5.0/24"]
-        },
-        {
-          from_port   = 8000
-          to_port     = 8000
-          protocol    = "tcp"
-          cidr_blocks = ["10.1.3.0/24"]
-        }
-      ]
-      egress_rules = [
-        {
-          from_port   = 0
-          to_port     = 0
-          protocol    = "-1"
-          cidr_blocks = ["0.0.0.0/0"]
-        },
-      ]
-      name = "control"
-    },
-     "ecr_sg" = {
-      ingress_rules = [
-        {
-          from_port   = 443
-          to_port     = 443
-          protocol    = "tcp"
-          cidr_blocks = ["10.1.1.0/24", "10.1.2.0/24", "10.1.4.0/24"]
-        }
-      ]
-      egress_rules = [
-        {
-          from_port   = 0
-          to_port     = 0
-          protocol    = "-1"
-          cidr_blocks = ["0.0.0.0/0"]
-        },
-      ]
-      name = "registry"
+  cluster_name    = "my-cluster-eks"
+  cluster_version = "1.27"
+
+  cluster_endpoint_public_access = true
+
+  vpc_id                   = aws_vpc.main.id
+  subnet_ids               = [aws_subnet.subnet_1.id, aws_subnet.subnet_2.id, aws_subnet.subnet_3.id]
+  control_plane_subnet_ids = [aws_subnet.subnet_1.id, aws_subnet.subnet_2.id, aws_subnet.subnet_3.id]
+
+  eks_managed_node_groups = {
+    green = {
+      min_size       = 1
+      max_size       = 1
+      desired_size   = 1
+      instance_types = ["t3.medium"]
     }
   }
-  iam_modules = {
-    ec2 = {
-      assume_role_policy_path  = "./metadata/EC2AssumeRolePolicy.json",
-      policy_arns              = [
-        "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
-        "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"
-      ],
-      name                     = "trading-server"
-    },
-    ks_clusters = {
-      assume_role_policy_path  = "./metadata/EKSClusterAssumeRolePolicy.json",
-      policy_arns              = [
-        "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
-      ],
-      name                     = "eks-cluster"
-    },
-    ks_node_group = {
-      assume_role_policy_path = "./metadata/EKSNodeGroupAssumeRolePolicy.json",
-      policy_arns              = [
-        "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy",
-        "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy",
-        "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
-      ]
-      name                     = "eks-node-group"
-    }
-  }
-
-  ec2_modules = {
-    "ec2_trading_server"      = { ami = "ami-053b0d53c279acc90", instance_type = "t2.micro"}  
-  }
-
-  ks_control = {
-    cluster_name = "eks-cluster", 
-    node_group_name  = "eks-node-group",  
-    instance_type = "t3.medium",
-    desired_capacity = 3,
-    max_size = 5,
-    min_size = 2
-  }
 }
 
-# module "server_certs" {
-#   source        = "./modules/acm"
-#   domain_name   = local.certs.server.domain_name
-# }
-
-# module "client_certs"  {
-#   source        = "./modules/acm"
-#   domain_name   = local.certs.client.domain_name
-# }
-
-module "vpc" {
-  source      = "./modules/vpc"
-  cidr_block  = local.vpc_cidr_block
-  environment = var.environment
+resource "aws_ecr_repository" "microservice_a" {
+  name = "microservice-a"
 }
 
-module "subnets" {
-  for_each          = local.subnets_modules
-  source            = "./modules/subnets"
-  environment       = var.environment
-  vpc_id            = module.vpc.vpc_id
-  cidr_block        = each.value.cidr_block
-  availability_zone = each.value.availability_zone
-  name              = each.value.name
+resource "aws_ecr_repository" "microservice_b" {
+  name = "microservice-b"
 }
 
-module "sg" {
-  for_each      = local.sg_modules
-  source        = "./modules/sg"
-  environment   = var.environment
-  vpc_id        = module.vpc.vpc_id
-  ingress_rules = each.value.ingress_rules
-  egress_rules  = each.value.egress_rules
-  name          = each.value.name
+output "ecr_repository_url_microservice_a" {
+  value = aws_ecr_repository.microservice_a.repository_url
 }
 
-module "iam" {
-  for_each                = local.iam_modules
-  source                  = "./modules/iam"
-  environment             = var.environment
-  name                    = each.value.name
-  assume_role_policy_path = each.value.assume_role_policy_path
-  policy_arns             = each.value.policy_arns
+output "ecr_repository_url_microservice_b" {
+  value = aws_ecr_repository.microservice_b.repository_url
 }
-
-# module "keys" {
-#   source                  = "./modules/keys"
-#   key_name                = "${var.environment}-key0012"
-# }
-
-# module "secret_manager" {
-#   source                  = "./modules/secretmanager"
-#   key_name                = module.keys.key_pair_name
-#   private_key_pem         = module.keys.private_key_pem    
-# }
-
-# module "ec2" {
-#   for_each               = local.ec2_modules
-#   source                 = "./modules/ec2"
-#   ami                    = each.value.ami
-#   environment            = var.environment
-#   private_subnet_id      = module.subnets["ec2_subnet"].subnet_id
-#   iam_instance_profile   = module.iam["ec2"].iam_instance_profile_name
-#   sg_private             = module.sg["ec2_sg"].security_group_id
-#   instance_type          = each.value.instance_type
-#   key_name               = module.keys.key_pair_name
-# }
-
-module "route_table" {
-  source            = "./modules/routes"
-  environment       = var.environment
-  vpc_id            = module.vpc.vpc_id
-  subnet_ids     = [
-    module.subnets["ec2_subnet"].subnet_id,
-    module.subnets["ks_subnet_a"].subnet_id,
-    module.subnets["ks_subnet_b"].subnet_id,
-    module.subnets["ecr_subnet"].subnet_id
-  ]
-}
-
-module "eks_endpoint" {
-  source             = "./modules/endpoints"
-  vpc_id             = module.vpc.vpc_id
-  service_name       = local.vpc_endpoints.eks.service_name
-  vpc_endpoint_type  = local.vpc_endpoints.eks.vpc_endpoint_type 
-  sg_private_id      = module.sg["ks_sg"].security_group_id
-  subnet_ids         = [module.subnets["ks_subnet_a"].subnet_id, module.subnets["ks_subnet_b"].subnet_id]
-  environment        = var.environment
-  name               = local.vpc_endpoints.eks.name
-  route_table_id     = ""
-}
-
-module "ec2_endpoint" {
-  source             = "./modules/endpoints"
-  vpc_id             = module.vpc.vpc_id
-  service_name       = local.vpc_endpoints.ec2.service_name
-  vpc_endpoint_type  = local.vpc_endpoints.ec2.vpc_endpoint_type 
-  sg_private_id      = module.sg["ks_sg"].security_group_id
-  subnet_ids         = [module.subnets["ks_subnet_a"].subnet_id, module.subnets["ks_subnet_b"].subnet_id]
-  environment        = var.environment
-  name               = local.vpc_endpoints.ec2.name
-  route_table_id     = ""
-}
-
-module "s3_endpoint" {
-  source             = "./modules/endpoints"
-  vpc_id             = module.vpc.vpc_id
-  service_name       = local.vpc_endpoints.s3.service_name
-  vpc_endpoint_type  = local.vpc_endpoints.s3.vpc_endpoint_type 
-  sg_private_id      = ""
-  subnet_ids         = []
-  environment        = var.environment
-  name               = local.vpc_endpoints.s3.name
-  route_table_id     = module.route_table.route_table_id
-}
-
-module "ecr_dkr_endpoint" {
-  source             = "./modules/endpoints"
-  vpc_id             = module.vpc.vpc_id
-  service_name       = local.vpc_endpoints.ecr_dkr.service_name
-  vpc_endpoint_type  = local.vpc_endpoints.ecr_dkr.vpc_endpoint_type 
-  sg_private_id      = module.sg["ecr_sg"].security_group_id
-  subnet_ids         = [module.subnets["ecr_subnet"].subnet_id]
-  environment        = var.environment
-  name               = local.vpc_endpoints.ecr_dkr.name
-  route_table_id     = ""
-}
-
-module "ecr_api_endpoint" {
-  source             = "./modules/endpoints"
-  vpc_id             = module.vpc.vpc_id
-  service_name       = local.vpc_endpoints.ecr_api.service_name
-  vpc_endpoint_type  = local.vpc_endpoints.ecr_api.vpc_endpoint_type 
-  sg_private_id      = module.sg["ecr_sg"].security_group_id
-  subnet_ids         = [module.subnets["ecr_subnet"].subnet_id]
-  environment        = var.environment
-  name               = local.vpc_endpoints.ecr_api.name
-  route_table_id     = ""
-}
-
-# module "ecr" {
-#   for_each      = local.ecr_modules
-#   source        = "./modules/ecr"
-#   mutable       = each.value.mutable
-#   name          = each.value.name
-# }
-
-# module "cognito" {
-#   source      = "./modules/cognito"
-#   name        = local.cognito.name
-#   environment = var.environment
-# }
-
-module "kubernetes" {
-  source               = "./modules/eks"
-  environment          = var.environment
-  vpc_id               = module.vpc.vpc_id
-  subnet_ids           = [module.subnets["ks_subnet_a"].subnet_id, module.subnets["ks_subnet_b"].subnet_id]
-  sg_id                = module.sg["ks_sg"].security_group_id
-  eks_cluster_role_arn = module.iam["ks_clusters"].policy_arn
-  eks_node_role_arn    = module.iam["ks_node_group"].policy_arn
-  cluster_name         = local.ks_control.cluster_name 
-  node_group_name      = local.ks_control.node_group_name
-  desired_capacity     = local.ks_control.desired_capacity
-  max_size             = local.ks_control.max_size
-  min_size             = local.ks_control.min_size
-  instance_type        = local.ks_control.instance_type
-  depends_on           = [module.ecr_api_endpoint]
-}
-
-# module "vpn" {
-#   source                = "./modules/vpn"
-#   vpc_cidr_block        = local.vpn.vpc_cidr_block
-#   client_cidr_block     = local.vpn.client_cidr_block
-#   ec2_subnet_cidr_block = local.vpn.ec2_subnet_cidr_block
-#   vpn_subnet_id         = module.subnets["vpn_ni_subnet"].subnet_id
-#   environment           = var.environment
-#   name                  = local.vpn.name
-#   server_arn            = module.server_certs.cert_arn
-#   client_arn            = module.client_certs.cert_arn
-# }
