@@ -1,82 +1,140 @@
-resource "aws_vpc" "main" {
-  cidr_block           = "10.0.0.0/16"
-  enable_dns_hostnames = true
+################# VPC #################
+module "vpc" {
+  source               = "./modules/vpc"
+  proj                 = var.proj
+  cidr_block           = var.cidr_block
+  instance_tenancy     = var.instance_tenancy
+  enable_dns_hostnames = var.enable_dns_hostnames
+  enable_dns_support   = var.enable_dns_support
 }
 
-resource "aws_internet_gateway" "main" {
-  vpc_id = aws_vpc.main.id
+############### SUBNETS ###############
+module "subnets" {
+  source                  = "./modules/subnets"
+  proj                    = var.proj
+  vpc_id                  = module.vpc.id
+  az                      = var.az
+  subnets                 = var.subnets
+  tags                    = var.tags
+  map_public_ip_on_launch = var.map_public_ip_on_launch
 }
 
-resource "aws_route_table" "main" {
-  vpc_id = aws_vpc.main.id
-
-  route {
-    cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.main.id
-  }
-
-  route {
-    cidr_block = "10.0.0.0/16"
-    gateway_id = "local"
-  }
+################ ROUTES ###############
+module "routes" {
+  source      = "./modules/routes"
+  proj        = var.proj
+  vpc_id      = module.vpc.id
+  cidr_block  = var.cidr_block
+  gateway_id  = var.gateway_id
+  subnet_ids  = module.subnets.ids
+  tags        = var.tags
 }
 
-resource "aws_subnet" "subnet_1" {
-  vpc_id                  = aws_vpc.main.id
-  cidr_block              = "10.0.0.0/20"
-  availability_zone       = "us-east-1b"
-  map_public_ip_on_launch = true
-}
-
-resource "aws_subnet" "subnet_2" {
-  vpc_id                  = aws_vpc.main.id
-  cidr_block              = "10.0.16.0/20"
-  availability_zone       = "us-east-1c"
-  map_public_ip_on_launch = true
-}
-
-resource "aws_subnet" "subnet_3" {
-  vpc_id                  = aws_vpc.main.id
-  cidr_block              = "10.0.32.0/20"
-  availability_zone       = "us-east-1d"
-  map_public_ip_on_launch = true
-}
-
-module "eks" {
-  source  = "terraform-aws-modules/eks/aws"
-  version = "~> 19.0"
-
-  cluster_name    = "my-cluster-eks"
-  cluster_version = "1.27"
-
-  cluster_endpoint_public_access = true
-
-  vpc_id                   = aws_vpc.main.id
-  subnet_ids               = [aws_subnet.subnet_1.id, aws_subnet.subnet_2.id, aws_subnet.subnet_3.id]
-  control_plane_subnet_ids = [aws_subnet.subnet_1.id, aws_subnet.subnet_2.id, aws_subnet.subnet_3.id]
-
-  eks_managed_node_groups = {
-    green = {
-      min_size       = 1
-      max_size       = 1
-      desired_size   = 1
-      instance_types = ["t3.medium"]
+########## SECURITY GROUPS ###########
+module "sg" {
+  source          = "./modules/sg"
+  proj            = var.proj
+  vpc_id          = module.vpc.id
+  security_groups = [
+    {
+      name = "endpoint"
+      ingress_rules = [
+        { 
+          from_port   = 443, 
+          to_port     = 443, 
+          protocol    = "tcp", 
+          cidr_blocks = [var.cidr_block] 
+        }
+      ]
+      egress_rules = []
     }
+  ]
+}
+
+############# ENDPOINTS #############
+data "aws_subnets" "this" {
+  filter {
+    name   = "tag:Name"
+    values = ["${var.proj}-subnet-eks-1a", "${var.proj}-subnet-eks-1b"]
   }
 }
 
-resource "aws_ecr_repository" "microservice_a" {
-  name = "microservice-a"
+data "aws_security_groups" "this" {
+  filter {
+    name   = "tag:Name"
+    values = ["${var.proj}-sg-endpoint"]
+  }
 }
 
-resource "aws_ecr_repository" "microservice_b" {
-  name = "microservice-b"
+data "aws_route_tables" "this" {
+  filter {
+    name   = "tag:Name"
+    values = ["${var.proj}-rt-eks-1a", "${var.proj}-rt-eks-1b"]
+  }
 }
 
-output "ecr_repository_url_microservice_a" {
-  value = aws_ecr_repository.microservice_a.repository_url
+module "endpoints" {
+  source             = "./modules/endpoints"
+  proj               = var.proj
+  vpc_id             = module.vpc.id
+  vpc_endpoints      = var.vpc_endpoints
+  vpc_endpoints_tags = var.vpc_endpoints_tags
+  subnet_ids         = data.aws_subnets.this.ids
+  sg_ids             = data.aws_security_groups.this.ids
+  rt_ids             = data.aws_route_tables.this.ids
 }
 
-output "ecr_repository_url_microservice_b" {
-  value = aws_ecr_repository.microservice_b.repository_url
+############## IAM ##############
+module "iam" {
+  source = "./modules/iam"
+  proj   = var.proj
+  roles = [
+    {
+      name        = "AmazonEKSClusterRole"
+      effect      = "Allow"
+      type        = "Service"
+      identifiers = ["eks.amazonaws.com"]
+      actions     = ["sts:AssumeRole"]
+      policy_arns = [
+        "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
+      ]
+    },
+    {
+      name        = "AmazonEKSNodeRole"
+      effect      = "Allow"
+      type        = "Service"
+      identifiers = ["ec2.amazonaws.com"]
+      actions     = ["sts:AssumeRole"]
+      policy_arns = [
+        "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy",
+        "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy",
+        "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+      ]
+    },
+     {
+      name        = "AmazonEC2Role"
+      effect      = "Allow"
+      type        = "Service"
+      identifiers = ["ec2.amazonaws.com"]
+      actions     = ["sts:AssumeRole"]
+      policy_arns = [
+        "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
+        "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"
+      ]
+    }
+  ]
+}
+
+############ EKS ############
+module "eks" {
+  depends_on                   = [module.iam, data.aws_subnets.this]
+  source                       = "./modules/eks"
+  proj                         = var.proj
+  eks_cluster_role_arn_name    = "AmazonEKSClusterRole"
+  eks_node_group_role_arn_name = "AmazonEKSNodeRole"
+  eks_version                  = var.eks_version
+  subnet_ids                   = module.subnets.ids
+  max_size                     = var.max_size
+  min_size                     = var.min_size
+  desired_size                 = var.desired_size
 }

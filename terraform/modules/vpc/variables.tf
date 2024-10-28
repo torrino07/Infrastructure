@@ -1,8 +1,19 @@
-variable "cidr_block" {
-  description = "The CIDR block for the VPC"
-  type        = string
+variable "proj" {
+  type = string
 }
-variable "environment" {
-  description = "The environment (dev, prod, test)"
-  type        = string
+
+variable "cidr_block" {
+  type = string
+}
+
+variable "instance_tenancy" {
+  type = string
+}
+
+variable "enable_dns_hostnames" {
+  type = bool
+}
+
+variable "enable_dns_support" {
+  type = bool
 }

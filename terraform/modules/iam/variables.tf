@@ -1,19 +1,14 @@
-variable "environment" {
-  description = "The environment (dev, prod, test)"
-  type        = string
+variable "proj" {
+  type = string
 }
 
-variable "name" {
-  description = "Name"
-  type        = string
-}
-
-variable "assume_role_policy_path" {
-  description = "Path to the policy JSON files"
-  type        = string
-}
-
-variable "policy_arns" {
-  description = "Policy Arns"
-  type        = list(string)
+variable "roles" {
+  type = list(object({
+    name        = string
+    effect      = string
+    type        = string
+    identifiers = list(string)
+    actions     = list(string)
+    policy_arns = list(string)
+  }))
 }

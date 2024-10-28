@@ -1,7 +1,7 @@
 variable "key" {
-  type        = string
+  type = string
 }
 
 variable "bucket" {
-  type        = string
+  type = string
 }

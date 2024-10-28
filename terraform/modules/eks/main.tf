@@ -1,52 +1,41 @@
-module "eks" {
-  source  = "terraform-aws-modules/eks/aws"
-  version = "20.8.5"
+data "aws_iam_role" "eks_cluster_role" {
+  name = "${var.proj}-iam-role-${var.eks_cluster_role_arn_name}"
+}
 
-  cluster_name    = "${var.environment}-${var.cluster_name}"
-  cluster_version = "1.31"
+data "aws_iam_role" "eks_node_role" {
+  name = "${var.proj}-iam-role-${var.eks_node_group_role_arn_name}"
+}
 
-  cluster_endpoint_public_access  = false
-  cluster_endpoint_private_access = true
+resource "aws_eks_cluster" "this" {
+  name       = "${var.proj}-eks-cluster"
+  role_arn   = data.aws_iam_role.eks_cluster_role.arn
+  version    = var.eks_version
 
-  vpc_id                   = var.vpc_id
-  subnet_ids               = var.subnet_ids
-  control_plane_subnet_ids = var.subnet_ids
-  enable_irsa              = true
-  
-
-  cluster_addons = {
-    coredns = {
-      most_recent = true
-    }
-    kube-proxy = {
-      most_recent = true
-    }
-    vpc-cni = {
-      most_recent = true
-    }
+  vpc_config {
+    endpoint_private_access = true
+    endpoint_public_access  = true
+    subnet_ids              = var.subnet_ids
   }
 
-  eks_managed_node_group_defaults = {
-    instance_types         = [var.instance_type]
+  access_config {
+    authentication_mode = "API"
   }
+}
 
-  eks_managed_node_groups = {
-    node_group = {
-      ami_type             = "AL2023_x86_64_STANDARD"
-      instance_types       = [var.instance_type]
-      capacity_type        = "ON_DEMAND"
-      name                 = "${var.environment}-general"
-      desired_size         = var.desired_capacity
-      max_size             = var.max_size
-      min_size             = var.min_size
-    }
+data "aws_ssm_parameter" "this" {
+  name = "/aws/service/eks/optimized-ami/${aws_eks_cluster.this.version}/amazon-linux-2/recommended/release_version"
+}
 
-  }
-
-  enable_cluster_creator_admin_permissions = true
-
-  tags = {
-    Environment = "${var.environment}"
-    name        = "${var.environment}-eks"
+resource "aws_eks_node_group" "this" {
+  cluster_name    = aws_eks_cluster.this.name
+  node_group_name = "${var.proj}-nodegroup"
+  version         = aws_eks_cluster.this.version
+  release_version = nonsensitive(data.aws_ssm_parameter.this.value)
+  node_role_arn   = data.aws_iam_role.eks_node_role.arn
+  subnet_ids      = var.subnet_ids
+  scaling_config {
+    max_size     = var.max_size
+    min_size     = var.min_size
+    desired_size = var.desired_size
   }
 }

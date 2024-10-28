@@ -1,14 +1,16 @@
 resource "aws_vpc_endpoint" "this" {
-  vpc_id            = var.vpc_id
-  service_name      = var.service_name
-  vpc_endpoint_type = var.vpc_endpoint_type
+  count               = length(var.vpc_endpoints)
+  vpc_id              = var.vpc_id
+  service_name        = var.vpc_endpoints[count.index]
+  vpc_endpoint_type   = can(regex("s3$", var.vpc_endpoints[count.index])) ? "Gateway" : "Interface"
+  private_dns_enabled = can(regex("s3$", var.vpc_endpoints[count.index])) ? null : true
 
-  private_dns_enabled = var.vpc_endpoint_type == "Interface" ? true : false
-  security_group_ids  = var.vpc_endpoint_type == "Interface" ? [var.sg_private_id] : null
-  subnet_ids          = var.vpc_endpoint_type == "Interface" ? var.subnet_ids : null
-  route_table_ids     = var.vpc_endpoint_type == "Gateway" ? [var.route_table_id] : null
+  subnet_ids      = can(regex("s3$", var.vpc_endpoints[count.index])) ? null : var.subnet_ids
+  route_table_ids = can(regex("s3$", var.vpc_endpoints[count.index])) ? var.rt_ids : null
 
-  tags = {
-    Name = "${var.environment}-${var.name}"
+  security_group_ids = can(regex("s3$", var.vpc_endpoints[count.index])) ? null : var.sg_ids
+
+   tags = {
+    Name = "${var.proj}-${var.vpc_endpoints_tags[count.index]}"
   }
 }
