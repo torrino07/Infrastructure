@@ -1,3 +1,3 @@
 output "ids" {
-  value = aws_subnet.this[*].id
+  value = { for subnet in aws_subnet.this : subnet.tags["Name"] => subnet.id }
 }

@@ -4,19 +4,11 @@ variable "proj" {
 variable "vpc_id" {
   type = string
 }
-
-variable "az" {
-  type = list(string)
-}
-
 variable "subnets" {
-  type = list(string)
-}
-
-variable "tags" {
-  type = list(string)
-}
-
-variable "map_public_ip_on_launch" {
-  type = list(bool)
+  type = list(object({
+    tag                     = string
+    az                      = string
+    cidr_block              = string
+    map_public_ip_on_launch = bool
+  }))
 }

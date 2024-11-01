@@ -1,3 +1,3 @@
-output "sg_ids" {
-  value = [for sg in aws_security_group.this : sg.id]
+output "ids" {
+  value = {for sg in aws_security_group.this : sg.tags["Name"] => sg.id }
 }

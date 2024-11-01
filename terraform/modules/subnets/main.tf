@@ -1,11 +1,12 @@
 resource "aws_subnet" "this" {
-  count             = length(var.az)
-  vpc_id            = var.vpc_id
-  cidr_block        = var.subnets[count.index]
-  availability_zone = var.az[count.index]
-  map_public_ip_on_launch = var.map_public_ip_on_launch[count.index]
+  for_each                 = { for subnet in var.subnets : subnet.tag => subnet }
+  vpc_id                   = var.vpc_id
+  cidr_block               = each.value.cidr_block
+  availability_zone        = each.value.az
+  map_public_ip_on_launch  = each.value.map_public_ip_on_launch
 
   tags = {
-    Name = "${var.proj}-subnet-${var.tags[count.index]}"
+    Name = "${var.proj}-subnet-${each.value.tag}"
+    Project = var.proj
   }
 }
