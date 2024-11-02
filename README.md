@@ -29,4 +29,6 @@ If you want to learn more about creating good readme files then refer the follow
 - aws ssm start-session --target 
 
 ## Generate Certificates
-aws secretsmanager delete-secret --secret-id dev --force-delete-without-recovery --region us-east-1
+aws ssm describe-instance-information --query "InstanceInformationList[*].InstanceId"
+aws ssm start-session --target "i-09efb6cf55564513f"
+session-manager-plugin
