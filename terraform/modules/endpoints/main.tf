@@ -1,15 +1,16 @@
 resource "aws_vpc_endpoint" "this" {
-  count               = length(var.vpc_endpoints)
-  vpc_id              = var.vpc_id
-  
-  service_name        = var.vpc_endpoints[count.index]
-  vpc_endpoint_type   = can(regex("s3$", var.vpc_endpoints[count.index])) ? "Gateway" : "Interface"
-  security_group_ids = can(regex("s3$", var.vpc_endpoints[count.index])) ? null : var.sg_ids
-  private_dns_enabled = can(regex("s3$", var.vpc_endpoints[count.index])) ? null : true
-  subnet_ids      = can(regex("s3$", var.vpc_endpoints[count.index])) ? null : var.subnet_ids
-  route_table_ids = can(regex("s3$", var.vpc_endpoints[count.index])) ? var.rt_ids : null
+  for_each          = { for idx, endpoint in var.vpc_endpoints : idx => endpoint }
+  vpc_id            = var.vpc_id
+  service_name      = each.value.service_name
+  vpc_endpoint_type = each.value.vpc_endpoint_type
 
-   tags = {
-    Name = "${var.proj}-${var.vpc_endpoints_tags[count.index]}"
+  security_group_ids  = each.value.vpc_endpoint_type == "Interface" ? each.value.security_group_ids : null
+  subnet_ids          = each.value.vpc_endpoint_type == "Interface" ? each.value.subnet_ids : null
+  route_table_ids     = each.value.vpc_endpoint_type == "Gateway" ? each.value.route_table_ids : null
+  private_dns_enabled = each.value.vpc_endpoint_type == "Interface" ? lookup(each.value, "private_dns_enabled", true) : null
+  ip_address_type     = each.value.vpc_endpoint_type == "Interface" ? lookup(each.value, "ip_address_type", "ipv4") : null
+
+  tags = {
+    Name = "${var.proj}-${each.value.tag}"
   }
 }

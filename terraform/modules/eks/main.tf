@@ -7,9 +7,9 @@ data "aws_iam_role" "eks_node_role" {
 }
 
 resource "aws_eks_cluster" "this" {
-  name       = "${var.proj}-eks-cluster"
-  role_arn   = data.aws_iam_role.eks_cluster_role.arn
-  version    = var.eks_version
+  name     = "${var.proj}-eks-cluster"
+  role_arn = data.aws_iam_role.eks_cluster_role.arn
+  version  = var.eks_version
 
   vpc_config {
     endpoint_private_access = true
