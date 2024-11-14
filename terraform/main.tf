@@ -337,11 +337,11 @@ module "ec2" {
 #   ]
 # }
 
-########## COGNITO ##########
-# module "cognito" {
-#   source      = "./modules/cognito"
-#   proj        = var.proj
-#   environment = var.environment
-#   name        = "x-turbo"
-# }
+######### COGNITO ##########
+module "cognito" {
+  source      = "./modules/cognito"
+  proj        = var.proj
+  environment = var.environment
+  name        = "x-turbo"
+}
 
