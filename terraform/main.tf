@@ -287,7 +287,7 @@ module "ec2" {
   source        = "./modules/ec2"
   proj          = var.proj
   environment   = var.environment
-  name          = "trading-server12"
+  name          = "trading-server"
   subnet_id     = module.subnets.ids["tradingbot-dev-ec2-private-1b-1"]
   sg_id         = module.sg.ids["tradingbot-dev-ec2-sg"]
   instance_type = "t4g.medium"
@@ -337,11 +337,11 @@ module "ec2" {
 #   ]
 # }
 
-# ########## COGNITO ##########
-# module "cognito" {
-#   source      = "./modules/cognito"
-#   proj        = var.proj
-#   environment = var.environment
-#   name        = "x-turbo"
-# }
+########## COGNITO ##########
+module "cognito" {
+  source      = "./modules/cognito"
+  proj        = var.proj
+  environment = var.environment
+  name        = "x-turbo"
+}
 
