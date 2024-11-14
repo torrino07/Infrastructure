@@ -312,30 +312,30 @@ module "ec2" {
 #   desired_size                 = 1
 # }
 
-# ########## ECR ##########
-# module "ecr" {
-#   source      = "./modules/ecr"
-#   proj        = var.proj
-#   environment = var.environment
-#   repositories = [
-#     {
-#       name                 = "fastapi-app"
-#       scan_on_push         = true
-#       image_tag_mutability = "IMMUTABLE"
-#     },
-#     {
-#       name                 = "react-app"
-#       scan_on_push         = true
-#       image_tag_mutability = "MUTABLE"
-#     }
-#     ,
-#     {
-#       name                 = "postgresql-server"
-#       scan_on_push         = true
-#       image_tag_mutability = "MUTABLE"
-#     }
-#   ]
-# }
+########## ECR ##########
+module "ecr" {
+  source      = "./modules/ecr"
+  proj        = var.proj
+  environment = var.environment
+  repositories = [
+    {
+      name                 = "fastapi-app"
+      scan_on_push         = true
+      image_tag_mutability = "IMMUTABLE"
+    },
+    {
+      name                 = "react-app"
+      scan_on_push         = true
+      image_tag_mutability = "MUTABLE"
+    }
+    ,
+    {
+      name                 = "postgresql-server"
+      scan_on_push         = true
+      image_tag_mutability = "MUTABLE"
+    }
+  ]
+}
 
 ########## COGNITO ##########
 module "cognito" {
