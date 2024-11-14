@@ -43,7 +43,7 @@ jobs:
         id: plan
         run: |
           terraform plan -var-file="environments/${{ env.BRANCH_NAME }}/terraform.tfvars" -out=${{ env.BRANCH_NAME }}-plan.out
-      
+          
       - name: Run Apply
         working-directory: terraform
         run: |

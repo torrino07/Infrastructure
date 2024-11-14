@@ -28,7 +28,7 @@ If you want to learn more about creating good readme files then refer the follow
 - terraform destroy -var-file="environments/dev/terraform.tfvars" -auto-approve
 - aws ssm start-session --target 
 
-## Generate Certificates
+## SSM
 aws ssm describe-instance-information --query "InstanceInformationList[*].InstanceId"
-aws ssm start-session --target "i-09efb6cf55564513f"
+aws ssm start-session --target "i-0c4ee4233c87058f8"
 session-manager-plugin
