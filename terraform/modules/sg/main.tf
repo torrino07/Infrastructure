@@ -1,5 +1,5 @@
 resource "aws_security_group" "this" {
-  for_each = { for sg in var.security_groups : sg.name => sg }
+  for_each = { for sg in var.security_groups : "${var.proj}-${var.environment}-${sg.name}-sg" => sg }
 
   name   = each.value.name
   vpc_id = var.vpc_id
@@ -23,9 +23,9 @@ resource "aws_security_group" "this" {
       cidr_blocks = egress.value.cidr_blocks
     }
   }
-  
+
   tags = {
-    Name = "${var.proj}-sg-${each.value.name}"
+    Name    = "${var.proj}-${var.environment}-${each.value.name}-sg"
     Project = var.proj
   }
 }

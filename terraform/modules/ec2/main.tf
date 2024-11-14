@@ -1,5 +1,5 @@
 data "aws_iam_instance_profile" "this" {
-  name = "${var.proj}-instance-profile-${var.role_arn_name}"
+  name = "${var.proj}-${var.environment}-${var.role_arn_name}-${var.access_level}-iam-policy"
 }
 resource "aws_instance" "this" {
   ami                    = var.ami
@@ -9,7 +9,7 @@ resource "aws_instance" "this" {
   iam_instance_profile   = data.aws_iam_instance_profile.this.name
 
   tags = {
-    Name        = "${var.proj}-ec2-${var.tag}"
+    Name        = "${var.proj}-${var.environment}-${var.name}-ec2"
     Environment = var.proj
   }
 }

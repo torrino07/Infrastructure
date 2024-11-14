@@ -2,6 +2,10 @@ variable "proj" {
   type = string
 }
 
+variable "environment" {
+  type = string
+}
+
 variable "eks_cluster_role_arn_name" {
   type = string
 }
@@ -15,6 +19,10 @@ variable "eks_version" {
 }
 
 variable "subnet_ids" {
+  type = list(string)
+}
+
+variable "security_ids" {
   type = list(string)
 }
 

@@ -1,5 +1,4 @@
-data "aws_s3_object" "this" {
+resource "aws_s3_bucket_policy" "artifactstore_policy" {
   bucket = var.bucket
-  key = var.key
+  policy = jsonencode(var.policy)
 }
-

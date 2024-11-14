@@ -2,7 +2,11 @@ variable "proj" {
   type = string
 }
 
-variable "tag" {
+variable "environment" {
+  type = string
+}
+
+variable "name" {
   type = string
 }
 
@@ -20,6 +24,9 @@ variable "sg_id" {
   type = any
 }
 
+variable "access_level" {
+  type = any
+}
 variable "role_arn_name" {
   type = string
 }

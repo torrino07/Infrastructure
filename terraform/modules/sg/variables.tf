@@ -1,8 +1,12 @@
-variable "vpc_id" {
+variable "proj" {
   type = string
 }
 
-variable "proj" {
+variable "environment" {
+  type = string
+}
+
+variable "vpc_id" {
   type = string
 }
 

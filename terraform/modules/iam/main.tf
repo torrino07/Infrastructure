@@ -3,17 +3,19 @@ data "aws_iam_policy_document" "this" {
   for_each = { for role in var.roles : role.name => role }
   statement {
     effect =  each.value.effect
+    actions = each.value.actions
+    resources = each.value.resources
+
     principals {
       type        = each.value.type
       identifiers = each.value.identifiers
     }
-    actions = each.value.actions
   }
 }
 
 resource "aws_iam_role" "this" {
   for_each = { for role in var.roles : role.name => role }
-  name               = "${var.proj}-iam-role-${each.key}"
+  name               = "${var.proj}-${var.environment}-${each.key}-iam-role"
   assume_role_policy = data.aws_iam_policy_document.this[each.key].json
 }
 
@@ -40,7 +42,7 @@ resource "aws_iam_role_policy_attachment" "role_policy_attachment" {
 resource "aws_iam_instance_profile" "instance_profile" {
   for_each = { for role in var.roles : role.name => role }
 
-  name = "${var.proj}-instance-profile-${each.value.name}"
+  name = "${var.proj}-${var.environment}-${each.value.name}-${each.value.access_level}-iam-policy"
   role = aws_iam_role.this[each.key].name
 }
 

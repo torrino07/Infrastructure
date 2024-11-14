@@ -14,10 +14,6 @@ variable "gateway_id" {
   type = string
 }
 
-variable "tags" {
-  type = list(string)
-}
-
 variable "subnet_ids" {
-  type = list(string)
+  type = map(string)
 }

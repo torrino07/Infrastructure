@@ -1,13 +1,13 @@
 data "aws_iam_role" "eks_cluster_role" {
-  name = "${var.proj}-iam-role-${var.eks_cluster_role_arn_name}"
+  name = "${var.proj}-${var.environment}-${var.eks_cluster_role_arn_name}-iam-role"
 }
 
 data "aws_iam_role" "eks_node_role" {
-  name = "${var.proj}-iam-role-${var.eks_node_group_role_arn_name}"
+  name = "${var.proj}-${var.environment}-${var.eks_node_group_role_arn_name}-iam-role"
 }
 
 resource "aws_eks_cluster" "this" {
-  name     = "${var.proj}-eks-cluster"
+  name     = "${var.proj}-${var.environment}-eks-cluster"
   role_arn = data.aws_iam_role.eks_cluster_role.arn
   version  = var.eks_version
 
@@ -15,6 +15,7 @@ resource "aws_eks_cluster" "this" {
     endpoint_private_access = true
     endpoint_public_access  = true
     subnet_ids              = var.subnet_ids
+    security_group_ids      = var.security_ids
   }
 
   access_config {
@@ -28,11 +29,12 @@ data "aws_ssm_parameter" "this" {
 
 resource "aws_eks_node_group" "this" {
   cluster_name    = aws_eks_cluster.this.name
-  node_group_name = "${var.proj}-nodegroup"
+  node_group_name = "${var.proj}-${var.environment}-nodegroup"
   version         = aws_eks_cluster.this.version
   release_version = nonsensitive(data.aws_ssm_parameter.this.value)
   node_role_arn   = data.aws_iam_role.eks_node_role.arn
   subnet_ids      = var.subnet_ids
+
   scaling_config {
     max_size     = var.max_size
     min_size     = var.min_size

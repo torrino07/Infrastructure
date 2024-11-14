@@ -11,6 +11,6 @@ resource "aws_vpc_endpoint" "this" {
   ip_address_type     = each.value.vpc_endpoint_type == "Interface" ? lookup(each.value, "ip_address_type", "ipv4") : null
 
   tags = {
-    Name = "${var.proj}-${each.value.tag}"
+    Name = "${var.proj}-${var.environment}-${each.value.tag}"
   }
 }
