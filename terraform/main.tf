@@ -287,7 +287,7 @@ module "ec2" {
   source        = "./modules/ec2"
   proj          = var.proj
   environment   = var.environment
-  name          = "trading-server"
+  name          = "trading-server12"
   subnet_id     = module.subnets.ids["tradingbot-dev-ec2-private-1b-1"]
   sg_id         = module.sg.ids["tradingbot-dev-ec2-sg"]
   instance_type = "t4g.medium"
