@@ -9,7 +9,6 @@ resource "aws_cognito_user_pool" "this" {
     name                = "Email"
     attribute_data_type = "String"
     required            = true
-    mutable             = true
   }
 
   auto_verified_attributes = ["email"]
