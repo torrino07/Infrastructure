@@ -10,7 +10,6 @@ resource "aws_cognito_user_pool" "this" {
     attribute_data_type      = "String"
     mutable                  = true
     developer_only_attribute = false
-    required                 = true
 
     string_attribute_constraints {
       min_length = 5
