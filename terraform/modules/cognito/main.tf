@@ -1,5 +1,5 @@
 resource "aws_cognito_user_pool" "this" {
-  name = "${var.proj}-${var.name}-userpool"
+  name = "${var.proj}-${var.environment}-${var.name}-userpool"
 
   admin_create_user_config {
     allow_admin_create_user_only = false
