@@ -6,9 +6,10 @@ resource "aws_cognito_user_pool" "this" {
   }
 
   schema {
-    name                     = "Email"
-    attribute_data_type      = "String"
-    mutable                  = true
+    name                = "Email"
+    attribute_data_type = "String"
+    required            = true
+    mutable             = true
   }
 
   auto_verified_attributes = ["email"]
