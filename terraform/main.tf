@@ -294,7 +294,8 @@ module "s3" {
         Principal = "*"
         Resource = [
           "arn:aws:s3:::artifactstore001",
-          "arn:aws:s3:::artifactstore001/*"
+          "arn:aws:s3:::artifactstore001/*",
+          "arn:aws:s3:::amazon-eks/*",
         ]
         Condition = {
           StringEquals = {
