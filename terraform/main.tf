@@ -244,7 +244,7 @@ module "endpoints" {
       tag                = "ssmmessages-ec2"
     },
 
-        {
+    {
       service_name       = "com.amazonaws.us-east-1.ec2messages"
       vpc_endpoint_type  = "Interface"
       security_group_ids = [for tag, id in module.sg.ids : id if tag == "tradingbot-dev-ssm-https-eks-endpoint-sg"]
