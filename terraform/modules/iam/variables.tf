@@ -13,7 +13,6 @@ variable "roles" {
     type         = string
     identifiers  = list(string)
     actions      = list(string)
-    resources    = list(string)
     policy_arns  = list(string)
     access_level = string
   }))

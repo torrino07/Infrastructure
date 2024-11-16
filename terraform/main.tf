@@ -213,7 +213,6 @@ module "iam" {
       type        = "Service"
       identifiers = ["eks.amazonaws.com"]
       actions     = ["sts:AssumeRole"]
-      resources   = []
       policy_arns = [
         "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
       ],
@@ -225,12 +224,11 @@ module "iam" {
       type        = "Service"
       identifiers = ["ec2.amazonaws.com"]
       actions     = ["sts:AssumeRole"]
-      resources   = []
       policy_arns = [
         "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy",
         "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy",
         "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly",
-        "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+        "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
       ],
       access_level = "readwrite"
     },
@@ -240,7 +238,6 @@ module "iam" {
       type        = "Service"
       identifiers = ["ec2.amazonaws.com"]
       actions     = ["sts:AssumeRole"]
-      resources   = []
       policy_arns = [
         "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
         "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"
@@ -294,6 +291,18 @@ module "ec2" {
   ami           = "ami-07ee04759daf109de"
   role_arn_name = "AmazonEC2Role"
   access_level  = "readwrite"
+}
+
+############# EBS ############
+module "ebs" {
+  depends_on        = [module.iam]
+  source            = "./modules/ebs"
+  proj              = var.proj
+  environment       = var.environment
+  name              = "eks-ebs-volume"
+  ebs_volume_size   = 20
+  ebs_volume_type   = "gp3"
+  availability_zone = "us-east-1a"
 }
 
 # ############ EKS ############

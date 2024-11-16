@@ -2,9 +2,8 @@
 data "aws_iam_policy_document" "this" {
   for_each = { for role in var.roles : role.name => role }
   statement {
-    effect =  each.value.effect
+    effect  = each.value.effect
     actions = each.value.actions
-    resources = each.value.resources
 
     principals {
       type        = each.value.type
@@ -14,7 +13,7 @@ data "aws_iam_policy_document" "this" {
 }
 
 resource "aws_iam_role" "this" {
-  for_each = { for role in var.roles : role.name => role }
+  for_each           = { for role in var.roles : role.name => role }
   name               = "${var.proj}-${var.environment}-${each.key}-iam-role"
   assume_role_policy = data.aws_iam_policy_document.this[each.key].json
 }
