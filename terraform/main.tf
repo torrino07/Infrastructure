@@ -203,26 +203,52 @@ module "endpoints" {
       service_name       = "com.amazonaws.us-east-1.ec2messages"
       vpc_endpoint_type  = "Interface"
       security_group_ids = [for tag, id in module.sg.ids : id if contains(["tradingbot-dev-ssm-https-endpoint-sg"], tag)]
-      subnet_ids         = [for tag, id in module.subnets.ids : id if contains(["tradingbot-dev-ec2-private-1b-1", "tradingbot-dev-eks-private-1a-1", "tradingbot-dev-eks-private-1b-1"], tag)]
+      subnet_ids         = [for tag, id in module.subnets.ids : id if contains(["tradingbot-dev-ec2-private-1b-1"], tag)]
       ip_address_type    = "ipv4"
-      tag                = "ec2messages"
+      tag                = "ec2messages-ec2"
     },
     {
       service_name       = "com.amazonaws.us-east-1.ssm"
       vpc_endpoint_type  = "Interface"
       security_group_ids = [for tag, id in module.sg.ids : id if contains(["tradingbot-dev-ssm-https-endpoint-sg"], tag)]
-      subnet_ids         = [for tag, id in module.subnets.ids : id if contains(["tradingbot-dev-ec2-private-1b-1", "tradingbot-dev-eks-private-1a-1", "tradingbot-dev-eks-private-1b-1"], tag)]
+      subnet_ids         = [for tag, id in module.subnets.ids : id if contains(["tradingbot-dev-ec2-private-1b-1"], tag)]
       ip_address_type    = "ipv4"
-      tag                = "ssm"
+      tag                = "ssm-ec2"
     },
 
     {
       service_name       = "com.amazonaws.us-east-1.ssmmessages"
       vpc_endpoint_type  = "Interface"
       security_group_ids = [for tag, id in module.sg.ids : id if contains(["tradingbot-dev-ssm-https-endpoint-sg"], tag)]
-      subnet_ids         = [for tag, id in module.subnets.ids : id if contains(["tradingbot-dev-ec2-private-1b-1", "tradingbot-dev-eks-private-1a-1", "tradingbot-dev-eks-private-1b-1"], tag)]
+      subnet_ids         = [for tag, id in module.subnets.ids : id if contains(["tradingbot-dev-ec2-private-1b-1"], tag)]
       ip_address_type    = "ipv4"
-      tag                = "ssmmessages"
+      tag                = "ssmmessages-ec2"
+    },
+
+        {
+      service_name       = "com.amazonaws.us-east-1.ec2messages"
+      vpc_endpoint_type  = "Interface"
+      security_group_ids = [for tag, id in module.sg.ids : id if contains(["tradingbot-dev-ssm-https-endpoint-sg"], tag)]
+      subnet_ids         = [for tag, id in module.subnets.ids : id if contains(["tradingbot-dev-eks-private-1a-1", "tradingbot-dev-eks-private-1b-1"], tag)]
+      ip_address_type    = "ipv4"
+      tag                = "ec2messages-eks"
+    },
+    {
+      service_name       = "com.amazonaws.us-east-1.ssm"
+      vpc_endpoint_type  = "Interface"
+      security_group_ids = [for tag, id in module.sg.ids : id if contains(["tradingbot-dev-ssm-https-endpoint-sg"], tag)]
+      subnet_ids         = [for tag, id in module.subnets.ids : id if contains(["tradingbot-dev-eks-private-1a-1", "tradingbot-dev-eks-private-1b-1"], tag)]
+      ip_address_type    = "ipv4"
+      tag                = "ssm-eks"
+    },
+
+    {
+      service_name       = "com.amazonaws.us-east-1.ssmmessages"
+      vpc_endpoint_type  = "Interface"
+      security_group_ids = [for tag, id in module.sg.ids : id if contains(["tradingbot-dev-ssm-https-endpoint-sg"], tag)]
+      subnet_ids         = [for tag, id in module.subnets.ids : id if contains(["tradingbot-dev-eks-private-1a-1", "tradingbot-dev-eks-private-1b-1"], tag)]
+      ip_address_type    = "ipv4"
+      tag                = "ssmmessages-eks"
     },
 
   ]
