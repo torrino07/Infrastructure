@@ -162,7 +162,7 @@ module "endpoints" {
       vpc_endpoint_type  = "Interface"
       security_group_ids = [for tag, id in module.sg.ids : id if contains(["tradingbot-dev-ebs-endpoint-sg"], tag)]
       subnet_ids         = [for tag, id in module.subnets.ids : id if contains(["tradingbot-dev-eks-private-1a-1", "tradingbot-dev-eks-private-1b-1"], tag)]
-      tag                = "ec2"
+      tag                = "ebs"
     },
 
     {
