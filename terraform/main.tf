@@ -80,32 +80,13 @@ module "sg" {
       egress_rules = []
     },
     {
-      name = "ssm-https-ec2-endpoint"
+      name = "ssm-https-endpoint"
       ingress_rules = [
         {
           from_port   = 443,
           to_port     = 443,
           protocol    = "tcp",
           cidr_blocks = ["10.0.160.0/23"]
-        }
-      ]
-      egress_rules = [
-        {
-          from_port   = 0,
-          to_port     = 0,
-          protocol    = "-1",
-          cidr_blocks = ["0.0.0.0/0"]
-        }
-      ]
-    },
-     {
-      name = "ssm-https-eks-endpoint"
-      ingress_rules = [
-        {
-          from_port   = 443,
-          to_port     = 443,
-          protocol    = "tcp",
-          cidr_blocks = ["10.0.144.0/23", "10.0.128.0/23"]
         }
       ]
       egress_rules = [
@@ -221,54 +202,28 @@ module "endpoints" {
     {
       service_name       = "com.amazonaws.us-east-1.ec2messages"
       vpc_endpoint_type  = "Interface"
-      security_group_ids = [for tag, id in module.sg.ids : id if tag == "tradingbot-dev-ssm-https-ec2-endpoint-sg"]
+      security_group_ids = [for tag, id in module.sg.ids : id if tag == "tradingbot-dev-ssm-https-endpoint-sg"]
       subnet_ids         = [for tag, id in module.subnets.ids : id if tag == "tradingbot-dev-ec2-private-1b-1"]
       ip_address_type    = "ipv4"
-      tag                = "ec2messages-ec2"
+      tag                = "ec2messages"
     },
     {
       service_name       = "com.amazonaws.us-east-1.ssm"
       vpc_endpoint_type  = "Interface"
-      security_group_ids = [for tag, id in module.sg.ids : id if tag == "tradingbot-dev-ssm-https-ec2-endpoint-sg"]
+      security_group_ids = [for tag, id in module.sg.ids : id if tag == "tradingbot-dev-ssm-https-endpoint-sg"]
       subnet_ids         = [for tag, id in module.subnets.ids : id if tag == "tradingbot-dev-ec2-private-1b-1"]
       ip_address_type    = "ipv4"
-      tag                = "ssm-ec2"
+      tag                = "ssm"
     },
 
     {
       service_name       = "com.amazonaws.us-east-1.ssmmessages"
       vpc_endpoint_type  = "Interface"
-      security_group_ids = [for tag, id in module.sg.ids : id if tag == "tradingbot-dev-ssm-https-ec2-endpoint-sg"]
+      security_group_ids = [for tag, id in module.sg.ids : id if tag == "tradingbot-dev-ssm-https-endpoint-sg"]
       subnet_ids         = [for tag, id in module.subnets.ids : id if tag == "tradingbot-dev-ec2-private-1b-1"]
       ip_address_type    = "ipv4"
-      tag                = "ssmmessages-ec2"
-    },
-
-    {
-      service_name       = "com.amazonaws.us-east-1.ec2messages"
-      vpc_endpoint_type  = "Interface"
-      security_group_ids = [for tag, id in module.sg.ids : id if tag == "tradingbot-dev-ssm-https-eks-endpoint-sg"]
-      subnet_ids         = [for tag, id in module.subnets.ids : id if contains(["tradingbot-dev-eks-private-1a-1", "tradingbot-dev-eks-private-1b-1"], tag)]
-      ip_address_type    = "ipv4"
-      tag                = "ec2messages-eks"
-    },
-    {
-      service_name       = "com.amazonaws.us-east-1.ssm"
-      vpc_endpoint_type  = "Interface"
-      security_group_ids = [for tag, id in module.sg.ids : id if tag == "tradingbot-dev-ssm-https-eks-endpoint-sg"]
-      subnet_ids         = [for tag, id in module.subnets.ids : id if contains(["tradingbot-dev-eks-private-1a-1", "tradingbot-dev-eks-private-1b-1"], tag)]
-      ip_address_type    = "ipv4"
-      tag                = "ssm-eks"
-    },
-
-    {
-      service_name       = "com.amazonaws.us-east-1.ssmmessages"
-      vpc_endpoint_type  = "Interface"
-      security_group_ids = [for tag, id in module.sg.ids : id if tag == "tradingbot-dev-ssm-https-eks-endpoint-sg"]
-      subnet_ids         = [for tag, id in module.subnets.ids : id if contains(["tradingbot-dev-eks-private-1a-1", "tradingbot-dev-eks-private-1b-1"], tag)]
-      ip_address_type    = "ipv4"
-      tag                = "ssmmessages-eks"
-    },
+      tag                = "ssmmessages"
+    }
   ]
 }
 
