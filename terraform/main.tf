@@ -299,7 +299,7 @@ module "ebs" {
   source            = "./modules/ebs"
   proj              = var.proj
   environment       = var.environment
-  name              = "eks-ebs-volume"
+  name              = "eks-ebs"
   ebs_volume_size   = 20
   ebs_volume_type   = "gp3"
   availability_zone = "us-east-1a"
