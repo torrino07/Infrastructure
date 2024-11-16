@@ -49,6 +49,25 @@ module "sg" {
   vpc_id      = module.vpc.id
   security_groups = [
     {
+      name = "ebs-endpoint"
+      ingress_rules = [
+        {
+          from_port   = 0,
+          to_port     = 0,
+          protocol    = "-1",
+          cidr_blocks = ["10.0.0.0/16"]
+        }
+      ]
+      egress_rules = [
+        {
+          from_port   = 0,
+          to_port     = 0,
+          protocol    = "-1",
+          cidr_blocks = ["0.0.0.0/0"]
+        }
+      ]
+    },
+    {
       name = "eks-endpoint"
       ingress_rules = [
         {
@@ -138,6 +157,14 @@ module "endpoints" {
   environment = var.environment
   vpc_id      = module.vpc.id
   vpc_endpoints = [
+    {
+      service_name       = "com.amazonaws.us-east-1.ebs"
+      vpc_endpoint_type  = "Interface"
+      security_group_ids = [for tag, id in module.sg.ids : id if contains(["tradingbot-dev-ebs-endpoint-sg"], tag)]
+      subnet_ids         = [for tag, id in module.subnets.ids : id if contains(["tradingbot-dev-eks-private-1a-1", "tradingbot-dev-eks-private-1b-1"], tag)]
+      tag                = "ec2"
+    },
+
     {
       service_name       = "com.amazonaws.us-east-1.ec2"
       vpc_endpoint_type  = "Interface"
