@@ -30,5 +30,5 @@ If you want to learn more about creating good readme files then refer the follow
 
 ## SSM
 aws ssm describe-instance-information --query "InstanceInformationList[*].InstanceId"
-aws ssm start-session --target "i-0c4ee4233c87058f8"
+aws ssm start-session --target "i-089b0b7f99d99a01d"
 session-manager-plugin

@@ -332,21 +332,21 @@ module "ebs" {
   availability_zone = "us-east-1a"
 }
 
-# ############ EKS ############
-# module "eks" {
-#   depends_on                   = [module.iam]
-#   source                       = "./modules/eks"
-#   proj                         = var.proj
-#   environment                  = var.environment
-#   eks_cluster_role_arn_name    = "AmazonEKSClusterRole"
-#   eks_node_group_role_arn_name = "AmazonEKSNodeRole"
-#   eks_version                  = "1.31.1"
-#   subnet_ids                   = [for tag, id in module.subnets.ids : id if contains(["tradingbot-dev-eks-private-1a-1", "tradingbot-dev-eks-private-1b-1"], tag)]
-#   security_ids                 = [for tag, id in module.sg.ids : id if tag == "eks"]
-#   max_size                     = 1
-#   min_size                     = 1
-#   desired_size                 = 1
-# }
+############ EKS ############
+module "eks" {
+  depends_on                   = [module.iam]
+  source                       = "./modules/eks"
+  proj                         = var.proj
+  environment                  = var.environment
+  eks_cluster_role_arn_name    = "AmazonEKSClusterRole"
+  eks_node_group_role_arn_name = "AmazonEKSNodeRole"
+  eks_version                  = "1.31.1"
+  subnet_ids                   = [for tag, id in module.subnets.ids : id if contains(["tradingbot-dev-eks-private-1a-1", "tradingbot-dev-eks-private-1b-1"], tag)]
+  security_ids                 = [for tag, id in module.sg.ids : id if tag == "eks"]
+  max_size                     = 1
+  min_size                     = 1
+  desired_size                 = 1
+}
 
 ######## COGNITO ##########
 module "cognito" {
