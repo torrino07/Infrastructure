@@ -40,4 +40,9 @@ resource "aws_eks_node_group" "this" {
     min_size     = var.min_size
     desired_size = var.desired_size
   }
+
+  tags = {
+    Name        = "${var.proj}-${var.environment}-${var.name}-eks"
+    Environment = var.proj
+  }
 }

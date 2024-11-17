@@ -6,6 +6,11 @@ variable "environment" {
   type = string
 }
 
+variable "name" {
+  type = string
+}
+
+
 variable "eks_cluster_role_arn_name" {
   type = string
 }

@@ -168,7 +168,7 @@ module "endpoints" {
     {
       service_name       = "com.amazonaws.us-east-1.ec2"
       vpc_endpoint_type  = "Interface"
-      security_group_ids = [for tag, id in module.sg.ids : id if  tag == "tradingbot-dev-ec2-ecr-eks-endpoint-sg"]
+      security_group_ids = [for tag, id in module.sg.ids : id if tag == "tradingbot-dev-ec2-ecr-eks-endpoint-sg"]
       subnet_ids         = [for tag, id in module.subnets.ids : id if contains(["tradingbot-dev-eks-private-1a-1", "tradingbot-dev-eks-private-1b-1"], tag)]
       tag                = "ec2"
     },
@@ -339,6 +339,7 @@ module "eks" {
   source                       = "./modules/eks"
   proj                         = var.proj
   environment                  = var.environment
+  name                         = "node"
   eks_cluster_role_arn_name    = "AmazonEKSClusterRole"
   eks_node_group_role_arn_name = "AmazonEKSNodeRole"
   eks_version                  = "1.31"
