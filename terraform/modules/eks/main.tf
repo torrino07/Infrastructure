@@ -50,7 +50,7 @@ resource "aws_eks_node_group" "this" {
 resource "aws_eks_access_entry" "this" {
   cluster_name      = aws_eks_cluster.this.name
   principal_arn     = "arn:aws:iam::160945804984:user/dorian"
-  kubernetes_groups = ["system:masters"]
+  kubernetes_groups = ["eks-admin-group"]
   type              = "STANDARD"
   depends_on        = [aws_eks_cluster.this]
 }
