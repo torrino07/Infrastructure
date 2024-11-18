@@ -66,3 +66,35 @@ resource "aws_eks_access_policy_association" "this" {
   }
   depends_on = [aws_eks_access_entry.this]
 }
+
+resource "kubernetes_cluster_role" "this" {
+  metadata {
+    name = "dorian-full-access"
+  }
+
+  rule {
+    api_groups = ["*"]
+    resources  = ["*"]
+    verbs      = ["*"]
+  }
+  depends_on = [aws_eks_access_policy_association.this]
+}
+
+resource "kubernetes_cluster_role_binding" "this" {
+  metadata {
+    name = "dorian-full-access-binding"
+  }
+
+  role_ref {
+    api_group = "rbac.authorization.k8s.io"
+    kind      = "ClusterRole"
+    name      = kubernetes_cluster_role.this.metadata[0].name
+  }
+
+  subject {
+    kind      = "User"
+    name      = "dorian"
+    api_group = "rbac.authorization.k8s.io"
+  }
+  depends_on = [kubernetes_cluster_role.this]
+}
