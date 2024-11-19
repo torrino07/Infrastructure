@@ -378,6 +378,16 @@ module "ecr" {
       name                 = "postgresql-server"
       scan_on_push         = true
       image_tag_mutability = "MUTABLE"
+    },
+    {
+      name                 = "metrics-scraper"
+      scan_on_push         = true
+      image_tag_mutability = "MUTABLE"
+    },
+    {
+      name                 = "kubernetes-dashboard"
+      scan_on_push         = true
+      image_tag_mutability = "MUTABLE"
     }
   ]
 }
