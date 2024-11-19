@@ -380,7 +380,7 @@ module "ecr" {
       image_tag_mutability = "MUTABLE"
     },
     {
-      name                 = "metrics-scraper"
+      name                 = "dashboard-metrics-scraper"
       scan_on_push         = true
       image_tag_mutability = "MUTABLE"
     },
