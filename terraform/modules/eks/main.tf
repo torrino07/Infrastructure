@@ -61,8 +61,7 @@ resource "aws_eks_access_policy_association" "this" {
   principal_arn = "arn:aws:iam::160945804984:user/dorian"
 
   access_scope {
-    type       = "namespace"
-    namespaces = ["default"]
+    type       = "cluster"
   }
   depends_on = [aws_eks_access_entry.this]
 }
