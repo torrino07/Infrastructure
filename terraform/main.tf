@@ -388,6 +388,11 @@ module "ecr" {
       name                 = "kubernetes-dashboard"
       scan_on_push         = true
       image_tag_mutability = "MUTABLE"
+    },
+    {
+      name                 = "ingress-nginx"
+      scan_on_push         = true
+      image_tag_mutability = "MUTABLE"
     }
   ]
 }
