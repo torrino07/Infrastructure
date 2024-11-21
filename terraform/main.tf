@@ -390,7 +390,12 @@ module "ecr" {
       image_tag_mutability = "MUTABLE"
     },
     {
-      name                 = "ingress-nginx"
+      name                 = "controller"
+      scan_on_push         = true
+      image_tag_mutability = "MUTABLE"
+    },
+    {
+      name                 = "kube-webhook-certgen"
       scan_on_push         = true
       image_tag_mutability = "MUTABLE"
     }
