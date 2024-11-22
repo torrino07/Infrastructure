@@ -344,9 +344,9 @@ module "eks" {
   eks_version                  = "1.31"
   subnet_ids                   = [for tag, id in module.subnets.ids : id if contains(["tradingbot-dev-eks-private-1a-1", "tradingbot-dev-eks-private-1b-1"], tag)]
   security_ids                 = [for tag, id in module.sg.ids : id if tag == "eks"]
-  max_size                     = 1
+  max_size                     = 3
   min_size                     = 1
-  desired_size                 = 1
+  desired_size                 = 3
 }
 
 ######## COGNITO ##########
