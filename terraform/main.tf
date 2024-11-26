@@ -348,6 +348,18 @@ module "eks" {
   max_size                     = 3
   min_size                     = 1
   desired_size                 = 3
+  eks_users = [
+    {
+      name          = "dorian"
+      policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+      principal_arn = "arn:aws:iam::160945804984:user/dorian"
+    },
+    {
+      name          = "cicd-pipeline"
+      policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+      principal_arn = "arn:aws:iam::160945804984:user/cicd-pipeline"
+    }
+  ]
 }
 
 ######## COGNITO ##########

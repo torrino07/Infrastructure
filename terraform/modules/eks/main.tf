@@ -47,25 +47,6 @@ resource "aws_eks_node_group" "this" {
   }
 }
 
-# resource "aws_eks_access_entry" "this" {
-#   cluster_name      = aws_eks_cluster.this.name
-#   principal_arn     = "arn:aws:iam::160945804984:user/dorian"
-#   kubernetes_groups = ["eks-admin"]
-#   type              = "STANDARD"
-#   depends_on        = [aws_eks_cluster.this]
-# }
-
-# resource "aws_eks_access_policy_association" "this" {
-#   cluster_name  = aws_eks_cluster.this.name
-#   policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
-#   principal_arn = "arn:aws:iam::160945804984:user/dorian"
-
-#   access_scope {
-#     type       = "cluster"
-#   }
-#   depends_on = [aws_eks_access_entry.this]
-# }
-
 resource "aws_eks_access_entry" "this" {
   for_each          = { for user in var.eks_users : user.name => user }
   cluster_name      = aws_eks_cluster.this.name

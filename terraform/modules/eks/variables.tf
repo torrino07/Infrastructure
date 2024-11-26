@@ -17,18 +17,6 @@ variable "eks_users" {
     policy_arn    = string
     principal_arn = string
   }))
-  default = [
-    {
-      name          = "dorian"
-      policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
-      principal_arn = "arn:aws:iam::160945804984:user/dorian"
-    },
-    {
-      name          = "cicd-pipeline"
-      policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
-      principal_arn = "arn:aws:iam::160945804984:user/cicd-pipeline"
-    }
-  ]
 }
 
 
