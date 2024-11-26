@@ -102,9 +102,9 @@ module "sg" {
       name = "ec2"
       ingress_rules = [
         {
-          from_port   = 8000,
-          to_port     = 8000,
-          protocol    = "tcp",
+          from_port   = 0,
+          to_port     = 0,
+          protocol    = "-1",
           cidr_blocks = ["10.0.128.0/23", "10.0.144.0/23"]
         }
       ]
@@ -130,9 +130,9 @@ module "sg" {
       ]
       egress_rules = [
         {
-          from_port   = 8000,
-          to_port     = 8000,
-          protocol    = "tcp",
+          from_port   = 0,
+          to_port     = 0,
+          protocol    = "-1",
           cidr_blocks = ["10.0.160.0/23"]
         }
       ]
