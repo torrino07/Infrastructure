@@ -4,7 +4,17 @@ on:
   push:
     branches:
       - dev
+      - main
   workflow_dispatch:
+    inputs:
+      action:
+        description: 'Choose action'
+        required: true
+        default: 'build'
+        type: choice
+        options:
+          - build
+          - destroy
 
 env:
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -17,7 +27,7 @@ jobs:
   infra-build:
     name: Build Infra
     runs-on:  ${{ vars.RUNNER }}
-    if: github.event_name == 'push'
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
 
     steps:
       - name: Checkout repository
@@ -26,7 +36,6 @@ jobs:
       - name: Run Terraform Init
         working-directory: terraform
         run: |
-          ls
           terraform init \
             -backend-config="region=${{ env.AWS_REGION }}" \
             -backend-config="bucket=terraformstate001-${{ env.BRANCH_NAME }}" \
@@ -38,41 +47,18 @@ jobs:
         run: |
           terraform workspace select ${{ env.BRANCH_NAME }} || terraform workspace new ${{ env.BRANCH_NAME }}
 
-      - name: Run Plan
+      - name: Run Plan or Destroy
         working-directory: terraform
-        id: plan
+        id: plan_or_destroy
         run: |
-          terraform plan -var-file="environments/${{ env.BRANCH_NAME }}/terraform.tfvars" -out=${{ env.BRANCH_NAME }}-plan.out
-          
-      - name: Run Apply
+          if [ "${{ github.event.inputs.action }}" == "build" ]; then
+            terraform plan -var-file="environments/${{ env.BRANCH_NAME }}/terraform.tfvars" -out=${{ env.BRANCH_NAME }}-plan.out
+          elif [ "${{ github.event.inputs.action }}" == "destroy" ]; then
+            terraform destroy -var-file="environments/${{ env.BRANCH_NAME }}/terraform.tfvars" -auto-approve
+          fi
+
+      - name: Run Apply (if building)
+        if: ${{ github.event.inputs.action == 'build' }}
         working-directory: terraform
         run: |
           terraform apply ${{ env.BRANCH_NAME }}-plan.out
-
-  infra-destroy:
-    name: Destroy Infra on Branch Deletion
-    runs-on: ${{ vars.RUNNER }}
-    if: github.event_name == 'workflow_dispatch'
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-      
-      - name: Run Terraform Init
-        working-directory: terraform
-        run: |
-          terraform init \
-            -backend-config="region=${{ env.AWS_REGION }}" \
-            -backend-config="bucket=terraformstate001-${{ env.BRANCH_NAME }}" \
-            -backend-config="key=${{ env.BRANCH_NAME }}/terraform.tfstate" \
-            -backend-config="dynamodb_table=terraform-locks-${{ env.BRANCH_NAME }}"
-            
-      - name: Select or Create Workspace
-        working-directory: terraform
-        run: |
-          terraform workspace select ${{ env.BRANCH_NAME }}
-
-      - name: Run Destroy
-        working-directory: terraform
-        run: |
-          terraform destroy -var-file="environments/${{ env.BRANCH_NAME }}/terraform.tfvars" -auto-approve
