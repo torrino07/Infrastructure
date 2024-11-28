@@ -82,3 +82,37 @@ resource "aws_iam_openid_connect_provider" "this" {
   }
   depends_on = [aws_eks_access_policy_association.this]
 }
+
+resource "aws_iam_role" "fastapi_role" {
+  name = "FastAPIRole"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Federated = "arn:aws:iam::160945804984:oidc-provider/${replace(data.aws_eks_cluster.eks.identity[0].oidc[0].issuer, "https://", "")}"
+        }
+        Action = "sts:AssumeRoleWithWebIdentity"
+        Condition = {
+          StringEquals = {
+            "${replace(data.aws_eks_cluster.eks.identity[0].oidc[0].issuer, "https://", "")}:sub" : "system:serviceaccount:dev:fastapi-sa"
+          }
+        }
+      }
+    ]
+  })
+  depends_on = [aws_iam_openid_connect_provider.this]
+}
+
+resource "aws_iam_role_policy_attachment" "ec2_read_only" {
+  role       = aws_iam_role.fastapi_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess"
+  depends_on = [aws_iam_role.fastapi_role]
+}
+
+resource "aws_iam_role_policy_attachment" "ssm_full_access" {
+  role       = aws_iam_role.fastapi_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMFullAccess"
+  depends_on = [aws_iam_role.fastapi_role]
+}
