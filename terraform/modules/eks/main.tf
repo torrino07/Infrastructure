@@ -67,3 +67,18 @@ resource "aws_eks_access_policy_association" "this" {
   }
   depends_on = [aws_eks_access_entry.this]
 }
+
+data "aws_eks_cluster" "cluster" {
+  name       = aws_eks_cluster.this.name
+  depends_on = [aws_eks_access_policy_association.this]
+}
+resource "aws_iam_openid_connect_provider" "this" {
+  url             = data.aws_eks_cluster.this.identity[0].oidc[0].issuer
+  client_id_list  = ["sts.amazonaws.com"]
+  thumbprint_list = ["9e99a48a9960a6d40a546a6022c0ccaa57f4aa18"]
+
+  tags = {
+    Name = "${var.proj}-${var.environment}-${var.name}-oidc"
+  }
+  depends_on = [aws_eks_cluster.cluster]
+}
