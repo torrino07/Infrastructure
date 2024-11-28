@@ -68,7 +68,7 @@ resource "aws_eks_access_policy_association" "this" {
   depends_on = [aws_eks_access_entry.this]
 }
 
-data "aws_eks_cluster" "cluster" {
+data "aws_eks_cluster" "this" {
   name       = aws_eks_cluster.this.name
   depends_on = [aws_eks_access_policy_association.this]
 }
@@ -80,5 +80,5 @@ resource "aws_iam_openid_connect_provider" "this" {
   tags = {
     Name = "${var.proj}-${var.environment}-${var.name}-oidc"
   }
-  depends_on = [aws_eks_cluster.cluster]
+  depends_on = [aws_eks_access_policy_association.this]
 }
