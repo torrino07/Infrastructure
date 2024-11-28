@@ -91,12 +91,12 @@ resource "aws_iam_role" "fastapi_role" {
       {
         Effect = "Allow"
         Principal = {
-          Federated = "arn:aws:iam::160945804984:oidc-provider/${replace(data.aws_eks_cluster.eks.identity[0].oidc[0].issuer, "https://", "")}"
+          Federated = "arn:aws:iam::160945804984:oidc-provider/${replace(data.aws_eks_cluster.this.identity[0].oidc[0].issuer, "https://", "")}"
         }
         Action = "sts:AssumeRoleWithWebIdentity"
         Condition = {
           StringEquals = {
-            "${replace(data.aws_eks_cluster.eks.identity[0].oidc[0].issuer, "https://", "")}:sub" : "system:serviceaccount:dev:fastapi-sa"
+            "${replace(data.aws_eks_cluster.this.identity[0].oidc[0].issuer, "https://", "")}:sub" : "system:serviceaccount:dev:fastapi-sa"
           }
         }
       }
