@@ -281,7 +281,6 @@ module "iam" {
         "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy",
         "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy",
         "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly",
-        "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy",
         "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
       ],
       access_level = "readwrite"

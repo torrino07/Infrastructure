@@ -128,3 +128,33 @@ resource "aws_iam_role_policy_attachment" "ssm_full_access" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMFullAccess"
   depends_on = [aws_iam_role.fastapi_role]
 }
+
+resource "aws_iam_role" "ebs_csi_driver_role" {
+  name = "AmazonEKSEBSCSIDriverRole"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Principal = {
+          Federated = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/${replace(data.aws_eks_cluster.this.identity[0].oidc.issuer, "https://", "")}"
+        },
+        Action = "sts:AssumeRoleWithWebIdentity",
+        Condition = {
+          StringEquals = {
+            "${replace(data.aws_eks_cluster.this.identity[0].oidc.issuer, "https://", "")}:aud" : "sts.amazonaws.com",
+            "${replace(data.aws_eks_cluster.this.identity[0].oidc.issuer, "https://", "")}:sub" : "system:serviceaccount:kube-system:ebs-csi-controller-sa"
+          }
+        }
+      }
+    ]
+  })
+  depends_on = [aws_iam_openid_connect_provider.this]
+}
+
+resource "aws_iam_role_policy_attachment" "ebs_csi_driver_policy_attachment" {
+  role       = aws_iam_role.ebs_csi_driver_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
+  depends_on = [aws_iam_role.ebs_csi_driver_role]
+}
