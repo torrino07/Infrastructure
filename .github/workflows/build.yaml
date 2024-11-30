@@ -1,23 +1,15 @@
 name: Build/Destroy Infrastructure AWS
 
 on:
-  # push:
-  #   branches:
-  #     - dev
-  #     - main
+  push:
+    branches:
+      - dev
+      - main
   pull_request:
     branches:
       - main
   workflow_dispatch:
     inputs:
-      action:
-        description: 'Choose action'
-        required: true
-        default: 'build'
-        type: choice
-        options:
-          - build
-          - destroy
       region:
         description: 'Target region'
         required: true
@@ -57,18 +49,13 @@ jobs:
         run: |
           terraform workspace select ${{ env.ENVIRONMENT }} || terraform workspace new ${{ env.ENVIRONMENT }}
 
-      - name: Run Plan or Destroy
+      - name: Run Plan
         working-directory: terraform
-        id: plan_or_destroy
+        id: plan
         run: |
-          if [ "${{ github.event.inputs.action }}" == "build" ]; then
-            terraform plan -var-file="environments/${{ env.ENVIRONMENT }}/terraform.tfvars" -out=${{ env.ENVIRONMENT }}-plan.out
-          elif [ "${{ github.event.inputs.action }}" == "destroy" ]; then
-            terraform destroy -var-file="environments/${{ env.ENVIRONMENT }}/terraform.tfvars" -auto-approve
-          fi
+          terraform plan -var-file="environments/${{ env.ENVIRONMENT }}/terraform.tfvars" -out=${{ env.ENVIRONMENT }}-plan.out
 
-      - name: Run Apply (if building)
-        if: ${{ github.event.inputs.action == 'build' }}
+      - name: Run Apply
         working-directory: terraform
         run: |
           terraform apply ${{ env.ENVIRONMENT }}-plan.out

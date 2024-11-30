@@ -1,0 +1,50 @@
+name: Build/Destroy Infrastructure AWS
+
+on:
+  workflow_dispatch:
+    inputs:
+      region:
+        description: 'Target region'
+        required: true
+        default: 'us-east-1'
+        type: choice
+        options:
+          - us-east-1
+
+env:
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+  AWS_REGION: ${{ github.event.inputs.region || 'us-east-1'}}
+  ENVIRONMENT: ${{ github.ref_name == 'main' && github.event_name == 'pull_request' && 'staging' || github.ref_name == 'main' && 'prod' || 'dev' }}
+
+jobs:
+  infra-build:
+    name: Build Infra
+    runs-on:  ${{ vars.RUNNER }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      
+      - name: Run Terraform Init
+        working-directory: terraform
+        run: |
+          echo ${{ env.AWS_REGION }}
+          terraform init \
+            -backend-config="region=${{ env.AWS_REGION }}" \
+            -backend-config="bucket=terraformstate001-${{ env.ENVIRONMENT }}" \
+            -backend-config="key=${{ env.ENVIRONMENT }}/terraform.tfstate" \
+            -backend-config="dynamodb_table=terraform-locks-${{ env.ENVIRONMENT }}"
+
+      - name: Select or Create Workspace
+        working-directory: terraform
+        run: |
+          terraform workspace select ${{ env.ENVIRONMENT }} || terraform workspace new ${{ env.ENVIRONMENT }}
+
+      - name: Destroy
+        working-directory: terraform
+        id: destroy
+        run: |
+          terraform destroy -var-file="environments/${{ env.ENVIRONMENT }}/terraform.tfvars" -auto-approve
+      
