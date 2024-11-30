@@ -5,6 +5,9 @@ on:
     branches:
       - dev
       - main
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
     inputs:
       action:
@@ -15,50 +18,58 @@ on:
         options:
           - build
           - destroy
+      environment:
+        description: 'Target environment'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - staging
+          - prod
 
 env:
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
   AWS_REGION: ${{ github.event.inputs.region || 'us-east-1' }}
-  BRANCH_NAME: ${{ github.ref_name == 'main' && 'prod' || github.ref_name }}
+  ENVIRONMENT: ${{ github.event.inputs.environment || github.ref_name == 'main' && github.event_name == 'pull_request' && 'staging' || github.ref_name == 'main' && 'prod' || 'dev' }}
 
 jobs:
   infra-build:
     name: Build Infra
     runs-on:  ${{ vars.RUNNER }}
-    if: github.event_name == 'workflow_dispatch'
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
       
-      # - name: Run Terraform Init
-      #   working-directory: terraform
-      #   run: |
-      #     terraform init \
-      #       -backend-config="region=${{ env.AWS_REGION }}" \
-      #       -backend-config="bucket=terraformstate001-${{ env.BRANCH_NAME }}" \
-      #       -backend-config="key=${{ env.BRANCH_NAME }}/terraform.tfstate" \
-      #       -backend-config="dynamodb_table=terraform-locks-${{ env.BRANCH_NAME }}"
+      - name: Run Terraform Init
+        working-directory: terraform
+        run: |
+          terraform init \
+            -backend-config="region=${{ env.AWS_REGION }}" \
+            -backend-config="bucket=terraformstate001-${{ env.ENVIRONMENT }}" \
+            -backend-config="key=${{ env.ENVIRONMENT }}/terraform.tfstate" \
+            -backend-config="dynamodb_table=terraform-locks-${{ env.ENVIRONMENT }}"
 
-      # - name: Select or Create Workspace
-      #   working-directory: terraform
-      #   run: |
-      #     terraform workspace select ${{ env.BRANCH_NAME }} || terraform workspace new ${{ env.BRANCH_NAME }}
+      - name: Select or Create Workspace
+        working-directory: terraform
+        run: |
+          terraform workspace select ${{ env.ENVIRONMENT }} || terraform workspace new ${{ env.ENVIRONMENT }}
 
-      # - name: Run Plan or Destroy
-      #   working-directory: terraform
-      #   id: plan_or_destroy
-      #   run: |
-      #     if [ "${{ github.event.inputs.action }}" == "build" ]; then
-      #       terraform plan -var-file="environments/${{ env.BRANCH_NAME }}/terraform.tfvars" -out=${{ env.BRANCH_NAME }}-plan.out
-      #     elif [ "${{ github.event.inputs.action }}" == "destroy" ]; then
-      #       terraform destroy -var-file="environments/${{ env.BRANCH_NAME }}/terraform.tfvars" -auto-approve
-      #     fi
+      - name: Run Plan or Destroy
+        working-directory: terraform
+        id: plan_or_destroy
+        run: |
+          if [ "${{ github.event.inputs.action }}" == "build" ]; then
+            terraform plan -var-file="environments/${{ env.ENVIRONMENT }}/terraform.tfvars" -out=${{ env.ENVIRONMENT }}-plan.out
+          elif [ "${{ github.event.inputs.action }}" == "destroy" ]; then
+            terraform destroy -var-file="environments/${{ env.ENVIRONMENT }}/terraform.tfvars" -auto-approve
+          fi
 
-      # - name: Run Apply (if building)
-      #   if: ${{ github.event.inputs.action == 'build' }}
-      #   working-directory: terraform
-      #   run: |
-      #     terraform apply ${{ env.BRANCH_NAME }}-plan.out
+      - name: Run Apply (if building)
+        if: ${{ github.event.inputs.action == 'build' }}
+        working-directory: terraform
+        run: |
+          terraform apply ${{ env.ENVIRONMENT }}-plan.out
