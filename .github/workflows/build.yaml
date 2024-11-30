@@ -1,4 +1,4 @@
-name: Build/Destroy Infrastructure AWS
+name: Build Infrastructure AWS
 
 on:
   push:
