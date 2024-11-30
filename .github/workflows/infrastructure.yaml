@@ -31,7 +31,7 @@ env:
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
   AWS_REGION: ${{ github.event.inputs.region || 'us-east-1' }}
-  ENVIRONMENT: ${{ github.event.inputs.environment || github.ref_name == 'main' && github.event_name == 'pull_request' && 'staging' || github.ref_name == 'main' && 'prod' || 'dev' }}
+  ENVIRONMENT: ${{ github.ref_name == 'main' && github.event_name == 'pull_request' && 'staging' || github.ref_name == 'main' && 'prod' || 'dev' }}
 
 jobs:
   infra-build:
