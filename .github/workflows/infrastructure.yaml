@@ -18,19 +18,19 @@ on:
         options:
           - build
           - destroy
-      environment:
-        description: 'Target environment'
+      region:
+        description: 'Target region'
         required: true
-        default: 'dev'
+        default: 'us-east-1'
         type: choice
         options:
-          - dev
+          - us-east-1
 
 env:
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
-  AWS_REGION: ${{ github.event.inputs.region || 'us-east-1' }}
+  AWS_REGION: ${{ github.event.inputs.region }}
   ENVIRONMENT: ${{ github.ref_name == 'main' && github.event_name == 'pull_request' && 'staging' || github.ref_name == 'main' && 'prod' || 'dev' }}
 
 jobs:
