@@ -34,28 +34,28 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
       
-      # - name: Run Terraform Init
-      #   working-directory: terraform
-      #   run: |
-      #     echo ${{ env.AWS_REGION }}
-      #     terraform init \
-      #       -backend-config="region=${{ env.AWS_REGION }}" \
-      #       -backend-config="bucket=terraformstate001-${{ env.ENVIRONMENT }}" \
-      #       -backend-config="key=${{ env.ENVIRONMENT }}/terraform.tfstate" \
-      #       -backend-config="dynamodb_table=terraform-locks-${{ env.ENVIRONMENT }}"
+      - name: Run Terraform Init
+        working-directory: terraform
+        run: |
+          echo ${{ env.AWS_REGION }}
+          terraform init \
+            -backend-config="region=${{ env.AWS_REGION }}" \
+            -backend-config="bucket=terraformstate001-${{ env.ENVIRONMENT }}" \
+            -backend-config="key=${{ env.ENVIRONMENT }}/terraform.tfstate" \
+            -backend-config="dynamodb_table=terraform-locks-${{ env.ENVIRONMENT }}"
 
-      # - name: Select or Create Workspace
-      #   working-directory: terraform
-      #   run: |
-      #     terraform workspace select ${{ env.ENVIRONMENT }} || terraform workspace new ${{ env.ENVIRONMENT }}
+      - name: Select or Create Workspace
+        working-directory: terraform
+        run: |
+          terraform workspace select ${{ env.ENVIRONMENT }} || terraform workspace new ${{ env.ENVIRONMENT }}
 
-      # - name: Run Plan
-      #   working-directory: terraform
-      #   id: plan
-      #   run: |
-      #     terraform plan -var-file="environments/${{ env.ENVIRONMENT }}/terraform.tfvars" -out=${{ env.ENVIRONMENT }}-plan.out
+      - name: Run Plan
+        working-directory: terraform
+        id: plan
+        run: |
+          terraform plan -var-file="environments/${{ env.ENVIRONMENT }}/terraform.tfvars" -out=${{ env.ENVIRONMENT }}-plan.out
 
-      # - name: Run Apply
-      #   working-directory: terraform
-      #   run: |
-      #     terraform apply ${{ env.ENVIRONMENT }}-plan.out
+      - name: Run Apply
+        working-directory: terraform
+        run: |
+          terraform apply ${{ env.ENVIRONMENT }}-plan.out
