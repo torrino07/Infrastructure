@@ -1,10 +1,10 @@
 name: Build/Destroy Infrastructure AWS
 
 on:
-  push:
-    branches:
-      - dev
-      - main
+  # push:
+  #   branches:
+  #     - dev
+  #     - main
   pull_request:
     branches:
       - main
