@@ -130,7 +130,7 @@ resource "aws_iam_role_policy_attachment" "ssm_full_access" {
 }
 
 resource "aws_iam_role" "ebs_csi_driver_role" {
-  name = "AmazonEKSEBSCSIDriverRole"
+  name = "AmazonEKS_EBS_CSI_DriverRole"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
