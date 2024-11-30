@@ -1,13 +1,18 @@
-resource "aws_route_table" "private_route_table" {
-  vpc_id = var.vpc_id
+resource "aws_route_table" "this" {
+  for_each = var.subnet_ids
+  vpc_id   = var.vpc_id
 
+  route {
+    cidr_block = var.cidr_block
+    gateway_id = var.gateway_id
+  }
   tags = {
-    Name        = "${var.environment}-private-route-table"
-    Environment = var.environment
+    Name = "${each.key}-rt"
   }
 }
 
-resource "aws_route_table_association" "private_subnet" {
-  subnet_id      = var.subnet_id
-  route_table_id = aws_route_table.private_route_table.id
+resource "aws_route_table_association" "this" {
+  for_each       = var.subnet_ids
+  subnet_id      = each.value
+  route_table_id = aws_route_table.this[each.key].id
 }

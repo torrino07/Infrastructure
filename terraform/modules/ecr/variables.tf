@@ -1,14 +1,15 @@
+variable "proj" {
+  type = string
+}
+
 variable "environment" {
-  description = "The environment (dev, prod, test)"
-  type        = string
+  type = string
 }
 
-variable "mutable" {
-  description = "Mutable tag"
-  type        = string
-}
-
-variable "name"{
-    description = "Name of the Registry"
-    type        = string
+variable "repositories" {
+  type = list(object({
+    name                 = string
+    scan_on_push         = bool
+    image_tag_mutability = string
+  }))
 }

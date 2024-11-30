@@ -1,0 +1,16 @@
+{
+    "variable": {
+        "proj": {
+            "default": "tradingbot",
+            "//": "name which will be used to tag/name the resources accordingly"
+        },
+        "environment": {
+            "default": "dev",
+            "//": "environment name"
+        },
+        "region": {
+            "default": "us-east",
+            "//": "environment name"
+        }
+    }
+}
