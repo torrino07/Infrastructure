@@ -1,15 +1,18 @@
-name: Build/Destroy Infrastructure AWS
+name: Infrastructure Pipeline
 
 on:
-  workflow_call:
+  push:
+    branches:
+      - main
+      - dev
+  workflow_dispatch:
     inputs:
       action:
         description: 'Choose action'
         required: true
-        default: 'build'
         type: string
-      branch_name:
-        description: 'Branch name'
+      stage_name:
+        description: 'Stage name'
         required: true
         type: string
       aws_region:
@@ -37,29 +40,29 @@ jobs:
         run: |
           terraform init \
             -backend-config="region=${{ inputs.aws_region }}" \
-            -backend-config="bucket=terraformstate001-${{ inputs.branch_name }}" \
-            -backend-config="key=${{ inputs.branch_name }}/terraform.tfstate" \
-            -backend-config="dynamodb_table=terraform-locks-${{ inputs.branch_name }}"
+            -backend-config="bucket=terraformstate001-${{ inputs.stage_name }}" \
+            -backend-config="key=${{ inputs.stage_name }}/terraform.tfstate" \
+            -backend-config="dynamodb_table=terraform-locks-${{ inputs.stage_name }}"
 
       - name: Select or Create Workspace
         working-directory: terraform
         run: |
-          terraform workspace select ${{ inputs.branch_name }} || terraform workspace new ${{ inputs.branch_name }}
+          terraform workspace select ${{ inputs.stage_name }} || terraform workspace new ${{ inputs.stage_name }}
 
       - name: Run Plan or Destroy
         working-directory: terraform
         id: plan_or_destroy
         run: |
           if [ "${{ github.event_name }}" == "push" ]; then
-            terraform plan -var-file="environments/${{ inputs.branch_name }}/terraform.tfvars" -out=${{ inputs.branch_name }}-plan.out
+            terraform plan -var-file="environments/${{ inputs.stage_name }}/terraform.tfvars" -out=${{ inputs.stage_name }}-plan.out
           elif [ "${{ inputs.action }}" == "build" ]; then
-            terraform plan -var-file="environments/${{ inputs.branch_name }}/terraform.tfvars" -out=${{ inputs.branch_name }}-plan.out
+            terraform plan -var-file="environments/${{ inputs.stage_name }}/terraform.tfvars" -out=${{ inputs.stage_name }}-plan.out
           elif [ "${{ inputs.action }}" == "destroy" ]; then
-            terraform destroy -var-file="environments/${{ inputs.branch_name }}/terraform.tfvars" -auto-approve
+            terraform destroy -var-file="environments/${{ inputs.stage_name }}/terraform.tfvars" -auto-approve
           fi
 
       - name: Run Apply (if building)
         if: ${{ github.event_name == 'push' || inputs.action == 'build' }}
         working-directory: terraform
         run: |
-          terraform apply ${{ inputs.branch_name }}-plan.out
+          terraform apply ${{ inputs.stage_name }}-plan.out
