@@ -73,4 +73,4 @@ jobs:
             -H "Accept: application/vnd.github.v3+json" \
             -H "Authorization: token ${{ secrets.PAT }}" \
             https://api.github.com/repos/${{ matrix.repo }}/dispatches \
-            -d '{"event_type":"infra-ready"}'
+            -d '{"event_type":"infra-ready"} "client_payload": {"branch": "${{ github.ref_name }}"}}'
