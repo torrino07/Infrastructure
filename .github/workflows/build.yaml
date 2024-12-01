@@ -68,8 +68,15 @@ jobs:
     runs-on: ${{ vars.RUNNER }}
     steps:
       - name: Repository Dispatch
-        uses: peter-evans/repository-dispatch@v3
-        with:
-          token: ${{ secrets.PAT }}
-          repository: ${{ matrix.repo }}
-          event-type: infra-ready
+        run: |
+          curl -X POST \
+            -H "Accept: application/vnd.github.v3+json" \
+            -H "Authorization: token ${{ secrets.PAT }}" \
+            https://api.github.com/repos/${{ matrix.repo }}/dispatches \
+            -d '{"event_type":"infra-ready"}'
+
+        # uses: peter-evans/repository-dispatch@v3
+        # with:
+        #   token: ${{ secrets.PAT }}
+        #   repository: ${{ matrix.repo }}
+        #   event-type: infra-ready
