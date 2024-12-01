@@ -64,7 +64,7 @@ jobs:
     needs: build
     strategy:
       matrix:
-        repo: [torrino07/react-app]
+        repo: [torrino07/react-app, torrino07/fastapi-app, torrino07/mssql-server, torrino07/feeds]
     runs-on: ${{ vars.RUNNER }}
     steps:
       - name: Repository Dispatch
