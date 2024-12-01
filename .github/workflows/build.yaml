@@ -26,7 +26,7 @@ env:
   ENVIRONMENT: ${{ github.ref_name == 'main' && github.event_name == 'pull_request' && 'staging' || github.ref_name == 'main' && 'prod' || 'dev' }}
 
 jobs:
-  infra-build:
+  build:
     name: Build Infra
     runs-on:  ${{ vars.RUNNER }}
 
