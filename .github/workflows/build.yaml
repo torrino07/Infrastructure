@@ -64,7 +64,7 @@ jobs:
     needs: build
     strategy:
       matrix:
-        repo: ['torrino07/react-app']
+        repo: [torrino07/react-app]
     runs-on: ${{ vars.RUNNER }}
     steps:
       - name: Repository Dispatch
