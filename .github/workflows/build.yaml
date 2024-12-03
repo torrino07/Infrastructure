@@ -59,3 +59,18 @@ jobs:
         working-directory: terraform
         run: |
           terraform apply ${{ env.ENVIRONMENT }}-plan.out
+
+      - name: Notify Orchestrator
+        uses: actions/github-script@v6
+        with:
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              owner: 'torrino07',
+              repo: 'orchestra',
+              workflow_id: 'orchestrator.yaml',
+              ref: 'main',
+              inputs: {
+                job: 'infra',
+                status: 'completed'
+              }
+            });
