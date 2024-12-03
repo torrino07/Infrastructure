@@ -34,12 +34,18 @@ env:
   ENVIRONMENT:  ${{ github.event.inputs.environment }}
 
 jobs:
-  destroy:
-    name: Destroy Infra
+  validate-environment:
+    name: Validate Environment
     runs-on: ${{ vars.RUNNER }}
     if: >
       (github.ref_name == 'dev' && github.event.inputs.environment == 'dev') ||
       (github.ref_name == 'main' && (github.event.inputs.environment == 'staging' || github.event.inputs.environment == 'production'))
+
+  destroy:
+    name: Destroy Infra
+    needs: validate-environment
+    runs-on: ${{ vars.RUNNER }}
+    environment: ${{ env.ENVIRONMENT }} 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
