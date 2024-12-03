@@ -47,8 +47,8 @@ jobs:
       - name: Validating Environment
         run: echo "Validating ${{ env.ENVIRONMENT }} environment from ${{ github.ref_name }} branch"
 
-  destroy:
-    name: Destroy Infra
+  build:
+    name: Build Infra
     needs: validate-environment
     runs-on: ${{ vars.RUNNER }}
     steps:
