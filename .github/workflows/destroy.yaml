@@ -51,7 +51,6 @@ jobs:
     name: Destroy Infra
     needs: validate-environment
     runs-on: ${{ vars.RUNNER }}
-    environment: ${{ env.ENVIRONMENT }} 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
