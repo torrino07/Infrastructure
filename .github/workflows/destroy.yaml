@@ -1,6 +1,12 @@
 name: Destroy Infrastructure AWS
 
 on:
+  pull_request:
+    branches:
+      - dev
+      - main
+    types:
+      - opened
   workflow_dispatch:
     inputs:
       region:
@@ -10,22 +16,36 @@ on:
         type: choice
         options:
           - us-east-1
+      environment:
+        description: 'Target environment'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - staging
+          - prod
 
 env:
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  AWS_ACCOUNT_ID: ${{ github.ref_name == 'main' && github.event_name == 'pull_request' && secrets.AWS_ACCOUNT_ID_STAGING || github.ref_name == 'main' && secrets.AWS_ACCOUNT_ID_PROD || secrets.AWS_ACCOUNT_ID_DEV }}
-  AWS_REGION: ${{ github.event.inputs.region || 'us-east-1'}}
-  ENVIRONMENT: ${{ github.ref_name == 'main' && github.event_name == 'pull_request' && 'staging' || github.ref_name == 'main' && 'prod' || 'dev' }}
+  AWS_ACCOUNT_ID: ${{ github.event.inputs.environment == 'dev' && secrets.AWS_ACCOUNT_ID_DEV || github.event.inputs.environment == 'staging' && secrets.AWS_ACCOUNT_ID_STAGING  || secrets.AWS_ACCOUNT_ID_PROD }}
+  AWS_REGION: ${{ github.event.inputs.region }}
+  ENVIRONMENT:  ${{ github.event.inputs.environment }}
 
 jobs:
   destroy:
     name: Destroy Infra
-    runs-on:  ${{ vars.RUNNER }}
-
+    runs-on: ${{ vars.RUNNER }}
+    if: >
+      (github.ref_name == 'dev' && github.event.inputs.environment == 'dev') ||
+      (github.ref_name == 'main' && (github.event.inputs.environment == 'staging' || github.event.inputs.environment == 'production'))
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
+      
+      - name: Configure Environment
+        run: echo "Deploying to ${{ env.ENVIRONMENT }} environment from ${{ github.ref_name }} branch"
       
       - name: Run Terraform Init
         working-directory: terraform
