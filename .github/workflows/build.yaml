@@ -40,7 +40,13 @@ jobs:
     if: >
       (github.ref_name == 'dev' && github.event.inputs.environment == 'dev') ||
       (github.ref_name == 'main' && (github.event.inputs.environment == 'staging' || github.event.inputs.environment == 'production'))
-
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      
+      - name: Validating Environment
+        run: echo "Validating ${{ env.ENVIRONMENT }} environment from ${{ github.ref_name }} branch"
+        
   destroy:
     name: Destroy Infra
     needs: validate-environment
