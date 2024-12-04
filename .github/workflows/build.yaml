@@ -7,6 +7,18 @@ on:
       - main
     types:
       - opened
+  workflow_call:
+    inputs:
+      region:
+        description: 'Target region'
+        required: true
+        default: 'us-east-1'
+        type: string
+      environment:
+        description: 'Target environment'
+        required: true
+        default: 'dev'
+        type: string
   workflow_dispatch:
     inputs:
       region:
