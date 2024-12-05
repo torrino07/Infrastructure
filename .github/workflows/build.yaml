@@ -68,7 +68,6 @@ jobs:
         uses: actions/checkout@v3
         with:
           repository: torrino07/Infrastructure
-          path: Infrastructure
           ref: dev
           token: ${{ secrets.PAT }}
       
