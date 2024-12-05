@@ -70,6 +70,7 @@ jobs:
           repository: torrino07/Infrastructure
           path: Infrastructure
           ref: dev
+          token: ${{ secrets.TOKEN }}
       
       - name: Configure Environment
         run: echo "Deploying to ${{ env.ENVIRONMENT }} environment from ${{ github.ref_name }} branch"
