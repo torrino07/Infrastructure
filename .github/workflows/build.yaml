@@ -66,6 +66,9 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
+        with:
+          repository: torrino07/Infrastructure
+          fetch-depth: 1
       
       - name: Configure Environment
         run: echo "Deploying to ${{ env.ENVIRONMENT }} environment from ${{ github.ref_name }} branch"
