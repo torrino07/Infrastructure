@@ -54,7 +54,7 @@ jobs:
       (github.ref_name == 'main' && (github.event.inputs.environment == 'staging' || github.event.inputs.environment == 'production'))
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       
       - name: Validating Environment
         run: echo "Validating ${{ env.ENVIRONMENT }} environment from ${{ github.ref_name }} branch"
