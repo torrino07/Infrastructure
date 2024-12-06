@@ -64,14 +64,12 @@ jobs:
     needs: validate-environment
     runs-on: ${{ vars.RUNNER }}
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Configure Environment
         run: echo "Deploying to ${{ env.ENVIRONMENT }} environment from ${{ github.ref_name }} branch"
 
-      - name: Download Terraform Templates
-        uses: actions/download-artifact@v4
-        with:
-          name: terraform
-      
       - name: Run Terraform Init
         working-directory: terraform
         run: |
