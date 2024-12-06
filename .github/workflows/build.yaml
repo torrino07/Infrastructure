@@ -66,16 +66,18 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          sparse-checkout: terraform
 
       - name: Configure Environment
         run: echo "Deploying to ${{ env.ENVIRONMENT }} environment from ${{ github.ref_name }} branch"
+
+      - name: Download Terraform Templates
+        uses: actions/download-artifact@v4
+        with:
+          name: downloads
       
       - name: Run Terraform Init
-        working-directory: terraform
+        working-directory: downloads
         run: |
-          echo ${{ env.AWS_REGION }}
           terraform init \
             -backend-config="region=${{ env.AWS_REGION }}" \
             -backend-config="bucket=terraformstate001-${{ env.ENVIRONMENT }}" \
@@ -83,17 +85,16 @@ jobs:
             -backend-config="dynamodb_table=terraform-locks-${{ env.ENVIRONMENT }}"
 
       - name: Select or Create Workspace
-        working-directory: terraform
+        working-directory: downloads
         run: |
           terraform workspace select ${{ env.ENVIRONMENT }} || terraform workspace new ${{ env.ENVIRONMENT }}
 
       - name: Run Plan
-        working-directory: terraform
-        id: plan
+        working-directory: downloads
         run: |
           terraform plan -var-file="environments/${{ env.ENVIRONMENT }}/terraform.tfvars" -out=${{ env.ENVIRONMENT }}-plan.out
 
       - name: Run Apply
-        working-directory: terraform
+        working-directory: downloads
         run: |
           terraform apply ${{ env.ENVIRONMENT }}-plan.out
