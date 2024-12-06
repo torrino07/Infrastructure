@@ -68,6 +68,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          submodules: recursive
 
       - name: Configure Environment
         run: echo "Deploying to ${{ env.ENVIRONMENT }} environment from ${{ github.ref_name }} branch"
