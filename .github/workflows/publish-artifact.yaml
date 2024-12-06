@@ -22,5 +22,5 @@ jobs:
     - name: Upload Terraform Templates
       uses: actions/upload-artifact@v3
       with:
-        name: terraform-templates
+        name: terraform
         path: terraform/
