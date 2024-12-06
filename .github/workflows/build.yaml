@@ -64,19 +64,16 @@ jobs:
     needs: validate-environment
     runs-on: ${{ vars.RUNNER }}
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
       - name: Configure Environment
         run: echo "Deploying to ${{ env.ENVIRONMENT }} environment from ${{ github.ref_name }} branch"
 
       - name: Download Terraform Templates
         uses: actions/download-artifact@v4
         with:
-          name: downloads
+          name: terraform
       
       - name: Run Terraform Init
-        working-directory: downloads
+        working-directory: terraform
         run: |
           terraform init \
             -backend-config="region=${{ env.AWS_REGION }}" \
@@ -85,16 +82,16 @@ jobs:
             -backend-config="dynamodb_table=terraform-locks-${{ env.ENVIRONMENT }}"
 
       - name: Select or Create Workspace
-        working-directory: downloads
+        working-directory: terraform
         run: |
           terraform workspace select ${{ env.ENVIRONMENT }} || terraform workspace new ${{ env.ENVIRONMENT }}
 
       - name: Run Plan
-        working-directory: downloads
+        working-directory: terraform
         run: |
           terraform plan -var-file="environments/${{ env.ENVIRONMENT }}/terraform.tfvars" -out=${{ env.ENVIRONMENT }}-plan.out
 
       - name: Run Apply
-        working-directory: downloads
+        working-directory: terraform
         run: |
           terraform apply ${{ env.ENVIRONMENT }}-plan.out
