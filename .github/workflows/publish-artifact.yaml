@@ -1,0 +1,26 @@
+name: Prepare Terraform Files
+
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  prepare-terraform:
+    name: Prepare Terraform Templates
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Validate Terraform Files
+      run: |
+        terraform init
+        terraform validate
+
+    - name: Upload Terraform Templates
+      uses: actions/upload-artifact@v3
+      with:
+        name: terraform-templates
+        path: terraform/
