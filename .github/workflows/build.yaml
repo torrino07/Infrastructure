@@ -41,55 +41,85 @@ on:
 env:
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  AWS_ACCOUNT_ID: ${{ github.event.inputs.environment == 'dev' && secrets.AWS_ACCOUNT_ID_DEV || github.event.inputs.environment == 'staging' && secrets.AWS_ACCOUNT_ID_STAGING  || secrets.AWS_ACCOUNT_ID_PROD }}
+  AWS_ACCOUNT_ID: ${{ github.ref_name == 'dev' && secrets.AWS_ACCOUNT_ID_DEV || github.ref_name == 'staging' && secrets.AWS_ACCOUNT_ID_STAGING  || secrets.AWS_ACCOUNT_ID_PROD }}
   AWS_REGION: ${{ github.event.inputs.region }}
-  ENVIRONMENT:  ${{ github.event.inputs.environment }}
+  ARTIFACT: terraform
 
 jobs:
-  validate-environment:
-    name: Validate Environment
-    runs-on: ${{ vars.RUNNER }}
-    if: >
-      (github.ref_name == 'dev' && github.event.inputs.environment == 'dev') ||
-      (github.ref_name == 'main' && (github.event.inputs.environment == 'staging' || github.event.inputs.environment == 'production'))
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-      
-      - name: Validating Environment
-        run: echo "Validating ${{ env.ENVIRONMENT }} environment from ${{ github.ref_name }} branch"
-
-  build:
-    name: Build Infra
-    needs: validate-environment
+  ci:
+    name: ci
     runs-on: ${{ vars.RUNNER }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Configure Environment
-        run: echo "Deploying to ${{ env.ENVIRONMENT }} environment from ${{ github.ref_name }} branch"
+      - name: Lint code
+        run: echo "lint"
 
-      - name: Run Terraform Init
-        working-directory: terraform
-        run: |
-          terraform init \
-            -backend-config="region=${{ env.AWS_REGION }}" \
-            -backend-config="bucket=terraformstate001-${{ env.ENVIRONMENT }}" \
-            -backend-config="key=${{ env.ENVIRONMENT }}/terraform.tfstate" \
-            -backend-config="dynamodb_table=terraform-locks-${{ env.ENVIRONMENT }}"
+      - name: Test code
+        run: echo "test"
 
-      - name: Select or Create Workspace
-        working-directory: terraform
+      - name: compress
         run: |
-          terraform workspace select ${{ env.ENVIRONMENT }} || terraform workspace new ${{ env.ENVIRONMENT }}
+          mkdir -p dist
+          zip -r ${{ env.ARTIFACT }}.zip ${{ env.ARTIFACT }}
+          mv ${{ env.ARTIFACT }}.zip dist/
 
-      - name: Run Plan
-        working-directory: terraform
-        run: |
-          terraform plan -var-file="environments/${{ env.ENVIRONMENT }}/terraform.tfvars" -out=${{ env.ENVIRONMENT }}-plan.out
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.ARTIFACT }}
+          path: dist/*
 
-      - name: Run Apply
-        working-directory: terraform
+  cd:
+    name: cd
+    if: ${{ github.ref_name == 'dev' || github.ref_name == 'main'}}
+    needs: ci
+    runs-on: ${{ vars.RUNNER }}
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+          fetch-depth: 0
+          ref: ${{ github.ref }}
+
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ env.ARTIFACT }}
+          path: dist
+
+      - name: Test
         run: |
-          terraform apply ${{ env.ENVIRONMENT }}-plan.out
+          ls
+          cd dist
+          ls
+
+      # - name: Configure Environment
+      #   run: echo "Deploying to ${{ github.ref_name }} environment from ${{ github.ref_name }} branch"
+
+      # - name: Run Terraform Init
+      #   working-directory: terraform
+      #   run: |
+      #     terraform init \
+      #       -backend-config="region=${{ env.AWS_REGION }}" \
+      #       -backend-config="bucket=terraformstate001-${{ github.ref_name }}" \
+      #       -backend-config="key=${{ github.ref_name }}/terraform.tfstate" \
+      #       -backend-config="dynamodb_table=terraform-locks-${{ github.ref_name }}"
+
+      # - name: Select or Create Workspace
+      #   working-directory: terraform
+      #   run: |
+      #     terraform workspace select ${{ github.ref_name }} || terraform workspace new ${{ github.ref_name }}
+
+      # - name: Run Plan
+      #   working-directory: terraform
+      #   run: |
+      #     terraform plan -var-file="environments/${{ github.ref_name }}/terraform.tfvars" -out=${{ github.ref_name }}-plan.out
+
+      # - name: Run Apply
+      #   working-directory: terraform
+      #   run: |
+      #     terraform apply ${{ github.ref_name }}-plan.out
