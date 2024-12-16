@@ -31,12 +31,11 @@ env:
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   AWS_ACCOUNT_ID: ${{ github.event.inputs.environment == 'dev' && secrets.AWS_ACCOUNT_ID_DEV || github.event.inputs.environment == 'staging' && secrets.AWS_ACCOUNT_ID_STAGING  || secrets.AWS_ACCOUNT_ID_PROD }}
   AWS_REGION: ${{ github.event.inputs.region }}
-  ENVIRONMENT:  ${{ github.event.inputs.environment }}
+  ENVIRONMENT: ${{ github.ref_name == 'dev' && 'dev' || github.ref_name == 'staging' && 'staging'  || 'prod' }}
 
 jobs:
   destroy:
     name: Destroy Infra
-    needs: validate-environment
     runs-on: ${{ vars.RUNNER }}
     steps:
       - name: Checkout repository
