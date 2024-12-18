@@ -1,12 +1,6 @@
 name: Destroy Infrastructure AWS
 
 on:
-  pull_request:
-    branches:
-      - dev
-      - main
-    types:
-      - opened
   workflow_dispatch:
     inputs:
       region:
@@ -20,7 +14,6 @@ on:
 env:
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  AWS_ACCOUNT_ID: ${{ github.event.inputs.environment == 'dev' && secrets.AWS_ACCOUNT_ID_DEV || github.event.inputs.environment == 'staging' && secrets.AWS_ACCOUNT_ID_STAGING  || secrets.AWS_ACCOUNT_ID_PROD }}
   AWS_REGION: ${{ github.event.inputs.region }}
   ENVIRONMENT: ${{ github.ref_name == 'dev' && 'dev' || github.ref_name == 'staging' && 'staging'  || 'prod' }}
 
