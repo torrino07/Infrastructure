@@ -14,18 +14,19 @@ on:
 env:
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
-  AWS_REGION: ${{ github.event.inputs.region || 'us-east-1'}}
-  ENVIRONMENT: ${{ github.ref_name == 'main' && github.event_name == 'pull_request' && 'staging' || github.ref_name == 'main' && 'prod' || 'dev' }}
+  AWS_REGION: ${{ github.event.inputs.region }}
+  ENVIRONMENT: ${{ github.ref_name == 'dev' && 'dev' || github.ref_name == 'staging' && 'staging'  || 'prod' }}
 
 jobs:
-  infra-build:
-    name: Build Infra
-    runs-on:  ${{ vars.RUNNER }}
-
+  destroy:
+    name: Destroy Infra
+    runs-on: ${{ vars.RUNNER }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
+      
+      - name: Configure Environment
+        run: echo "Deploying to ${{ env.ENVIRONMENT }} environment from ${{ github.ref_name }} branch"
       
       - name: Run Terraform Init
         working-directory: terraform
