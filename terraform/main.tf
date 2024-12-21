@@ -77,14 +77,7 @@ module "sg" {
           cidr_blocks = ["10.0.0.0/16"]
         }
       ]
-      egress_rules = [
-        {
-          from_port   = 0,
-          to_port     = 0,
-          protocol    = "-1",
-          cidr_blocks = ["0.0.0.0/0"]
-        }
-      ]
+      egress_rules = []
     },
     {
       name = "ssm-https-endpoint"
@@ -144,25 +137,25 @@ module "sg" {
         }
       ]
     },
-    {
-      name = "sts-endpoint"
-      ingress_rules = [
-        {
-          from_port   = 443,
-          to_port     = 443,
-          protocol    = "tcp",
-          cidr_blocks = ["10.0.128.0/23", "10.0.144.0/23"]
-        }
-      ]
-      egress_rules = [
-        {
-          from_port   = 0,
-          to_port     = 0,
-          protocol    = "-1",
-          cidr_blocks = ["0.0.0.0/0"]
-        }
-      ]
-    }
+    # {
+    #   name = "sts-endpoint"
+    #   ingress_rules = [
+    #     {
+    #       from_port   = 443,
+    #       to_port     = 443,
+    #       protocol    = "tcp",
+    #       cidr_blocks = ["10.0.128.0/23", "10.0.144.0/23"]
+    #     }
+    #   ]
+    #   egress_rules = [
+    #     {
+    #       from_port   = 0,
+    #       to_port     = 0,
+    #       protocol    = "-1",
+    #       cidr_blocks = ["0.0.0.0/0"]
+    #     }
+    #   ]
+    # }
   ]
 }
 
@@ -250,14 +243,14 @@ module "endpoints" {
       ip_address_type    = "ipv4"
       tag                = "ssmmessages"
     },
-    {
-      service_name       = "com.amazonaws.us-east-1.sts"
-      vpc_endpoint_type  = "Interface"
-      security_group_ids = [for tag, id in module.sg.ids : id if tag == "tradingbot-dev-sts-endpoint-sg"]
-      subnet_ids         = [for tag, id in module.subnets.ids : id if contains(["tradingbot-dev-eks-private-1a-1", "tradingbot-dev-eks-private-1b-1"], tag)]
-      ip_address_type    = "ipv4"
-      tag                = "sts"
-    }
+    # {
+    #   service_name       = "com.amazonaws.us-east-1.sts"
+    #   vpc_endpoint_type  = "Interface"
+    #   security_group_ids = [for tag, id in module.sg.ids : id if tag == "tradingbot-dev-sts-endpoint-sg"]
+    #   subnet_ids         = [for tag, id in module.subnets.ids : id if contains(["tradingbot-dev-eks-private-1a-1", "tradingbot-dev-eks-private-1b-1"], tag)]
+    #   ip_address_type    = "ipv4"
+    #   tag                = "sts"
+    # }
   ]
 }
 
