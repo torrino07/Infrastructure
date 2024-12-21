@@ -77,7 +77,14 @@ module "sg" {
           cidr_blocks = ["10.0.0.0/16"]
         }
       ]
-      egress_rules = []
+      egress_rules = [
+        {
+          from_port   = 0,
+          to_port     = 0,
+          protocol    = "-1",
+          cidr_blocks = ["0.0.0.0/0"]
+        }
+      ]
     },
     {
       name = "ssm-https-endpoint"
