@@ -166,14 +166,24 @@ module "sg" {
   ]
 }
 
+############ NAT GATEAWAY ###########
+module "nat" {
+  source      = "./modules/nat"
+  proj        = var.proj
+  vpc_id      = module.vpc.id
+  environment = var.environment
+  subnet_id   = module.subnets.ids["tradingbot-dev-nat-public-1c-1"]
+}
+
 ############## ROUTES ###############
 module "routes" {
-  source     = "./modules/routes"
-  proj       = var.proj
-  vpc_id     = module.vpc.id
-  cidr_block = "10.0.0.0/16"
-  gateway_id = "local"
-  subnet_ids = module.subnets.ids
+  source         = "./modules/routes"
+  proj           = var.proj
+  vpc_id         = module.vpc.id
+  cidr_block     = "10.0.0.0/16"
+  gateway_id     = "local"
+  nat_gateway_id = null
+  subnet_ids     = module.subnets.ids
 }
 
 ########### ENDPOINTS #############
