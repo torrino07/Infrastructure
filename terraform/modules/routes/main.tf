@@ -5,6 +5,7 @@ resource "aws_route_table" "this" {
   route {
     cidr_block = var.cidr_block
     gateway_id = var.gateway_id
+    nat_gateway_id = null
   }
   tags = {
     Name = "${each.key}-rt"
