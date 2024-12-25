@@ -2,22 +2,17 @@ variable "proj" {
   type = string
 }
 
-variable "cidr_block" {
-  type = string
-}
-
 variable "vpc_id" {
   type = string
 }
 
-variable "gateway_id" {
-  type = string
-}
-
-variable "nat_gateway_id" {
-  type = string
-}
-
-variable "subnet_ids" {
-  type = map(string)
+variable "routes" {
+  type = list(object({
+    name                   = string
+    type                   = string
+    internet               = bool
+    destination_cidr_block = optional(string)
+    gateway_id             = optional(string)
+    subnet_id              = string
+  }))
 }
