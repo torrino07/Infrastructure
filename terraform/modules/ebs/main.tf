@@ -4,7 +4,7 @@ resource "aws_ebs_volume" "this" {
   type              = var.ebs_volume_type
 
   tags = {
-    Name    = "${var.proj}-${var.environment}-${var.name}"
+    Name    = "${var.proj}-${var.environment}-eks-ebs"
     Project = "${var.proj}"
   }
 }
