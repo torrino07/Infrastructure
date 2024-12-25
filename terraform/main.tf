@@ -38,6 +38,13 @@ module "subnets" {
       number           = "1"
       cidr_block       = "10.0.160.0/23"
     },
+    {
+      client_name_type = "nat"
+      route_type       = "public"
+      az               = "1c"
+      number           = "1"
+      cidr_block       = "10.0.0.0/24"
+    },
   ]
 }
 
@@ -106,6 +113,12 @@ module "sg" {
           to_port     = 0,
           protocol    = "-1",
           cidr_blocks = ["10.0.128.0/23", "10.0.144.0/23"]
+        },
+         {
+          from_port   = 0,
+          to_port     = 0,
+          protocol    = "-1",
+          cidr_blocks = ["10.0.0.0/24"]
         }
       ]
       egress_rules = [
@@ -113,6 +126,12 @@ module "sg" {
           from_port   = 0,
           to_port     = 0,
           protocol    = "-1",
+          cidr_blocks = ["0.0.0.0/0"]
+        },
+        {
+          from_port   = 443,
+          to_port     = 443,
+          protocol    = "tcp",
           cidr_blocks = ["0.0.0.0/0"]
         }
       ]
@@ -159,17 +178,53 @@ module "sg" {
   ]
 }
 
-############## ROUTES ###############
-module "routes" {
-  source     = "./modules/routes"
-  proj       = var.proj
-  vpc_id     = module.vpc.id
-  cidr_block = "10.0.0.0/16"
-  gateway_id = "local"
-  subnet_ids = module.subnets.ids
+############ GATEAWAY ###########
+module "gw" {
+  source      = "./modules/gw"
+  proj        = var.proj
+  vpc_id      = module.vpc.id
+  environment = var.environment
+  subnet_id   = module.subnets.ids["tradingbot-dev-nat-public-1c-1"]
 }
 
-########### ENDPOINTS #############
+############## ROUTES ###############
+module "routes" {
+  source = "./modules/routes"
+  proj   = var.proj
+  vpc_id = module.vpc.id
+  routes = [
+    {
+      name      = "tradingbot-dev-eks-private-1a-1"
+      type      = "private"
+      internet  = false
+      subnet_id = module.subnets.ids["tradingbot-dev-eks-private-1a-1"]
+    },
+    {
+      name      = "tradingbot-dev-eks-private-1b-1"
+      type      = "private"
+      internet  = false
+      subnet_id = module.subnets.ids["tradingbot-dev-eks-private-1b-1"]
+    },
+    {
+      name                   = "tradingbot-dev-ec2-private-1c-1"
+      type                   = "private"
+      internet               = true
+      destination_cidr_block = "0.0.0.0/0"
+      gateway_id             = module.gw.nat_gateway_id
+      subnet_id              = module.subnets.ids["tradingbot-dev-ec2-private-1c-1"]
+    },
+    {
+      name                   = "tradingbot-dev-nat-public-1c-1"
+      type                   = "public"
+      internet               = true
+      destination_cidr_block = "0.0.0.0/0"
+      gateway_id             = module.gw.internet_gateway_id
+      subnet_id              = module.subnets.ids["tradingbot-dev-nat-public-1c-1"]
+    }
+  ]
+}
+
+########## ENDPOINTS #############
 module "endpoints" {
   source      = "./modules/endpoints"
   proj        = var.proj
@@ -331,7 +386,7 @@ module "s3" {
   }
 }
 
-############# EC2 ############
+############ EC2 ############
 module "ec2" {
   depends_on    = [module.iam]
   source        = "./modules/ec2"
@@ -346,7 +401,7 @@ module "ec2" {
   access_level  = "readwrite"
 }
 
-############# EBS ############
+############ EBS ############
 module "ebs" {
   depends_on        = [module.iam]
   source            = "./modules/ebs"
@@ -358,7 +413,7 @@ module "ebs" {
   availability_zone = "us-east-1a"
 }
 
-############ EKS ############
+########### EKS ############
 module "eks" {
   depends_on                   = [module.iam]
   source                       = "./modules/eks"
@@ -387,7 +442,7 @@ module "eks" {
   ]
 }
 
-######## COGNITO ##########
+####### COGNITO ##########
 module "cognito" {
   source      = "./modules/cognito"
   proj        = var.proj
@@ -395,7 +450,7 @@ module "cognito" {
   name        = "x-turbo"
 }
 
-########## ECR ##########
+######### ECR ##########
 module "ecr" {
   source      = "./modules/ecr"
   proj        = var.proj
