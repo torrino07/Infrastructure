@@ -422,7 +422,7 @@ module "eks" {
   name                         = "node"
   eks_cluster_role_arn_name    = "AmazonEKSClusterRole"
   eks_node_group_role_arn_name = "AmazonEKSNodeRole"
-  eks_version                  = "1.31"
+  eks_version                  = var.eks_version
   subnet_ids                   = [for tag, id in module.subnets.ids : id if contains(["tradingbot-${var.environment}-eks-private-1a-1", "tradingbot-${var.environment}-eks-private-1b-1"], tag)]
   security_ids                 = [for tag, id in module.sg.ids : id if tag == "eks"]
   max_size                     = 3
