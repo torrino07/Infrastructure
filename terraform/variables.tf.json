@@ -1,5 +1,9 @@
 {
     "variable": {
+        "account_id": {
+            "default": "160945804984",
+            "//": "account id"
+        },
         "proj": {
             "default": "tradingbot",
             "//": "name which will be used to tag/name the resources accordingly"
@@ -9,8 +13,24 @@
             "//": "environment name"
         },
         "region": {
-            "default": "us-east",
+            "default": "us-east-1",
             "//": "environment name"
+        },
+        "artifact_store": {
+            "default": "artifactstore001",
+            "//": "account id"
+        },
+        "availability_zone_ebs": {
+            "default": "us-east-1a",
+            "//": "availability_zone_ebs"
+        },
+        "ec2_instance_type": {
+            "default": "t4g.medium",
+            "//": "ec2 instance type"
+        },
+        "ec2_ami_type": {
+            "default": "ami-07ee04759daf109de",
+            "//": "ec2 ami type"
         }
     }
 }

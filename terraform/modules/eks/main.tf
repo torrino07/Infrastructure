@@ -103,7 +103,7 @@ resource "aws_iam_role" "fastapi_role" {
       {
         Effect = "Allow"
         Principal = {
-          Federated = "arn:aws:iam::160945804984:oidc-provider/${replace(data.aws_eks_cluster.this.identity[0].oidc[0].issuer, "https://", "")}"
+          Federated = "arn:aws:iam::${var.account_id}:oidc-provider/${replace(data.aws_eks_cluster.this.identity[0].oidc[0].issuer, "https://", "")}"
         }
         Action = "sts:AssumeRoleWithWebIdentity"
         Condition = {
@@ -138,7 +138,7 @@ resource "aws_iam_role" "ebs_csi_driver_role" {
       {
         Effect = "Allow",
         Principal = {
-          Federated = "arn:aws:iam::160945804984:oidc-provider/${replace(data.aws_eks_cluster.this.identity[0].oidc[0].issuer, "https://", "")}"
+          Federated = "arn:aws:iam::${var.account_id}:oidc-provider/${replace(data.aws_eks_cluster.this.identity[0].oidc[0].issuer, "https://", "")}"
         },
         Action = "sts:AssumeRoleWithWebIdentity",
         Condition = {
