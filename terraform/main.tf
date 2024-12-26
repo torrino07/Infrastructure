@@ -402,15 +402,15 @@ module "ec2" {
 }
 
 ############ EBS ############
-module "ebs" {
-  depends_on        = [module.iam]
-  source            = "./modules/ebs"
-  proj              = var.proj
-  environment       = var.environment
-  ebs_volume_size   = 20
-  ebs_volume_type   = "gp3"
-  availability_zone = "${var.region}a"
-}
+# module "ebs" {
+#   depends_on        = [module.iam]
+#   source            = "./modules/ebs"
+#   proj              = var.proj
+#   environment       = var.environment
+#   ebs_volume_size   = 20
+#   ebs_volume_type   = "gp3"
+#   availability_zone = "${var.region}a"
+# }
 
 # ########### EKS ############
 # module "eks" {
@@ -442,56 +442,56 @@ module "ebs" {
 #   ]
 # }
 
-###### COGNITO ##########
-module "cognito" {
-  source      = "./modules/cognito"
-  proj        = var.proj
-  environment = var.environment
-  name        = "x-turbo"
-}
+# ###### COGNITO ##########
+# module "cognito" {
+#   source      = "./modules/cognito"
+#   proj        = var.proj
+#   environment = var.environment
+#   name        = "x-turbo"
+# }
 
-######### ECR ##########
-module "ecr" {
-  source      = "./modules/ecr"
-  proj        = var.proj
-  environment = var.environment
-  repositories = [
-    {
-      name                 = "fastapi-app"
-      scan_on_push         = true
-      image_tag_mutability = "MUTABLE"
-    },
-    {
-      name                 = "react-app"
-      scan_on_push         = true
-      image_tag_mutability = "MUTABLE"
-    }
-    ,
-    {
-      name                 = "postgresql-server"
-      scan_on_push         = true
-      image_tag_mutability = "MUTABLE"
-    },
-    {
-      name                 = "metrics-scraper"
-      scan_on_push         = true
-      image_tag_mutability = "MUTABLE"
-    },
-    {
-      name                 = "dashboard"
-      scan_on_push         = true
-      image_tag_mutability = "MUTABLE"
-    },
-    {
-      name                 = "controller"
-      scan_on_push         = true
-      image_tag_mutability = "MUTABLE"
-    },
-    {
-      name                 = "kube-webhook-certgen"
-      scan_on_push         = true
-      image_tag_mutability = "MUTABLE"
-    }
-  ]
-}
+# ######### ECR ##########
+# module "ecr" {
+#   source      = "./modules/ecr"
+#   proj        = var.proj
+#   environment = var.environment
+#   repositories = [
+#     {
+#       name                 = "fastapi-app"
+#       scan_on_push         = true
+#       image_tag_mutability = "MUTABLE"
+#     },
+#     {
+#       name                 = "react-app"
+#       scan_on_push         = true
+#       image_tag_mutability = "MUTABLE"
+#     }
+#     ,
+#     {
+#       name                 = "postgresql-server"
+#       scan_on_push         = true
+#       image_tag_mutability = "MUTABLE"
+#     },
+#     {
+#       name                 = "metrics-scraper"
+#       scan_on_push         = true
+#       image_tag_mutability = "MUTABLE"
+#     },
+#     {
+#       name                 = "dashboard"
+#       scan_on_push         = true
+#       image_tag_mutability = "MUTABLE"
+#     },
+#     {
+#       name                 = "controller"
+#       scan_on_push         = true
+#       image_tag_mutability = "MUTABLE"
+#     },
+#     {
+#       name                 = "kube-webhook-certgen"
+#       scan_on_push         = true
+#       image_tag_mutability = "MUTABLE"
+#     }
+#   ]
+# }
 
