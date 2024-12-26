@@ -20,28 +20,28 @@ module "subnets" {
     {
       client_name_type = "eks"
       route_type       = "private"
-      az               = "a"
+      az               = "1a"
       number           = "1"
       cidr_block       = "10.0.128.0/23"
     },
     {
       client_name_type = "eks"
       route_type       = "private"
-      az               = "b"
+      az               = "1b"
       number           = "1"
       cidr_block       = "10.0.144.0/23"
     },
     {
       client_name_type = "ec2"
       route_type       = "private"
-      az               = "c"
+      az               = "1c"
       number           = "1"
       cidr_block       = "10.0.160.0/23"
     },
     {
       client_name_type = "nat"
       route_type       = "public"
-      az               = "c"
+      az               = "1c"
       number           = "1"
       cidr_block       = "10.0.0.0/24"
     },
