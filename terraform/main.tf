@@ -20,28 +20,28 @@ module "subnets" {
     {
       client_name_type = "eks"
       route_type       = "private"
-      az               = "1a"
+      az               = "a"
       number           = "1"
       cidr_block       = "10.0.128.0/23"
     },
     {
       client_name_type = "eks"
       route_type       = "private"
-      az               = "1b"
+      az               = "b"
       number           = "1"
       cidr_block       = "10.0.144.0/23"
     },
     {
       client_name_type = "ec2"
       route_type       = "private"
-      az               = "1c"
+      az               = "c"
       number           = "1"
       cidr_block       = "10.0.160.0/23"
     },
     {
       client_name_type = "nat"
       route_type       = "public"
-      az               = "1c"
+      az               = "c"
       number           = "1"
       cidr_block       = "10.0.0.0/24"
     },
@@ -232,7 +232,7 @@ module "sg" {
 #   vpc_id      = module.vpc.id
 #   vpc_endpoints = [
 #     {
-#       service_name       = "com.amazonaws.${var.region}-1.ebs"
+#       service_name       = "com.amazonaws.${var.region}.ebs"
 #       vpc_endpoint_type  = "Interface"
 #       security_group_ids = [for tag, id in module.sg.ids : id if tag == "tradingbot-${var.environment}-ebs-endpoint-sg"]
 #       subnet_ids         = [for tag, id in module.subnets.ids : id if contains(["tradingbot-${var.environment}-eks-private-1a-1", "tradingbot-${var.environment}-eks-private-1b-1"], tag)]
@@ -240,41 +240,41 @@ module "sg" {
 #     },
 
 #     {
-#       service_name       = "com.amazonaws.${var.region}-1.ec2"
+#       service_name       = "com.amazonaws.${var.region}.ec2"
 #       vpc_endpoint_type  = "Interface"
 #       security_group_ids = [for tag, id in module.sg.ids : id if tag == "tradingbot-${var.environment}-ec2-ecr-eks-endpoint-sg"]
 #       subnet_ids         = [for tag, id in module.subnets.ids : id if contains(["tradingbot-${var.environment}-eks-private-1a-1", "tradingbot-${var.environment}-eks-private-1b-1"], tag)]
 #       tag                = "ec2"
 #     },
 #     {
-#       service_name       = "com.amazonaws.${var.region}-1.ecr.api"
+#       service_name       = "com.amazonaws.${var.region}.ecr.api"
 #       vpc_endpoint_type  = "Interface"
 #       security_group_ids = [for tag, id in module.sg.ids : id if tag == "tradingbot-${var.environment}-ec2-ecr-eks-endpoint-sg"]
 #       subnet_ids         = [for tag, id in module.subnets.ids : id if contains(["tradingbot-${var.environment}-eks-private-1a-1", "tradingbot-${var.environment}-eks-private-1b-1"], tag)]
 #       tag                = "ecr-api"
 #     },
 #     {
-#       service_name       = "com.amazonaws.${var.region}-1.ecr.dkr"
+#       service_name       = "com.amazonaws.${var.region}.ecr.dkr"
 #       vpc_endpoint_type  = "Interface"
 #       security_group_ids = [for tag, id in module.sg.ids : id if tag == "tradingbot-${var.environment}-ec2-ecr-eks-endpoint-sg"]
 #       subnet_ids         = [for tag, id in module.subnets.ids : id if contains(["tradingbot-${var.environment}-eks-private-1a-1", "tradingbot-${var.environment}-eks-private-1b-1"], tag)]
 #       tag                = "ecr-dkr"
 #     },
 #     {
-#       service_name       = "com.amazonaws.${var.region}-1.eks"
+#       service_name       = "com.amazonaws.${var.region}.eks"
 #       vpc_endpoint_type  = "Interface"
 #       security_group_ids = [for tag, id in module.sg.ids : id if tag == "tradingbot-${var.environment}-ec2-ecr-eks-endpoint-sg"]
 #       subnet_ids         = [for tag, id in module.subnets.ids : id if contains(["tradingbot-${var.environment}-eks-private-1a-1", "tradingbot-${var.environment}-eks-private-1b-1"], tag)]
 #       tag                = "eks"
 #     },
 #     {
-#       service_name      = "com.amazonaws.${var.region}-1.s3"
+#       service_name      = "com.amazonaws.${var.region}.s3"
 #       vpc_endpoint_type = "Gateway"
 #       route_table_ids   = [for tag, id in module.routes.ids : id if contains(["tradingbot-${var.environment}-eks-private-1a-1-rt", "tradingbot-${var.environment}-eks-private-1b-1-rt", "tradingbot-${var.environment}-ec2-private-1c-1-rt"], tag)]
 #       tag               = "s3"
 #     },
 #     {
-#       service_name       = "com.amazonaws.${var.region}-1.ec2messages"
+#       service_name       = "com.amazonaws.${var.region}.ec2messages"
 #       vpc_endpoint_type  = "Interface"
 #       security_group_ids = [for tag, id in module.sg.ids : id if tag == "tradingbot-${var.environment}-ssm-https-endpoint-sg"]
 #       subnet_ids         = [for tag, id in module.subnets.ids : id if contains(["tradingbot-${var.environment}-eks-private-1a-1", "tradingbot-${var.environment}-eks-private-1b-1", "tradingbot-${var.environment}-ec2-private-1c-1"], tag)]
@@ -282,7 +282,7 @@ module "sg" {
 #       tag                = "ec2messages"
 #     },
 #     {
-#       service_name       = "com.amazonaws.${var.region}-1.ssm"
+#       service_name       = "com.amazonaws.${var.region}.ssm"
 #       vpc_endpoint_type  = "Interface"
 #       security_group_ids = [for tag, id in module.sg.ids : id if tag == "tradingbot-${var.environment}-ssm-https-endpoint-sg"]
 #       subnet_ids         = [for tag, id in module.subnets.ids : id if contains(["tradingbot-${var.environment}-eks-private-1a-1", "tradingbot-${var.environment}-eks-private-1b-1", "tradingbot-${var.environment}-ec2-private-1c-1"], tag)]
@@ -291,7 +291,7 @@ module "sg" {
 #     },
 
 #     {
-#       service_name       = "com.amazonaws.${var.region}-1.ssmmessages"
+#       service_name       = "com.amazonaws.${var.region}.ssmmessages"
 #       vpc_endpoint_type  = "Interface"
 #       security_group_ids = [for tag, id in module.sg.ids : id if tag == "tradingbot-${var.environment}-ssm-https-endpoint-sg"]
 #       subnet_ids         = [for tag, id in module.subnets.ids : id if contains(["tradingbot-${var.environment}-eks-private-1a-1", "tradingbot-${var.environment}-eks-private-1b-1", "tradingbot-${var.environment}-ec2-private-1c-1"], tag)]
@@ -299,7 +299,7 @@ module "sg" {
 #       tag                = "ssmmessages"
 #     },
 #     {
-#       service_name       = "com.amazonaws.${var.region}-1.sts"
+#       service_name       = "com.amazonaws.${var.region}.sts"
 #       vpc_endpoint_type  = "Interface"
 #       security_group_ids = [for tag, id in module.sg.ids : id if tag == "tradingbot-${var.environment}-sts-endpoint-sg"]
 #       subnet_ids         = [for tag, id in module.subnets.ids : id if contains(["tradingbot-${var.environment}-eks-private-1a-1", "tradingbot-${var.environment}-eks-private-1b-1"], tag)]
@@ -360,7 +360,7 @@ module "sg" {
 #   source      = "./modules/s3"
 #   proj        = var.proj
 #   environment = var.environment
-#   bucket      = var.artifact_store
+#   bucket      = "${var.artifact_store}-${var.environment}"
 #   policy = {
 #     Version = "2012-10-17"
 #     Statement = [
@@ -373,8 +373,8 @@ module "sg" {
 #         ]
 #         Principal = "*"
 #         Resource = [
-#           "arn:aws:s3:::${var.artifact_store}",
-#           "arn:aws:s3:::${var.artifact_store}/*"
+#           "arn:aws:s3:::${var.artifact_store}-${var.environment}",
+#           "arn:aws:s3:::${var.artifact_store}-${var.environment}/*"
 #         ]
 #         Condition = {
 #           StringEquals = {
@@ -409,7 +409,7 @@ module "sg" {
 #   environment       = var.environment
 #   ebs_volume_size   = 20
 #   ebs_volume_type   = "gp3"
-#   availability_zone = var.availability_zone_ebs
+#   availability_zone = "${var.region}a"
 # }
 
 # ########### EKS ############

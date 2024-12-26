@@ -1,25 +1,20 @@
-variable "account_id" {
-  default = "160945804984"
-}
-
 variable "proj" {
   default = "tradingbot"
 }
 
+variable "account_id" {
+  default = "160945804984"
+}
 variable "environment" {
   default = "dev"
 }
 
 variable "region" {
-  default = "us-east"
+  default = "us-east-1"
 }
 
 variable "artifact_store" {
   default = "artifactstore001"
-}
-
-variable "availability_zone_ebs" {
-  default = "us-east-1a"
 }
 
 variable "ec2_instance_type" {
