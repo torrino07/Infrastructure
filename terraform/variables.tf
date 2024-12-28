@@ -18,11 +18,11 @@ variable "artifact_store" {
 }
 
 variable "ec2_instance_type" {
-  default = "t4g.medium"
+  default = "t3.medium"
 }
 
 variable "ec2_ami_type" {
-  default = "ami-07ee04759daf109de"
+  default = "ami-005fc0f236362e99f"
 }
 
 variable "eks_version" {
