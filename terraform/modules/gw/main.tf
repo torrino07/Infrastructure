@@ -13,6 +13,7 @@ resource "aws_eip" "this" {
     Name        = "${var.proj}-${var.environment}-eip"
     Environment = var.proj
   }
+  depends_on = [aws_internet_gateway.this]
 }
 
 resource "aws_nat_gateway" "this" {
