@@ -13,7 +13,7 @@ resource "aws_eks_cluster" "this" {
 
   vpc_config {
     endpoint_private_access = true
-    endpoint_public_access  = true
+    endpoint_public_access  = false
     subnet_ids              = var.subnet_ids
     security_group_ids      = var.security_ids
   }
@@ -103,12 +103,12 @@ resource "aws_iam_role" "fastapi_role" {
       {
         Effect = "Allow"
         Principal = {
-          Federated = "arn:aws:iam::160945804984:oidc-provider/${replace(data.aws_eks_cluster.this.identity[0].oidc[0].issuer, "https://", "")}"
+          Federated = "arn:aws:iam::${var.account_id}:oidc-provider/${replace(data.aws_eks_cluster.this.identity[0].oidc[0].issuer, "https://", "")}"
         }
         Action = "sts:AssumeRoleWithWebIdentity"
         Condition = {
           StringEquals = {
-            "${replace(data.aws_eks_cluster.this.identity[0].oidc[0].issuer, "https://", "")}:sub" : "system:serviceaccount:dev:fastapi-sa"
+            "${replace(data.aws_eks_cluster.this.identity[0].oidc[0].issuer, "https://", "")}:sub" : "system:serviceaccount:trading:fastapi-sa"
           }
         }
       }
@@ -138,7 +138,7 @@ resource "aws_iam_role" "ebs_csi_driver_role" {
       {
         Effect = "Allow",
         Principal = {
-          Federated = "arn:aws:iam::160945804984:oidc-provider/${replace(data.aws_eks_cluster.this.identity[0].oidc[0].issuer, "https://", "")}"
+          Federated = "arn:aws:iam::${var.account_id}:oidc-provider/${replace(data.aws_eks_cluster.this.identity[0].oidc[0].issuer, "https://", "")}"
         },
         Action = "sts:AssumeRoleWithWebIdentity",
         Condition = {

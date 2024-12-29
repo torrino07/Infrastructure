@@ -52,5 +52,5 @@ jobs:
         working-directory: terraform
         id: destroy
         run: |
-          terraform destroy -var-file="environments/${{ env.ENVIRONMENT }}/terraform.tfvars" -auto-approve
+          terraform destroy -auto-approve
       
