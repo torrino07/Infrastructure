@@ -209,8 +209,8 @@ module "routes" {
       name                   = "tradingbot-${var.environment}-ec2-private-1c-1"
       type                   = "private"
       internet               = false
-      # destination_cidr_block = "0.0.0.0/0"
-      # gateway_id             = module.gw.nat_gateway_id
+      destination_cidr_block = "0.0.0.0/0"
+      gateway_id             = module.gw.nat_gateway_id
       subnet_id              = module.subnets.ids["tradingbot-${var.environment}-ec2-private-1c-1"]
     },
     {
