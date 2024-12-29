@@ -208,7 +208,7 @@ module "routes" {
     {
       name                   = "tradingbot-${var.environment}-ec2-private-1c-1"
       type                   = "private"
-      internet               = false
+      internet               = true
       destination_cidr_block = "0.0.0.0/0"
       gateway_id             = module.gw.nat_gateway_id
       subnet_id              = module.subnets.ids["tradingbot-${var.environment}-ec2-private-1c-1"]
@@ -216,7 +216,7 @@ module "routes" {
     {
       name                   = "tradingbot-${var.environment}-nat-public-1c-1"
       type                   = "public"
-      internet               = false
+      internet               = true
       destination_cidr_block = "0.0.0.0/0"
       gateway_id             = module.gw.internet_gateway_id
       subnet_id              = module.subnets.ids["tradingbot-${var.environment}-nat-public-1c-1"]
