@@ -179,13 +179,13 @@ module "sg" {
 }
 
 ############ GATEAWAY ###########
-module "gw" {
-  source      = "./modules/gw"
-  proj        = var.proj
-  vpc_id      = module.vpc.id
-  environment = var.environment
-  subnet_id   = module.subnets.ids["tradingbot-${var.environment}-nat-public-1c-1"]
-}
+# module "gw" {
+#   source      = "./modules/gw"
+#   proj        = var.proj
+#   vpc_id      = module.vpc.id
+#   environment = var.environment
+#   subnet_id   = module.subnets.ids["tradingbot-${var.environment}-nat-public-1c-1"]
+# }
 
 ############## ROUTES ###############
 module "routes" {
@@ -216,9 +216,9 @@ module "routes" {
     {
       name                   = "tradingbot-${var.environment}-nat-public-1c-1"
       type                   = "public"
-      internet               = true
-      destination_cidr_block = "0.0.0.0/0"
-      gateway_id             = module.gw.internet_gateway_id
+      internet               = false
+      # destination_cidr_block = "0.0.0.0/0"
+      # gateway_id             = module.gw.internet_gateway_id
       subnet_id              = module.subnets.ids["tradingbot-${var.environment}-nat-public-1c-1"]
     }
   ]
