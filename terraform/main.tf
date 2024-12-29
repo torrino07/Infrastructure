@@ -213,14 +213,14 @@ module "routes" {
       # gateway_id             = module.gw.nat_gateway_id
       subnet_id              = module.subnets.ids["tradingbot-${var.environment}-ec2-private-1c-1"]
     },
-    # {
-    #   name                   = "tradingbot-${var.environment}-nat-public-1c-1"
-    #   type                   = "public"
-    #   internet               = true
-    #   destination_cidr_block = "0.0.0.0/0"
-    #   gateway_id             = module.gw.internet_gateway_id
-    #   subnet_id              = module.subnets.ids["tradingbot-${var.environment}-nat-public-1c-1"]
-    # }
+    {
+      name                   = "tradingbot-${var.environment}-nat-public-1c-1"
+      type                   = "public"
+      internet               = true
+      destination_cidr_block = "0.0.0.0/0"
+      gateway_id             = module.gw.internet_gateway_id
+      subnet_id              = module.subnets.ids["tradingbot-${var.environment}-nat-public-1c-1"]
+    }
   ]
 }
 
