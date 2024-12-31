@@ -186,7 +186,7 @@ resource "aws_iam_role" "github_actions_role" {
         },
         Action = "sts:AssumeRoleWithWebIdentity",
         Condition = {
-          StringLike = {
+          StringEquals = {
             "token.actions.githubusercontent.com:sub" = "repo:torrino07/cicd-pipeline:ref:refs/heads/dev",
             "token.actions.githubusercontent.com:aud": "sts.amazonaws.com"
           }
