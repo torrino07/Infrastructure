@@ -219,5 +219,5 @@ resource "aws_iam_policy" "eks_access_policy" {
 resource "aws_iam_role_policy_attachment" "github_actions_attach" {
   role       = aws_iam_role.github_actions_role.name
   policy_arn = aws_iam_policy.eks_access_policy.arn
-  depends_on = [aws_iam_policy.eks_access_policy.this]
+  depends_on = [aws_iam_policy.eks_access_policy]
 }
