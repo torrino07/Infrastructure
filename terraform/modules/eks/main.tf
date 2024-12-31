@@ -160,3 +160,64 @@ resource "aws_eks_addon" "ebs_csi_driver" {
   }
   depends_on = [aws_eks_node_group.this]
 }
+
+resource "aws_iam_openid_connect_provider" "github_oidc" {
+  url             = "https://token.actions.githubusercontent.com"
+  client_id_list  = ["sts.amazonaws.com"]
+  thumbprint_list = ["6938fd4d98bab03faadb97b34396831e3780aea1"]
+
+  tags = {
+    Name = "${var.proj}-${var.environment}-${var.name}-github-oidc"
+  }
+
+  depends_on = [aws_eks_access_policy_association.this]
+}
+
+resource "aws_iam_role" "github_actions_role" {
+  name = "GitHubAction-AssumeRoleWithAction"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Principal = {
+          Federated = "arn:aws:iam::${var.account_id}:oidc-provider/token.actions.githubusercontent.com"
+        },
+        Action = "sts:AssumeRoleWithWebIdentity",
+        Condition = {
+          StringLike = {
+            "token.actions.githubusercontent.com:sub" = "repo:torrino07/cicd-pipeline:ref:refs/heads/dev",
+            "token.actions.githubusercontent.com:aud": "sts.amazonaws.com"
+          }
+        }
+      }
+    ]
+  })
+
+  depends_on = [aws_iam_openid_connect_provider.github_oidc]
+}
+
+resource "aws_iam_policy" "eks_access_policy" {
+  name = "EKSPolicy"
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = [
+          "eks:DescribeCluster",
+          "eks:AccessKubernetesApi"
+        ],
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "github_actions_attach" {
+  role       = aws_iam_role.github_actions_role.name
+  policy_arn = aws_iam_policy.eks_access_policy.arn
+  depends_on = [aws_iam_policy.eks_access_policy.this]
+}
