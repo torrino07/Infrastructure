@@ -39,6 +39,13 @@ module "subnets" {
       cidr_block       = "10.0.160.0/23"
     },
     {
+      client_name_type = "codebuild"
+      route_type       = "private"
+      az               = "1d"
+      number           = "1"
+      cidr_block       = "10.0.176.0/23"
+    },
+    {
       client_name_type = "nat"
       route_type       = "public"
       az               = "1c"
@@ -172,6 +179,25 @@ module "sg" {
           to_port     = 0,
           protocol    = "-1",
           cidr_blocks = ["0.0.0.0/0"]
+        }
+      ]
+    },
+    {
+      name = "codebuild"
+      ingress_rules = [
+        {
+          from_port   = 443,
+          to_port     = 443,
+          protocol    = "tcp",
+          cidr_blocks = ["10.0.0.0/16"]
+        }
+      ]
+      egress_rules = [
+        {
+          from_port   = 443,
+          to_port     = 443,
+          protocol    = "tcp",
+          cidr_blocks = ["10.0.0.0/16"]
         }
       ]
     }
@@ -351,147 +377,166 @@ module "iam" {
         "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"
       ],
       access_level = "readwrite"
+    },
+    {
+      name        = "AmazonCodeBuildRole"
+      effect      = "Allow"
+      type        = "Service"
+      identifiers = ["codebuild.amazonaws.com"]
+      actions     = ["sts:AssumeRole"]
+      policy_arns = [
+        "arn:aws:iam::aws:policy/service-role/AWSCodeBuildAdminAccess",
+        "arn:aws:iam::aws:policy/service-role/AWSCodeBuildServiceRole"
+      ],
+      access_level = "readwrite"
     }
   ]
 }
 
-module "s3" {
-  depends_on  = [module.endpoints]
-  source      = "./modules/s3"
-  proj        = var.proj
-  environment = var.environment
-  bucket      = "${var.artifact_store}-${var.environment}"
-  policy = {
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Action = [
-          "s3:PutObject",
-          "s3:GetObject",
-          "s3:ListBucket"
-        ]
-        Principal = "*"
-        Resource = [
-          "arn:aws:s3:::${var.artifact_store}-${var.environment}",
-          "arn:aws:s3:::${var.artifact_store}-${var.environment}/*"
-        ]
-        Condition = {
-          StringEquals = {
-            "aws:SourceVpce" = module.endpoints.ids["tradingbot-${var.environment}-s3"]
-          }
-        }
-      }
-    ]
-  }
-}
+# module "s3" {
+#   depends_on  = [module.endpoints]
+#   source      = "./modules/s3"
+#   proj        = var.proj
+#   environment = var.environment
+#   bucket      = "${var.artifact_store}-${var.environment}"
+#   policy = {
+#     Version = "2012-10-17"
+#     Statement = [
+#       {
+#         Effect = "Allow"
+#         Action = [
+#           "s3:PutObject",
+#           "s3:GetObject",
+#           "s3:ListBucket"
+#         ]
+#         Principal = "*"
+#         Resource = [
+#           "arn:aws:s3:::${var.artifact_store}-${var.environment}",
+#           "arn:aws:s3:::${var.artifact_store}-${var.environment}/*"
+#         ]
+#         Condition = {
+#           StringEquals = {
+#             "aws:SourceVpce" = module.endpoints.ids["tradingbot-${var.environment}-s3"]
+#           }
+#         }
+#       }
+#     ]
+#   }
+# }
 
-########### EC2 ############
-module "ec2" {
-  depends_on    = [module.iam]
-  source        = "./modules/ec2"
-  proj          = var.proj
-  environment   = var.environment
-  name          = "trading-server"
-  subnet_id     = module.subnets.ids["tradingbot-${var.environment}-ec2-private-1c-1"]
-  sg_id         = module.sg.ids["tradingbot-${var.environment}-ec2-sg"]
-  instance_type = var.ec2_instance_type
-  ami           = var.ec2_ami_type
-  role_arn_name = "AmazonEC2Role"
-  access_level  = "readwrite"
-}
+# ########### EC2 ############
+# module "ec2" {
+#   depends_on    = [module.iam]
+#   source        = "./modules/ec2"
+#   proj          = var.proj
+#   environment   = var.environment
+#   name          = "trading-server"
+#   subnet_id     = module.subnets.ids["tradingbot-${var.environment}-ec2-private-1c-1"]
+#   sg_id         = module.sg.ids["tradingbot-${var.environment}-ec2-sg"]
+#   instance_type = var.ec2_instance_type
+#   ami           = var.ec2_ami_type
+#   role_arn_name = "AmazonEC2Role"
+#   access_level  = "readwrite"
+# }
 
-########## EBS ############
-module "ebs" {
-  depends_on        = [module.iam]
-  source            = "./modules/ebs"
-  proj              = var.proj
-  environment       = var.environment
-  ebs_volume_size   = 20
-  ebs_volume_type   = "gp3"
-  availability_zone = "${var.region}a"
-}
+# ########## EBS ############
+# module "ebs" {
+#   depends_on        = [module.iam]
+#   source            = "./modules/ebs"
+#   proj              = var.proj
+#   environment       = var.environment
+#   ebs_volume_size   = 20
+#   ebs_volume_type   = "gp3"
+#   availability_zone = "${var.region}a"
+# }
 
-########### EKS ############
-module "eks" {
-  depends_on                   = [module.iam]
-  source                       = "./modules/eks"
-  proj                         = var.proj
-  environment                  = var.environment
-  account_id                   = var.account_id
-  name                         = "node"
-  eks_cluster_role_arn_name    = "AmazonEKSClusterRole"
-  eks_node_group_role_arn_name = "AmazonEKSNodeRole"
-  eks_version                  = var.eks_version
-  subnet_ids                   = [for tag, id in module.subnets.ids : id if contains(["tradingbot-${var.environment}-eks-private-1a-1", "tradingbot-${var.environment}-eks-private-1b-1"], tag)]
-  security_ids                 = [for tag, id in module.sg.ids : id if tag == "eks"]
-  max_size                     = 3
-  min_size                     = 1
-  desired_size                 = 3
-  eks_users = [
-    {
-      name          = "dorian"
-      policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
-      principal_arn = "arn:aws:iam::${var.account_id}:user/dorian"
-    },
-    {
-      name          = "cicd-pipeline"
-      policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
-      principal_arn = "arn:aws:iam::${var.account_id}:user/cicd-pipeline"
-    }
-  ]
-}
+# ########### EKS ############
+# module "eks" {
+#   depends_on                   = [module.iam]
+#   source                       = "./modules/eks"
+#   proj                         = var.proj
+#   environment                  = var.environment
+#   account_id                   = var.account_id
+#   name                         = "node"
+#   eks_cluster_role_arn_name    = "AmazonEKSClusterRole"
+#   eks_node_group_role_arn_name = "AmazonEKSNodeRole"
+#   eks_version                  = var.eks_version
+#   subnet_ids                   = [for tag, id in module.subnets.ids : id if contains(["tradingbot-${var.environment}-eks-private-1a-1", "tradingbot-${var.environment}-eks-private-1b-1"], tag)]
+#   security_ids                 = [for tag, id in module.sg.ids : id if tag == "eks"]
+#   max_size                     = 3
+#   min_size                     = 1
+#   desired_size                 = 3
+#   eks_users = [
+#     {
+#       name          = "dorian"
+#       policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+#       principal_arn = "arn:aws:iam::${var.account_id}:user/dorian"
+#     },
+#     {
+#       name          = "cicd-pipeline"
+#       policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+#       principal_arn = "arn:aws:iam::${var.account_id}:user/cicd-pipeline"
+#     }
+#   ]
+# }
 
-###### COGNITO ##########
-module "cognito" {
-  source      = "./modules/cognito"
-  proj        = var.proj
-  environment = var.environment
-  name        = "x-turbo"
-}
+# ###### COGNITO ##########
+# module "cognito" {
+#   source      = "./modules/cognito"
+#   proj        = var.proj
+#   environment = var.environment
+#   name        = "x-turbo"
+# }
 
-######### ECR ##########
-module "ecr" {
-  source      = "./modules/ecr"
-  proj        = var.proj
-  environment = var.environment
-  repositories = [
-    {
-      name                 = "fastapi-app"
-      scan_on_push         = true
-      image_tag_mutability = "MUTABLE"
-    },
-    {
-      name                 = "react-app"
-      scan_on_push         = true
-      image_tag_mutability = "MUTABLE"
-    }
-    ,
-    {
-      name                 = "postgresql-server"
-      scan_on_push         = true
-      image_tag_mutability = "MUTABLE"
-    },
-    {
-      name                 = "metrics-scraper"
-      scan_on_push         = true
-      image_tag_mutability = "MUTABLE"
-    },
-    {
-      name                 = "dashboard"
-      scan_on_push         = true
-      image_tag_mutability = "MUTABLE"
-    },
-    {
-      name                 = "controller"
-      scan_on_push         = true
-      image_tag_mutability = "MUTABLE"
-    },
-    {
-      name                 = "kube-webhook-certgen"
-      scan_on_push         = true
-      image_tag_mutability = "MUTABLE"
-    }
-  ]
-}
+# ######### ECR ##########
+# module "ecr" {
+#   source      = "./modules/ecr"
+#   proj        = var.proj
+#   environment = var.environment
+#   repositories = [
+#     {
+#       name                 = "fastapi-app"
+#       scan_on_push         = true
+#       image_tag_mutability = "MUTABLE"
+#     },
+#     {
+#       name                 = "react-app"
+#       scan_on_push         = true
+#       image_tag_mutability = "MUTABLE"
+#     }
+#     ,
+#     {
+#       name                 = "postgresql-server"
+#       scan_on_push         = true
+#       image_tag_mutability = "MUTABLE"
+#     },
+#     {
+#       name                 = "metrics-scraper"
+#       scan_on_push         = true
+#       image_tag_mutability = "MUTABLE"
+#     },
+#     {
+#       name                 = "dashboard"
+#       scan_on_push         = true
+#       image_tag_mutability = "MUTABLE"
+#     },
+#     {
+#       name                 = "controller"
+#       scan_on_push         = true
+#       image_tag_mutability = "MUTABLE"
+#     },
+#     {
+#       name                 = "kube-webhook-certgen"
+#       scan_on_push         = true
+#       image_tag_mutability = "MUTABLE"
+#     }
+#   ]
+# }
 
+########### CODE BUIL ##############
+module "codebuild" {
+  source          = "./modules/codebuild"
+  proj            = var.proj
+  environment     = var.environment
+  role_arn_name   = "AmazonCodeBuildRole"
+}
