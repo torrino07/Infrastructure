@@ -535,6 +535,7 @@ module "iam" {
 
 ########### CODE BUIL ##############
 module "codebuild" {
+  depends_on    = [module.iam]
   source          = "./modules/codebuild"
   proj            = var.proj
   environment     = var.environment
