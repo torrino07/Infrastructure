@@ -401,7 +401,7 @@ module "iam" {
       policy_arns = [
         "arn:aws:iam::aws:policy/AWSCodeBuildAdminAccess",
         "arn:aws:iam::aws:policy/CloudWatchLogsFullAccess",
-        "arn:aws:iam::${var.account_id}:policy/DescribeNetworkInterfacesPolicy"
+        "arn:aws:iam::${var.account_id}:policy/AWSCodeBuildNetworkInterfaces"
       ],
       access_level = "readwrite"
     }
