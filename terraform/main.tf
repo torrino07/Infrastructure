@@ -533,7 +533,7 @@ module "iam" {
 #   ]
 # }
 
-########### CODE BUIL ##############
+########### CODE BUILD ##############
 module "codebuild" {
   depends_on    = [module.iam]
   source        = "./modules/codebuild"
