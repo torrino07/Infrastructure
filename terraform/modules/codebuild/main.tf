@@ -20,6 +20,12 @@ resource "aws_codebuild_project" "this" {
     image        = "aws/codebuild/standard:5.0"
     type         = "LINUX_CONTAINER"
   }
+
+  vpc_config {
+    vpc_id = var.vpc_id
+    subnets = var.subnet_ids
+    security_group_ids = var.sg_ids
+  }
 }
 
 resource "aws_codebuild_source_credential" "example" {
