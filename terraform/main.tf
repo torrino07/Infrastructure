@@ -193,7 +193,7 @@ module "sg" {
         }
       ]
       egress_rules = [
-         {
+        {
           from_port   = 0,
           to_port     = 0,
           protocol    = "-1",
@@ -245,7 +245,7 @@ module "routes" {
       gateway_id             = module.gw.nat_gateway_id
       subnet_id              = module.subnets.ids["tradingbot-${var.environment}-ec2-private-1c-1"]
     },
-     {
+    {
       name                   = "tradingbot-${var.environment}-codebuild-private-1d-1"
       type                   = "private"
       internet               = true
@@ -397,7 +397,12 @@ module "iam" {
       effect      = "Allow"
       type        = "Service"
       identifiers = ["codebuild.amazonaws.com"]
-      actions     = ["sts:AssumeRole"]
+      actions = [
+        "sts:AssumeRole",
+        "ec2:DescribeNetworkInterfaces",
+        "ec2:CreateNetworkInterface",
+        "ec2:DeleteNetworkInterface"
+      ]
       policy_arns = [
         "arn:aws:iam::aws:policy/AWSCodeBuildAdminAccess",
         "arn:aws:iam::aws:policy/CloudWatchLogsFullAccess"
