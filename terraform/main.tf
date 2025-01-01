@@ -385,7 +385,7 @@ module "iam" {
       identifiers = ["codebuild.amazonaws.com"]
       actions     = ["sts:AssumeRole"]
       policy_arns = [
-        "arn:aws:iam::aws:policy/service-role/AWSCodeBuildAdminAccess",
+        "arn:aws:iam::aws:policy/AWSCodeBuildAdminAccess",
         "arn:aws:iam::aws:policy/service-role/AWSCodeBuildServiceRole"
       ],
       access_level = "readwrite"
