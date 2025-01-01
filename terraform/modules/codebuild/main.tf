@@ -4,7 +4,7 @@ data "aws_iam_role" "codebuild_project_role" {
 
 resource "aws_codebuild_project" "this" {
   name         = "${var.proj}-${var.environment}-gh-actions"
-  service_role = data.aws_iam_role.codebuild_project_role
+  service_role = data.aws_iam_role.codebuild_project_role.arn
 
   source {
     type     = "GITHUB"
