@@ -397,15 +397,11 @@ module "iam" {
       effect      = "Allow"
       type        = "Service"
       identifiers = ["codebuild.amazonaws.com"]
-      actions = [
-        "sts:AssumeRole",
-        "ec2:DescribeNetworkInterfaces",
-        "ec2:CreateNetworkInterface",
-        "ec2:DeleteNetworkInterface"
-      ]
+      actions = ["sts:AssumeRole"]
       policy_arns = [
         "arn:aws:iam::aws:policy/AWSCodeBuildAdminAccess",
-        "arn:aws:iam::aws:policy/CloudWatchLogsFullAccess"
+        "arn:aws:iam::aws:policy/CloudWatchLogsFullAccess",
+        "arn:aws:iam::${var.account_id}:policy/DescribeNetworkInterfacesPolicy"
       ],
       access_level = "readwrite"
     }
