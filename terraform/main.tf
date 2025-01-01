@@ -533,11 +533,14 @@ module "iam" {
 #   ]
 # }
 
-########### CODE BUIL ##############
+########### CODE BUILD ##############
 module "codebuild" {
   depends_on    = [module.iam]
-  source          = "./modules/codebuild"
-  proj            = var.proj
-  environment     = var.environment
-  role_arn_name   = "AmazonCodeBuildRole"
+  source        = "./modules/codebuild"
+  proj          = var.proj
+  vpc_id        = module.vpc.id
+  subnet_ids    = [module.subnets.ids["tradingbot-${var.environment}-codebuild-private-1d-1"]]
+  sg_ids        = [module.sg["tradingbot-${var.environment}-codebuild-sg"]]
+  environment   = var.environment
+  role_arn_name = "AmazonCodeBuildRole"
 }
