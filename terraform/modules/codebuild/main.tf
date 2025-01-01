@@ -22,13 +22,20 @@ resource "aws_codebuild_project" "this" {
   }
 }
 
-resource "aws_codebuild_webhook" "webhook" {
+resource "aws_codebuild_source_credential" "example" {
+  auth_type   = "PERSONAL_ACCESS_TOKEN"
+  server_type = "GITHUB"
+  token       = "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"
+}
+
+resource "aws_codebuild_webhook" "this" {
   project_name = aws_codebuild_project.this.name
 
   filter_group {
     filter {
       type    = "EVENT"
       pattern = "WORKFLOW_JOB_QUEUED"
+    
     }
   }
 }
