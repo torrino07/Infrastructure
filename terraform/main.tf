@@ -163,7 +163,7 @@ module "sg" {
           from_port   = 8443,
           to_port     = 8443,
           protocol    = "tcp",
-          cidr_blocks = ["10.0.0.0/16"]
+          cidr_blocks = ["0.0.0.0/0"]
         }
       ]
       egress_rules = [
