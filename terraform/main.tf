@@ -157,7 +157,7 @@ module "sg" {
           from_port   = 443,
           to_port     = 443,
           protocol    = "tcp",
-          cidr_blocks = ["10.0.176.0/23"]
+          cidr_blocks = ["10.0.176.0/23", "10.0.128.0/23", "10.0.144.0/23"]
         },
         {
           from_port   = 8443,
