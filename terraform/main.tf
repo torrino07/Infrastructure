@@ -158,6 +158,12 @@ module "sg" {
           to_port     = 443,
           protocol    = "tcp",
           cidr_blocks = ["10.0.176.0/23"]
+        },
+        {
+          from_port   = 8443,
+          to_port     = 8443,
+          protocol    = "tcp",
+          cidr_blocks = ["10.0.176.0/23"]
         }
       ]
       egress_rules = [
@@ -409,7 +415,7 @@ module "iam" {
       effect      = "Allow"
       type        = "Service"
       identifiers = ["codebuild.amazonaws.com"]
-      actions = ["sts:AssumeRole"]
+      actions     = ["sts:AssumeRole"]
       policy_arns = [
         "arn:aws:iam::aws:policy/AWSCodeBuildAdminAccess",
         "arn:aws:iam::aws:policy/CloudWatchLogsFullAccess",
