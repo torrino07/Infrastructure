@@ -192,6 +192,12 @@ module "sg" {
       name = "codebuild"
       ingress_rules = [
         {
+          from_port   = 0,
+          to_port     = 0,
+          protocol    = "-1",
+          cidr_blocks = ["10.0.128.0/23", "10.0.144.0/23"]
+        },
+        {
           from_port   = 443,
           to_port     = 443,
           protocol    = "tcp",
