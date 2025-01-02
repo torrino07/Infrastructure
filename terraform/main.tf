@@ -152,6 +152,12 @@ module "sg" {
           to_port     = 8000,
           protocol    = "tcp",
           cidr_blocks = ["10.0.160.0/23"]
+        },
+        {
+          from_port   = 443,
+          to_port     = 443,
+          protocol    = "tcp",
+          cidr_blocks = ["10.0.176.0/23"]
         }
       ]
       egress_rules = [
