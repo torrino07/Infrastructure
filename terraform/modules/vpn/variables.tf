@@ -21,3 +21,7 @@ variable "ca_certificate_body" {
 variable "subnet_id" {
   type = string
 }
+
+variable "vpc_id" {
+  type = string
+}

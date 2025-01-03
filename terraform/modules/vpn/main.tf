@@ -1,6 +1,10 @@
 resource "aws_ec2_client_vpn_endpoint" "this" {
   server_certificate_arn = var.server_certificate_arn
   client_cidr_block      = var.cidr_block
+  vpc_id                 = var.vpc_id
+  vpn_port               = 433
+  session_timeout_hours  = 8
+  transport_protocol     = "udp"
 
   authentication_options {
     type                       = "certificate-authentication"
@@ -11,15 +15,16 @@ resource "aws_ec2_client_vpn_endpoint" "this" {
     enabled = false
   }
 
-  split_tunnel = false
+  split_tunnel = true
 
   tags = {
     Environment = "${var.environment}"
-    Name        = "${var.proj}-${var.environment}-vpn-client"
+    Name        = "${var.proj}-${var.environment}-vpn"
   }
 }
 
 resource "aws_ec2_client_vpn_network_association" "this" {
   client_vpn_endpoint_id = aws_ec2_client_vpn_endpoint.this.id
   subnet_id              = var.subnet_id
+  depends_on             = [aws_ec2_client_vpn_endpoint.this]
 }
