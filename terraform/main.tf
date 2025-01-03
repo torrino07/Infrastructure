@@ -603,7 +603,7 @@ module "acm" {
 
 ########### VPN ##############
 module "vpn" {
-  depends_on             = [acm]
+  depends_on             = [module.acm]
   source                 = "./modules/vpn"
   proj                   = var.proj
   vpc_id                 = module.vpc.id
