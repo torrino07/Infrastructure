@@ -603,13 +603,13 @@ module "acm" {
 
 ########### VPN ##############
 module "vpn" {
-  depends_on             = [module.acm]
-  source                 = "./modules/vpn"
-  proj                   = var.proj
-  vpc_id                 = module.vpc.id
-  cidr_block             = "192.168.0.0/16"
-  environment            = var.environment
-  subnet_id              = module.subnets.ids["tradingbot-${var.environment}-vpn-private-1a-1"]
-  server_certificate_arn = module.acm.server_certificate_arn
-  ca_certificate_body    = module.acm.server_certificate_arn
+  depends_on                = [module.acm]
+  source                    = "./modules/vpn"
+  proj                      = var.proj
+  vpc_id                    = module.vpc.id
+  cidr_block                = "192.168.0.0/16"
+  environment               = var.environment
+  subnet_id                 = module.subnets.ids["tradingbot-${var.environment}-vpn-private-1a-1"]
+  server_certificate_arn    = module.acm.server_certificate_arn
+  certificate_authority_arn = module.acm.certificate_authority_arn
 }
