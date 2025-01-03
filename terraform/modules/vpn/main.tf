@@ -2,7 +2,7 @@ resource "aws_ec2_client_vpn_endpoint" "this" {
   server_certificate_arn = var.server_certificate_arn
   client_cidr_block      = var.cidr_block
   vpc_id                 = var.vpc_id
-  vpn_port               = 433
+  vpn_port               = 443
   session_timeout_hours  = 8
   transport_protocol     = "udp"
 
