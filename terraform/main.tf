@@ -22,7 +22,7 @@ module "subnets" {
       route_type       = "private"
       az               = "1a"
       number           = "1"
-      cidr_block       = "10.8.1.0/24"
+      cidr_block       = "10.0.1.0/24"
     },
 
     {
