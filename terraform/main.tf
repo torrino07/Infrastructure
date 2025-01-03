@@ -184,6 +184,31 @@ module "sg" {
       ]
     },
     {
+      name = "vpn-endpoint"
+      ingress_rules = [
+        {
+          from_port   = 443,
+          to_port     = 443,
+          protocol    = "udp",
+          cidr_blocks = ["0.0.0.0/0"]
+        },
+        {
+          from_port   = 0,
+          to_port     = 0,
+          protocol    = "-1",
+          cidr_blocks = ["192.168.0.0/16"]
+        }
+      ]
+      egress_rules = [
+        {
+          from_port   = 0,
+          to_port     = 0,
+          protocol    = "-1",
+          cidr_blocks = ["0.0.0.0/0"]
+        }
+      ]
+    },
+    {
       name = "sts-endpoint"
       ingress_rules = [
         {
@@ -593,14 +618,6 @@ module "acm" {
   environment = var.environment
 }
 
-# output "name1" {
-#   value = module.acm.server_certificate_arn
-# }
-
-# output "name2" {
-#   value = module.acm.ca_certificate_body
-# }
-
 ########### VPN ##############
 module "vpn" {
   depends_on                = [module.acm]
@@ -608,6 +625,7 @@ module "vpn" {
   proj                      = var.proj
   vpc_id                    = module.vpc.id
   cidr_block                = "192.168.0.0/16"
+  sg_id                     = module.sg.ids["tradingbot-${var.environment}-vpn-endpoint-sg"]
   environment               = var.environment
   subnet_id                 = module.subnets.ids["tradingbot-${var.environment}-vpn-private-1a-1"]
   server_certificate_arn    = module.acm.server_certificate_arn

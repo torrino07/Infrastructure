@@ -5,6 +5,7 @@ resource "aws_ec2_client_vpn_endpoint" "this" {
   vpn_port               = 443
   session_timeout_hours  = 8
   transport_protocol     = "udp"
+  security_group_ids     = [var.sg_id]
 
   authentication_options {
     type                       = "certificate-authentication"
