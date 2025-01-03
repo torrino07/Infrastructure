@@ -22,7 +22,7 @@ module "subnets" {
       route_type       = "private"
       az               = "1a"
       number           = "1"
-      cidr_block       = "10.8.0.0/16"
+      cidr_block       = "10.8.1.0/24"
     },
 
     {
@@ -165,7 +165,7 @@ module "sg" {
           from_port   = 443,
           to_port     = 443,
           protocol    = "tcp",
-          cidr_blocks = ["10.0.176.0/23", "10.0.128.0/23", "10.0.144.0/23", "10.8.0.0/16"]
+          cidr_blocks = ["10.0.176.0/23", "10.0.128.0/23", "10.0.144.0/23", "10.8.1.0/24"]
         },
         {
           from_port   = 8443,
