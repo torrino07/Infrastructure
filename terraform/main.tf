@@ -18,6 +18,14 @@ module "subnets" {
   vpc_id      = module.vpc.id
   subnets = [
     {
+      client_name_type = "vpn"
+      route_type       = "private"
+      az               = "1a"
+      number           = "1"
+      cidr_block       = "10.8.0.0/16"
+    },
+
+    {
       client_name_type = "eks"
       route_type       = "private"
       az               = "1a"
@@ -39,19 +47,19 @@ module "subnets" {
       cidr_block       = "10.0.160.0/23"
     },
     {
-      client_name_type = "codebuild"
-      route_type       = "private"
-      az               = "1d"
-      number           = "1"
-      cidr_block       = "10.0.176.0/23"
-    },
-    {
       client_name_type = "nat"
       route_type       = "public"
       az               = "1c"
       number           = "1"
       cidr_block       = "10.0.0.0/24"
     },
+    {
+      client_name_type = "codebuild"
+      route_type       = "private"
+      az               = "1d"
+      number           = "1"
+      cidr_block       = "10.0.176.0/23"
+    }
   ]
 }
 
@@ -157,7 +165,7 @@ module "sg" {
           from_port   = 443,
           to_port     = 443,
           protocol    = "tcp",
-          cidr_blocks = ["10.0.176.0/23", "10.0.128.0/23", "10.0.144.0/23"]
+          cidr_blocks = ["10.0.176.0/23", "10.0.128.0/23", "10.0.144.0/23", "10.8.0.0/16"]
         },
         {
           from_port   = 8443,
@@ -237,50 +245,50 @@ module "sg" {
 #   subnet_id   = module.subnets.ids["tradingbot-${var.environment}-nat-public-1c-1"]
 # }
 
-# ############## ROUTES ###############
-# module "routes" {
-#   source = "./modules/routes"
-#   proj   = var.proj
-#   vpc_id = module.vpc.id
-#   routes = [
-#     {
-#       name      = "tradingbot-${var.environment}-eks-private-1a-1"
-#       type      = "private"
-#       internet  = false
-#       subnet_id = module.subnets.ids["tradingbot-${var.environment}-eks-private-1a-1"]
-#     },
-#     {
-#       name      = "tradingbot-${var.environment}-eks-private-1b-1"
-#       type      = "private"
-#       internet  = false
-#       subnet_id = module.subnets.ids["tradingbot-${var.environment}-eks-private-1b-1"]
-#     },
-#     {
-#       name                   = "tradingbot-${var.environment}-ec2-private-1c-1"
-#       type                   = "private"
-#       internet               = true
-#       destination_cidr_block = "0.0.0.0/0"
-#       gateway_id             = module.gw.nat_gateway_id
-#       subnet_id              = module.subnets.ids["tradingbot-${var.environment}-ec2-private-1c-1"]
-#     },
-#     {
-#       name                   = "tradingbot-${var.environment}-codebuild-private-1d-1"
-#       type                   = "private"
-#       internet               = true
-#       destination_cidr_block = "0.0.0.0/0"
-#       gateway_id             = module.gw.nat_gateway_id
-#       subnet_id              = module.subnets.ids["tradingbot-${var.environment}-codebuild-private-1d-1"]
-#     },
-#     {
-#       name                   = "tradingbot-${var.environment}-nat-public-1c-1"
-#       type                   = "public"
-#       internet               = true
-#       destination_cidr_block = "0.0.0.0/0"
-#       gateway_id             = module.gw.internet_gateway_id
-#       subnet_id              = module.subnets.ids["tradingbot-${var.environment}-nat-public-1c-1"]
-#     }
-#   ]
-# }
+############## ROUTES ###############
+module "routes" {
+  source = "./modules/routes"
+  proj   = var.proj
+  vpc_id = module.vpc.id
+  routes = [
+    {
+      name      = "tradingbot-${var.environment}-eks-private-1a-1"
+      type      = "private"
+      internet  = false
+      subnet_id = module.subnets.ids["tradingbot-${var.environment}-eks-private-1a-1"]
+    },
+    {
+      name      = "tradingbot-${var.environment}-eks-private-1b-1"
+      type      = "private"
+      internet  = false
+      subnet_id = module.subnets.ids["tradingbot-${var.environment}-eks-private-1b-1"]
+    },
+    # {
+    #   name                   = "tradingbot-${var.environment}-ec2-private-1c-1"
+    #   type                   = "private"
+    #   internet               = true
+    #   destination_cidr_block = "0.0.0.0/0"
+    #   gateway_id             = module.gw.nat_gateway_id
+    #   subnet_id              = module.subnets.ids["tradingbot-${var.environment}-ec2-private-1c-1"]
+    # },
+    # {
+    #   name                   = "tradingbot-${var.environment}-codebuild-private-1d-1"
+    #   type                   = "private"
+    #   internet               = true
+    #   destination_cidr_block = "0.0.0.0/0"
+    #   gateway_id             = module.gw.nat_gateway_id
+    #   subnet_id              = module.subnets.ids["tradingbot-${var.environment}-codebuild-private-1d-1"]
+    # },
+    # {
+    #   name                   = "tradingbot-${var.environment}-nat-public-1c-1"
+    #   type                   = "public"
+    #   internet               = true
+    #   destination_cidr_block = "0.0.0.0/0"
+    #   gateway_id             = module.gw.internet_gateway_id
+    #   subnet_id              = module.subnets.ids["tradingbot-${var.environment}-nat-public-1c-1"]
+    # }
+  ]
+}
 
 # ########## ENDPOINTS #############
 # module "endpoints" {
@@ -593,13 +601,14 @@ output "name2" {
   value = module.acm.ca_certificate_body
 }
 
-# ########### VPN ##############
-# module "vpn" {
-#   source                 = "./modules/vpn"
-#   proj                   = var.proj
-#   cidr_block             = "10.8.0.0/16"
-#   environment            = var.environment
-#   subnet_id              = ""
-#   server_certificate_arn = module.acm.server_certificate_arn
-#   ca_certificate_body    = module.acm.ca_certificate_body
-# }
+########### VPN ##############
+module "vpn" {
+  source                 = "./modules/vpn"
+  proj                   = var.proj
+  vpc_id                 = module.vpc.id
+  cidr_block             = "192.168.0.0/16"
+  environment            = var.environment
+  subnet_id              = module.subnets.ids["tradingbot-${var.environment}-vpn-private-1a-1"]
+  server_certificate_arn = module.acm.server_certificate_arn
+  ca_certificate_body    = module.acm.ca_certificate_body
+}
