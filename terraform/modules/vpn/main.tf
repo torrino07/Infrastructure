@@ -15,7 +15,7 @@ resource "aws_ec2_client_vpn_endpoint" "this" {
   }
 
   connection_log_options {
-    enabled               = true
+    enabled               = false
     cloudwatch_log_group  = "client-vpn-logs"
     cloudwatch_log_stream = "client-vpn-stream"
   }
