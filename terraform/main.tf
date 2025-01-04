@@ -25,41 +25,41 @@ module "subnets" {
       cidr_block       = "10.1.1.0/24"
     },
 
-    {
-      client_name_type = "eks"
-      route_type       = "private"
-      az               = "1a"
-      number           = "1"
-      cidr_block       = "10.0.128.0/23"
-    },
-    {
-      client_name_type = "eks"
-      route_type       = "private"
-      az               = "1b"
-      number           = "1"
-      cidr_block       = "10.0.144.0/23"
-    },
-    {
-      client_name_type = "ec2"
-      route_type       = "private"
-      az               = "1c"
-      number           = "1"
-      cidr_block       = "10.0.160.0/23"
-    },
-    {
-      client_name_type = "nat"
-      route_type       = "public"
-      az               = "1c"
-      number           = "1"
-      cidr_block       = "10.0.0.0/24"
-    },
-    {
-      client_name_type = "codebuild"
-      route_type       = "private"
-      az               = "1d"
-      number           = "1"
-      cidr_block       = "10.0.176.0/23"
-    }
+    # {
+    #   client_name_type = "eks"
+    #   route_type       = "private"
+    #   az               = "1a"
+    #   number           = "1"
+    #   cidr_block       = "10.0.128.0/23"
+    # },
+    # {
+    #   client_name_type = "eks"
+    #   route_type       = "private"
+    #   az               = "1b"
+    #   number           = "1"
+    #   cidr_block       = "10.0.144.0/23"
+    # },
+    # {
+    #   client_name_type = "ec2"
+    #   route_type       = "private"
+    #   az               = "1c"
+    #   number           = "1"
+    #   cidr_block       = "10.0.160.0/23"
+    # },
+    # {
+    #   client_name_type = "nat"
+    #   route_type       = "public"
+    #   az               = "1c"
+    #   number           = "1"
+    #   cidr_block       = "10.0.0.0/24"
+    # },
+    # {
+    #   client_name_type = "codebuild"
+    #   route_type       = "private"
+    #   az               = "1d"
+    #   number           = "1"
+    #   cidr_block       = "10.0.176.0/23"
+    # }
   ]
 }
 
