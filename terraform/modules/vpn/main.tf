@@ -1,5 +1,5 @@
 resource "aws_ec2_client_vpn_endpoint" "this" {
-  server_certificate_arn = var.server.arn
+  server_certificate_arn = var.server_arn
   client_cidr_block      = var.cidr_block
   vpc_id                 = var.vpc_id
   vpn_port               = 443
@@ -9,7 +9,7 @@ resource "aws_ec2_client_vpn_endpoint" "this" {
 
   authentication_options {
     type                       = "certificate-authentication"
-    root_certificate_chain_arn = var.client.arn
+    root_certificate_chain_arn = var.client_arn
   }
 
   connection_log_options {
