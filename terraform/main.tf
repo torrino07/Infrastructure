@@ -270,42 +270,42 @@ module "sg" {
 #   proj   = var.proj
 #   vpc_id = module.vpc.id
 #   routes = [
-    # {
-    #   name      = "tradingbot-${var.environment}-eks-private-1a-1"
-    #   type      = "private"
-    #   internet  = false
-    #   subnet_id = module.subnets.ids["tradingbot-${var.environment}-eks-private-1a-1"]
-    # },
-    # {
-    #   name      = "tradingbot-${var.environment}-eks-private-1b-1"
-    #   type      = "private"
-    #   internet  = false
-    #   subnet_id = module.subnets.ids["tradingbot-${var.environment}-eks-private-1b-1"]
-    # },
-    # {
-    #   name                   = "tradingbot-${var.environment}-ec2-private-1c-1"
-    #   type                   = "private"
-    #   internet               = true
-    #   destination_cidr_block = "0.0.0.0/0"
-    #   gateway_id             = module.gw.nat_gateway_id
-    #   subnet_id              = module.subnets.ids["tradingbot-${var.environment}-ec2-private-1c-1"]
-    # },
-    # {
-    #   name                   = "tradingbot-${var.environment}-codebuild-private-1d-1"
-    #   type                   = "private"
-    #   internet               = true
-    #   destination_cidr_block = "0.0.0.0/0"
-    #   gateway_id             = module.gw.nat_gateway_id
-    #   subnet_id              = module.subnets.ids["tradingbot-${var.environment}-codebuild-private-1d-1"]
-    # },
-    # {
-    #   name                   = "tradingbot-${var.environment}-nat-public-1c-1"
-    #   type                   = "public"
-    #   internet               = true
-    #   destination_cidr_block = "0.0.0.0/0"
-    #   gateway_id             = module.gw.internet_gateway_id
-    #   subnet_id              = module.subnets.ids["tradingbot-${var.environment}-nat-public-1c-1"]
-    # }
+# {
+#   name      = "tradingbot-${var.environment}-eks-private-1a-1"
+#   type      = "private"
+#   internet  = false
+#   subnet_id = module.subnets.ids["tradingbot-${var.environment}-eks-private-1a-1"]
+# },
+# {
+#   name      = "tradingbot-${var.environment}-eks-private-1b-1"
+#   type      = "private"
+#   internet  = false
+#   subnet_id = module.subnets.ids["tradingbot-${var.environment}-eks-private-1b-1"]
+# },
+# {
+#   name                   = "tradingbot-${var.environment}-ec2-private-1c-1"
+#   type                   = "private"
+#   internet               = true
+#   destination_cidr_block = "0.0.0.0/0"
+#   gateway_id             = module.gw.nat_gateway_id
+#   subnet_id              = module.subnets.ids["tradingbot-${var.environment}-ec2-private-1c-1"]
+# },
+# {
+#   name                   = "tradingbot-${var.environment}-codebuild-private-1d-1"
+#   type                   = "private"
+#   internet               = true
+#   destination_cidr_block = "0.0.0.0/0"
+#   gateway_id             = module.gw.nat_gateway_id
+#   subnet_id              = module.subnets.ids["tradingbot-${var.environment}-codebuild-private-1d-1"]
+# },
+# {
+#   name                   = "tradingbot-${var.environment}-nat-public-1c-1"
+#   type                   = "public"
+#   internet               = true
+#   destination_cidr_block = "0.0.0.0/0"
+#   gateway_id             = module.gw.internet_gateway_id
+#   subnet_id              = module.subnets.ids["tradingbot-${var.environment}-nat-public-1c-1"]
+# }
 #   ]
 # }
 
@@ -614,15 +614,16 @@ module "acm" {
 
 ########### VPN ##############
 module "vpn" {
-  depends_on          = [module.acm]
-  source              = "./modules/vpn"
-  proj                = var.proj
-  vpc_id              = module.vpc.id
-  cidr_block          = "192.168.0.0/16"
-  target_network_cidr = "10.1.0.0/16"
-  sg_id               = module.sg.ids["tradingbot-${var.environment}-vpn-endpoint-sg"]
-  environment         = var.environment
-  subnet_id           = module.subnets.ids["tradingbot-${var.environment}-vpn-private-1a-1"]
-  client_arn          = module.acm.client_certificate
-  server_arn          = module.acm.server_certificate
+  depends_on             = [module.acm]
+  source                 = "./modules/vpn"
+  proj                   = var.proj
+  vpc_id                 = module.vpc.id
+  cidr_block             = "172.16.0.0/22"
+  target_network_cidr    = "10.1.0.0/16"
+  destination_cidr_block = "10.1.3.0/24"
+  sg_id                  = module.sg.ids["tradingbot-${var.environment}-vpn-endpoint-sg"]
+  environment            = var.environment
+  subnet_id              = module.subnets.ids["tradingbot-${var.environment}-vpn-private-1a-1"]
+  client_arn             = module.acm.client_certificate
+  server_arn             = module.acm.server_certificate
 }
