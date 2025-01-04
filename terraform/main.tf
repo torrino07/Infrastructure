@@ -265,23 +265,23 @@ module "sg" {
 # }
 
 ############## ROUTES ###############
-module "routes" {
-  source = "./modules/routes"
-  proj   = var.proj
-  vpc_id = module.vpc.id
-  routes = [
-    {
-      name      = "tradingbot-${var.environment}-eks-private-1a-1"
-      type      = "private"
-      internet  = false
-      subnet_id = module.subnets.ids["tradingbot-${var.environment}-eks-private-1a-1"]
-    },
-    {
-      name      = "tradingbot-${var.environment}-eks-private-1b-1"
-      type      = "private"
-      internet  = false
-      subnet_id = module.subnets.ids["tradingbot-${var.environment}-eks-private-1b-1"]
-    },
+# module "routes" {
+#   source = "./modules/routes"
+#   proj   = var.proj
+#   vpc_id = module.vpc.id
+#   routes = [
+    # {
+    #   name      = "tradingbot-${var.environment}-eks-private-1a-1"
+    #   type      = "private"
+    #   internet  = false
+    #   subnet_id = module.subnets.ids["tradingbot-${var.environment}-eks-private-1a-1"]
+    # },
+    # {
+    #   name      = "tradingbot-${var.environment}-eks-private-1b-1"
+    #   type      = "private"
+    #   internet  = false
+    #   subnet_id = module.subnets.ids["tradingbot-${var.environment}-eks-private-1b-1"]
+    # },
     # {
     #   name                   = "tradingbot-${var.environment}-ec2-private-1c-1"
     #   type                   = "private"
@@ -306,8 +306,8 @@ module "routes" {
     #   gateway_id             = module.gw.internet_gateway_id
     #   subnet_id              = module.subnets.ids["tradingbot-${var.environment}-nat-public-1c-1"]
     # }
-  ]
-}
+#   ]
+# }
 
 # ########## ENDPOINTS #############
 # module "endpoints" {
