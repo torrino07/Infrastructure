@@ -3,7 +3,7 @@ module "vpc" {
   source               = "./modules/vpc"
   proj                 = var.proj
   environment          = var.environment
-  cidr_block           = "10.0.0.0/16"
+  cidr_block           = "10.1.0.0/16"
   instance_tenancy     = "default"
   enable_dns_hostnames = true
   enable_dns_support   = true
@@ -22,7 +22,7 @@ module "subnets" {
       route_type       = "private"
       az               = "1a"
       number           = "1"
-      cidr_block       = "10.0.1.0/24"
+      cidr_block       = "10.1.1.0/24"
     },
 
     {
@@ -618,8 +618,8 @@ module "vpn" {
   source              = "./modules/vpn"
   proj                = var.proj
   vpc_id              = module.vpc.id
-  cidr_block          = "10.100.0.0/22"
-  target_network_cidr = "10.0.0.0/16"
+  cidr_block          = "192.168.0.0/16"
+  target_network_cidr = "10.1.0.0/16"
   sg_id               = module.sg.ids["tradingbot-${var.environment}-vpn-endpoint-sg"]
   environment         = var.environment
   subnet_id           = module.subnets.ids["tradingbot-${var.environment}-vpn-private-1a-1"]
