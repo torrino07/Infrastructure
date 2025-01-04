@@ -25,3 +25,7 @@ variable "subnet_id" {
 variable "vpc_id" {
   type = string
 }
+
+variable "target_network_cidr" {
+  type = string
+}
