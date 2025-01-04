@@ -618,16 +618,24 @@ module "acm" {
   environment = var.environment
 }
 
-########### VPN ##############
-module "vpn" {
-  depends_on                = [module.acm]
-  source                    = "./modules/vpn"
-  proj                      = var.proj
-  vpc_id                    = module.vpc.id
-  cidr_block                = "192.168.0.0/16"
-  sg_id                     = module.sg.ids["tradingbot-${var.environment}-vpn-endpoint-sg"]
-  environment               = var.environment
-  subnet_id                 = module.subnets.ids["tradingbot-${var.environment}-vpn-private-1a-1"]
-  server_certificate_arn    = module.acm.server_certificate_arn
-  certificate_authority_arn = module.acm.certificate_authority_arn
+output "name1" {
+  value = module.acm.server_certificate_arn
 }
+
+output "name2" {
+  value = module.acm.certificate_authority_arn
+}
+
+# ########### VPN ##############
+# module "vpn" {
+#   depends_on                = [module.acm]
+#   source                    = "./modules/vpn"
+#   proj                      = var.proj
+#   vpc_id                    = module.vpc.id
+#   cidr_block                = "192.168.0.0/16"
+#   sg_id                     = module.sg.ids["tradingbot-${var.environment}-vpn-endpoint-sg"]
+#   environment               = var.environment
+#   subnet_id                 = module.subnets.ids["tradingbot-${var.environment}-vpn-private-1a-1"]
+#   server_certificate_arn    = module.acm.server_certificate_arn
+#   certificate_authority_arn = module.acm.certificate_authority_arn
+# }
