@@ -629,5 +629,5 @@ module "vpn" {
   environment               = var.environment
   subnet_id                 = module.subnets.ids["tradingbot-${var.environment}-vpn-private-1a-1"]
   server_certificate_arn    = module.acm.server_certificate_arn
-  certificate_authority_arn = module.acm.client_certificate_arn
+  certificate_authority_arn = module.acm.certificate_authority_arn
 }
