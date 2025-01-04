@@ -191,12 +191,6 @@ module "sg" {
           to_port     = 443,
           protocol    = "udp",
           cidr_blocks = ["0.0.0.0/0"]
-        },
-        {
-          from_port   = 0,
-          to_port     = 0,
-          protocol    = "-1",
-          cidr_blocks = ["192.168.0.0/16"]
         }
       ]
       egress_rules = [
@@ -624,7 +618,7 @@ module "vpn" {
   source                 = "./modules/vpn"
   proj                   = var.proj
   vpc_id                 = module.vpc.id
-  cidr_block             = "192.168.0.0/16"
+  cidr_block             = "10.100.0.0/22"
   target_network_cidr    = "10.0.0.0/16"
   sg_id                  = module.sg.ids["tradingbot-${var.environment}-vpn-endpoint-sg"]
   environment            = var.environment
