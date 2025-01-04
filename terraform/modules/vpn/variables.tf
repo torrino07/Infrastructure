@@ -14,7 +14,7 @@ variable "server_certificate_arn" {
   type = string
 }
 
-variable "client_certificate_arn" {
+variable "certificate_authority_arn" {
   type = string
 }
 
