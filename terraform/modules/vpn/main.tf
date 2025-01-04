@@ -35,3 +35,9 @@ resource "aws_ec2_client_vpn_network_association" "this" {
   subnet_id              = var.subnet_id
   depends_on             = [aws_ec2_client_vpn_endpoint.this]
 }
+
+resource "aws_ec2_client_vpn_authorization_rule" "this" {
+  client_vpn_endpoint_id = aws_ec2_client_vpn_endpoint.this.id
+  target_network_cidr = var.target_network_cidr
+  authorize_all_groups = true
+}
