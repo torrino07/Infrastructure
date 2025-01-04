@@ -614,13 +614,15 @@ module "acm" {
 
 ########### VPN ##############
 module "vpn" {
-  depends_on             = [module.acm]
-  source                 = "./modules/vpn"
-  proj                   = var.proj
-  vpc_id                 = module.vpc.id
-  cidr_block             = "10.100.0.0/22"
-  target_network_cidr    = "10.0.0.0/16"
-  sg_id                  = module.sg.ids["tradingbot-${var.environment}-vpn-endpoint-sg"]
-  environment            = var.environment
-  subnet_id              = module.subnets.ids["tradingbot-${var.environment}-vpn-private-1a-1"]
+  depends_on          = [module.acm]
+  source              = "./modules/vpn"
+  proj                = var.proj
+  vpc_id              = module.vpc.id
+  cidr_block          = "10.100.0.0/22"
+  target_network_cidr = "10.0.0.0/16"
+  sg_id               = module.sg.ids["tradingbot-${var.environment}-vpn-endpoint-sg"]
+  environment         = var.environment
+  subnet_id           = module.subnets.ids["tradingbot-${var.environment}-vpn-private-1a-1"]
+  client_arn          = module.acm.client_certificate
+  server_arn          = module.acm.server_certificate
 }

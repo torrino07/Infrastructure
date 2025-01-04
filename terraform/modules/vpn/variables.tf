@@ -25,3 +25,11 @@ variable "vpc_id" {
 variable "target_network_cidr" {
   type = string
 }
+
+variable "client_arn" {
+  type = string
+}
+
+variable "server_arn" {
+  type = string
+}
