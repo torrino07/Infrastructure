@@ -623,5 +623,4 @@ module "vpn" {
   sg_id                  = module.sg.ids["tradingbot-${var.environment}-vpn-endpoint-sg"]
   environment            = var.environment
   subnet_id              = module.subnets.ids["tradingbot-${var.environment}-vpn-private-1a-1"]
-  server_certificate_arn = module.acm.server_certificate_arn
 }

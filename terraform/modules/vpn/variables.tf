@@ -10,10 +10,6 @@ variable "cidr_block" {
   type = string
 }
 
-variable "server_certificate_arn" {
-  type = string
-}
-
 variable "sg_id" {
   type = string
 }
