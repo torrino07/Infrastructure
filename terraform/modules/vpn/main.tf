@@ -1,6 +1,6 @@
 resource "aws_ec2_client_vpn_endpoint" "this" {
   server_certificate_arn = var.server_arn
-  client_cidr_block      = var.cidr_block
+  client_cidr_block      = var.client_cidr_block
   vpc_id                 = var.vpc_id
   vpn_port               = 443
   dns_servers            = ["8.8.8.8"]
