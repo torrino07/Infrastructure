@@ -618,9 +618,9 @@ module "acm" {
   environment = var.environment
 }
 
-output "name1" {
-  value = module.acm.server_certificate_arn
-}
+# output "name1" {
+#   value = module.acm.server_certificate_arn
+# }
 
 output "name2" {
   value = module.acm.certificate_authority_arn
