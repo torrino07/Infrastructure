@@ -14,10 +14,6 @@ variable "server_certificate_arn" {
   type = string
 }
 
-variable "certificate_authority_arn" {
-  type = string
-}
-
 variable "sg_id" {
   type = string
 }

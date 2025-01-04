@@ -1,3 +1,9 @@
+data "aws_acm_certificate" "this" {
+  domain = "client1.domain.tld"
+  most_recent = true
+  statuses    = ["ISSUED"]
+}
+
 resource "aws_ec2_client_vpn_endpoint" "this" {
   server_certificate_arn = var.server_certificate_arn
   client_cidr_block      = var.cidr_block
@@ -9,7 +15,7 @@ resource "aws_ec2_client_vpn_endpoint" "this" {
 
   authentication_options {
     type                       = "certificate-authentication"
-    root_certificate_chain_arn = var.server_certificate_arn
+    root_certificate_chain_arn = data.aws_acm_certificate.this.arn
   }
 
   connection_log_options {
