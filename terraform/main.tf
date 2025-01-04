@@ -187,9 +187,15 @@ module "sg" {
       name = "vpn-endpoint"
       ingress_rules = [
         {
-          from_port   = 443,
-          to_port     = 443,
-          protocol    = "udp",
+          from_port   = 443
+          to_port     = 443
+          protocol    = "tcp"
+          cidr_blocks = ["0.0.0.0/0"]
+        },
+        {
+          from_port   = 1194
+          to_port     = 1194
+          protocol    = "udp"
           cidr_blocks = ["0.0.0.0/0"]
         }
       ]
