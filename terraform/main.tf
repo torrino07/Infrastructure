@@ -198,14 +198,7 @@ module "sg" {
           cidr_blocks = ["10.1.0.0/16"]
         }
       ]
-      egress_rules = [
-        {
-          from_port   = 0,
-          to_port     = 0,
-          protocol    = "-1",
-          cidr_blocks = ["0.0.0.0/0"]
-        }
-      ]
+      egress_rules = []
     },
     {
       name = "ecr-endpoint"
@@ -217,14 +210,7 @@ module "sg" {
           cidr_blocks = ["10.1.0.0/16"]
         }
       ]
-      egress_rules = [
-        {
-          from_port   = 0,
-          to_port     = 0,
-          protocol    = "-1",
-          cidr_blocks = ["0.0.0.0/0"]
-        }
-      ]
+      egress_rules = []
     },
     {
       name = "eks-endpoint"
@@ -236,14 +222,7 @@ module "sg" {
           cidr_blocks = ["10.1.0.0/16"]
         }
       ]
-      egress_rules = [
-        {
-          from_port   = 0,
-          to_port     = 0,
-          protocol    = "-1",
-          cidr_blocks = ["0.0.0.0/0"]
-        }
-      ]
+      egress_rules = []
     },
     {
       name = "ec2messages-endpoint"
@@ -293,11 +272,12 @@ module "sg" {
           cidr_blocks = ["10.1.128.0/23", "10.1.144.0/23", "10.1.160.0/23"]
         }
       ]
-      egress_rules = [{
-        from_port   = 0,
-        to_port     = 0,
-        protocol    = "-1",
-        cidr_blocks = ["0.0.0.0/0"]
+      egress_rules = [
+        {
+          from_port   = 0,
+          to_port     = 0,
+          protocol    = "-1",
+          cidr_blocks = ["0.0.0.0/0"]
         }
       ]
     },
