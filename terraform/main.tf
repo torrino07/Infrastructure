@@ -197,7 +197,7 @@ module "sg" {
           from_port   = 0,
           to_port     = 0,
           protocol    = "-1",
-          cidr_blocks = ["10.1.0.0/6"]
+          cidr_blocks = ["0.0.0.0/0"]
         }
       ]
     },
