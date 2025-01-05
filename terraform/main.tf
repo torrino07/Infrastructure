@@ -129,13 +129,19 @@ module "sg" {
           cidr_blocks = ["10.1.128.0/23", "10.1.144.0/23"]
         },
         {
-          from_port   = 443,
-          to_port     = 443,
-          protocol    = "tcp",
+          from_port   = 0,
+          to_port     = 0,
+          protocol    = "-1",
           cidr_blocks = ["10.1.0.0/24"]
         }
       ]
       egress_rules = [
+        {
+          from_port   = 0,
+          to_port     = 0,
+          protocol    = "-1",
+          cidr_blocks = ["0.0.0.0/0"]
+        },
         {
           from_port   = 443,
           to_port     = 443,
