@@ -110,6 +110,12 @@ module "sg" {
           to_port     = 8000,
           protocol    = "tcp",
           cidr_blocks = ["10.1.160.0/23"]
+        },
+        {
+          from_port   = 0,
+          to_port     = 0,
+          protocol    = "-1",
+          cidr_blocks = ["0.0.0.0/0"]
         }
       ]
     },
@@ -164,15 +170,15 @@ module "sg" {
           from_port   = 0,
           to_port     = 0,
           protocol    = "-1",
-          cidr_blocks = ["10.1.128.0/23", "10.1.144.0/23"]
+          cidr_blocks = ["0.0.0.0/0"]
         }
       ]
       egress_rules = [
         {
-          from_port   = 443,
-          to_port     = 443,
-          protocol    = "tcp",
-          cidr_blocks = ["10.1.128.0/23", "10.1.144.0/23"]
+          from_port   = 0,
+          to_port     = 0,
+          protocol    = "-1",
+          cidr_blocks = ["0.0.0.0/0"]
         }
       ]
     },
@@ -188,10 +194,10 @@ module "sg" {
       ]
       egress_rules = [
         {
-          from_port   = 443,
-          to_port     = 443,
-          protocol    = "tcp",
-          cidr_blocks = ["10.1.0.0/16"]
+          from_port   = 0,
+          to_port     = 0,
+          protocol    = "-1",
+          cidr_blocks = ["10.0.160.0/23"]
         }
       ]
     },
@@ -207,10 +213,10 @@ module "sg" {
       ]
       egress_rules = [
         {
-          from_port   = 443,
-          to_port     = 443,
-          protocol    = "tcp",
-          cidr_blocks = ["10.1.0.0/16"]
+          from_port   = 0,
+          to_port     = 0,
+          protocol    = "-1",
+          cidr_blocks = ["10.0.160.0/23"]
         }
       ]
     },
@@ -226,10 +232,10 @@ module "sg" {
       ]
       egress_rules = [
         {
-          from_port   = 443,
-          to_port     = 443,
-          protocol    = "tcp",
-          cidr_blocks = ["10.1.0.0/16"]
+          from_port   = 0,
+          to_port     = 0,
+          protocol    = "-1",
+          cidr_blocks = ["0.0.0.0/0"]
         }
       ]
     },
@@ -245,10 +251,10 @@ module "sg" {
       ]
       egress_rules = [
         {
-          from_port   = 443,
-          to_port     = 443,
-          protocol    = "tcp",
-          cidr_blocks = ["10.1.128.0/23", "10.1.144.0/23", "10.1.160.0/23"]
+          from_port   = 0,
+          to_port     = 0,
+          protocol    = "-1",
+          cidr_blocks = ["0.0.0.0/0"]
         }
       ]
     },
@@ -281,12 +287,11 @@ module "sg" {
           cidr_blocks = ["10.1.128.0/23", "10.1.144.0/23", "10.1.160.0/23"]
         }
       ]
-      egress_rules = [
-        {
-          from_port   = 443,
-          to_port     = 443,
-          protocol    = "tcp",
-          cidr_blocks = ["10.1.128.0/23", "10.1.144.0/23", "10.1.160.0/23"]
+      egress_rules = [{
+        from_port   = 0,
+        to_port     = 0,
+        protocol    = "-1",
+        cidr_blocks = ["0.0.0.0/0"]
         }
       ]
     },
@@ -302,10 +307,10 @@ module "sg" {
       ]
       egress_rules = [
         {
-          from_port   = 443,
-          to_port     = 443,
-          protocol    = "tcp",
-          cidr_blocks = ["10.1.128.0/23", "10.1.144.0/23"]
+          from_port   = 0,
+          to_port     = 0,
+          protocol    = "-1",
+          cidr_blocks = ["0.0.0.0/0"]
         }
       ]
     },
