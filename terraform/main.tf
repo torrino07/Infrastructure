@@ -219,7 +219,7 @@ module "sg" {
           from_port   = 443,
           to_port     = 443,
           protocol    = "tcp",
-          cidr_blocks = ["10.1.0.0/16"]
+          cidr_blocks = ["10.1.0.0/16", "172.16.0.0/22"]
         }
       ]
       egress_rules = []
