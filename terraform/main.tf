@@ -625,7 +625,7 @@ module "vpn" {
   vpc_id                  = module.vpc.id
   client_cidr_block       = "172.16.0.0/22"
   target_network_cidr     = "10.1.1.0/24"
-  destination_cidr_blocks = ["10.1.1.0/24", "10.1.128.0/23"]
+  destination_cidr_blocks = ["10.1.128.0/23", "10.1.144.0/23"]
   sg_id                   = module.sg.ids["tradingbot-${var.environment}-vpn-endpoint-sg"]
   environment             = var.environment
   subnet_id               = module.subnets.ids["tradingbot-${var.environment}-vpn-private-1a-1"]
