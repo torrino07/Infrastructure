@@ -24,21 +24,20 @@ module "subnets" {
       number           = "1"
       cidr_block       = "10.1.1.0/24"
     },
-
-    # {
-    #   client_name_type = "eks"
-    #   route_type       = "private"
-    #   az               = "1a"
-    #   number           = "1"
-    #   cidr_block       = "10.0.128.0/23"
-    # },
-    # {
-    #   client_name_type = "eks"
-    #   route_type       = "private"
-    #   az               = "1b"
-    #   number           = "1"
-    #   cidr_block       = "10.0.144.0/23"
-    # },
+    {
+      client_name_type = "eks"
+      route_type       = "private"
+      az               = "1a"
+      number           = "1"
+      cidr_block       = "10.1.128.0/23"
+    },
+    {
+      client_name_type = "eks"
+      route_type       = "private"
+      az               = "1b"
+      number           = "1"
+      cidr_block       = "10.1.144.0/23"
+    },
     # {
     #   client_name_type = "ec2"
     #   route_type       = "private"
@@ -620,16 +619,16 @@ module "acm" {
 
 ########### VPN ##############
 module "vpn" {
-  depends_on             = [module.acm]
-  source                 = "./modules/vpn"
-  proj                   = var.proj
-  vpc_id                 = module.vpc.id
-  client_cidr_block      = "172.16.0.0/22"
-  target_network_cidr    = "10.1.1.0/24"
-  destination_cidr_block = "10.1.0.0/16"
-  sg_id                  = module.sg.ids["tradingbot-${var.environment}-vpn-endpoint-sg"]
-  environment            = var.environment
-  subnet_id              = module.subnets.ids["tradingbot-${var.environment}-vpn-private-1a-1"]
-  client_arn             = module.acm.client_certificate
-  server_arn             = module.acm.server_certificate
+  depends_on              = [module.acm]
+  source                  = "./modules/vpn"
+  proj                    = var.proj
+  vpc_id                  = module.vpc.id
+  client_cidr_block       = "172.16.0.0/22"
+  target_network_cidr     = "10.1.1.0/24"
+  destination_cidr_blocks = ["10.1.1.0/24", "10.1.128.0/23"]
+  sg_id                   = module.sg.ids["tradingbot-${var.environment}-vpn-endpoint-sg"]
+  environment             = var.environment
+  subnet_id               = module.subnets.ids["tradingbot-${var.environment}-vpn-private-1a-1"]
+  client_arn              = module.acm.client_certificate
+  server_arn              = module.acm.server_certificate
 }
