@@ -41,8 +41,9 @@ resource "aws_ec2_client_vpn_authorization_rule" "this" {
 }
 
 resource "aws_ec2_client_vpn_route" "this" {
+  for_each               = var.destination_cidr_blocks
   client_vpn_endpoint_id = aws_ec2_client_vpn_endpoint.this.id
-  destination_cidr_block = var.destination_cidr_block 
+  destination_cidr_block = each.value
   target_vpc_subnet_id   = var.subnet_id
 
   timeouts {

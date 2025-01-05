@@ -34,7 +34,6 @@ variable "server_arn" {
   type = string
 }
 
-variable "destination_cidr_block" {
-  type = string
-
+variable "destination_cidr_blocks" {
+  type = list(string)
 }
