@@ -26,6 +26,7 @@ resource "aws_ec2_client_vpn_endpoint" "this" {
     Environment = "${var.environment}"
     Name        = "${var.proj}-${var.environment}-vpn"
   }
+
 }
 
 resource "aws_ec2_client_vpn_network_association" "this" {
@@ -47,6 +48,6 @@ resource "aws_ec2_client_vpn_route" "this" {
   target_vpc_subnet_id   = var.subnet_id
 
   timeouts {
-    create = "10m"
+    create = "20m"
   }
 }
