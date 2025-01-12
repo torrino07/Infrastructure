@@ -9,3 +9,7 @@ output "client_id" {
 output "trade_server_id" {
   value = module.ec2.trade_server_id
 }
+
+output "trade_server_private_ip" {
+  value = module.ec2.trade_server_private_ip
+}
