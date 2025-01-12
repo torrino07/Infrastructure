@@ -19,15 +19,6 @@ If you want to learn more about creating good readme files then refer the follow
 - [Visual Studio Code](https://github.com/Microsoft/vscode)
 - [Chakra Core](https://github.com/Microsoft/ChakraCore)
 
-## Commands
-
-- terraform workspace new dev
-- terraform workspace select dev
-- terraform plan -var-file="environments/dev/terraform.tfvars" -out=dev-plan.out
-- terraform apply dev-plan.out
-- terraform destroy -var-file="environments/dev/terraform.tfvars" -auto-approve
-- aws ssm start-session --target 
-
 ## SSM
 aws ssm describe-instance-information --query "InstanceInformationList[*].InstanceId"
 aws ssm start-session --target "i-089b0b7f99d99a01d"

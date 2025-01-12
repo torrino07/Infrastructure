@@ -47,18 +47,6 @@ resource "aws_eks_node_group" "this" {
   }
 }
 
-resource "aws_eks_addon" "ebs_csi_driver" {
-  cluster_name  = aws_eks_cluster.this.name
-  addon_name    = "aws-ebs-csi-driver"
-  addon_version = "v1.37.0-eksbuild.1"
-
-  tags = {
-    Name        = "${var.proj}-${var.environment}-${var.name}-ebs-csi-driver"
-    Environment = var.proj
-  }
-  depends_on = [aws_eks_node_group.this]
-}
-
 resource "aws_eks_access_entry" "this" {
   for_each          = { for user in var.eks_users : user.name => user }
   cluster_name      = aws_eks_cluster.this.name
@@ -157,4 +145,18 @@ resource "aws_iam_role_policy_attachment" "ebs_csi_driver_policy_attachment" {
   role       = aws_iam_role.ebs_csi_driver_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
   depends_on = [aws_iam_role.ebs_csi_driver_role]
+}
+
+resource "aws_eks_addon" "ebs_csi_driver" {
+  cluster_name  = aws_eks_cluster.this.name
+  addon_name    = "aws-ebs-csi-driver"
+  addon_version = "v1.37.0-eksbuild.1"
+  resolve_conflicts_on_update = "OVERWRITE"
+  service_account_role_arn = aws_iam_role.ebs_csi_driver_role.arn
+
+  tags = {
+    Name        = "${var.proj}-${var.environment}-${var.name}-ebs-csi-driver"
+    Environment = var.proj
+  }
+  depends_on = [aws_eks_node_group.this]
 }
