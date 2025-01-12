@@ -23,7 +23,22 @@ env:
   ENVIRONMENT: ${{ github.ref_name == 'dev' && 'dev' || github.ref_name == 'staging' && 'staging'  || 'prod' }}
 
 jobs:
+  destroy-cloud-managed:
+    name: Destroy cloud managed resources
+    runs-on: codebuild-tradingbot-dev-gh-actions-${{ github.run_id }}-${{ github.run_attempt }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      
+      - name: destroy service
+        run: |
+          kubectl delete service --all -n ingress-nginx
+          kubectl delete service --all -n trading
+          kubectl delete service --all -n kubernetes-dashboard
+          kubectl delete service --all -n kube-system
+          
   destroy:
+    needs: [destroy-cloud-managed]
     name: Destroy Infra
     runs-on: ${{ vars.RUNNER }}
     steps:
