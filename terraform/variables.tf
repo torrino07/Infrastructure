@@ -22,7 +22,7 @@ variable "ec2_instance_type" {
 }
 
 variable "ec2_ami_type" {
-  default = "ami-005fc0f236362e99f"
+  type = string
 }
 
 variable "eks_version" {
