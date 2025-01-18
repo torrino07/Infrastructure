@@ -1,32 +1,32 @@
 variable "proj" {
-  default = "tradingbot"
+  type = string
 }
 
 variable "account_id" {
-  default = "160945804984"
+  type = string
 }
 variable "environment" {
-  default = "dev"
+  type = string
 }
 
 variable "region" {
-  default = "us-east-1"
+  type = string
 }
 
 variable "artifact_store" {
-  default = "artifactstore001"
+  type = string
 }
 
 variable "ec2_instance_type" {
-  default = "t3.medium"
+  type = string
 }
 
 variable "ec2_ami_type" {
-  default = "ami-0e2c8caa4b6378d8c"
+  type = string
 }
 
 variable "eks_version" {
-  default = "1.31"
+  type = string
 }
 
 
