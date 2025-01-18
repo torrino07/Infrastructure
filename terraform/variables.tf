@@ -1,32 +1,17 @@
-variable "proj" {
-  default = "tradingbot"
-}
+variable "proj" {}
 
-variable "account_id" {
-  default = "160945804984"
-}
-variable "environment" {
-  default = "dev"
-}
+variable "account_id" {}
 
-variable "region" {
-  default = "us-east-1"
-}
+variable "environment" {}
 
-variable "artifact_store" {
-  default = "artifactstore001"
-}
+variable "region" {}
 
-variable "ec2_instance_type" {
-  default = "t3.medium"
-}
+variable "artifact_store" {}
 
-variable "ec2_ami_type" {
-  default = "ami-005fc0f236362e99f"
-}
+variable "ec2_instance_type" {}
 
-variable "eks_version" {
-  default = "1.31"
-}
+variable "ec2_ami_type" {}
+
+variable "eks_version" {}
 
 
