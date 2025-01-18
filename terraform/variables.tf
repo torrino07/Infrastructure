@@ -1,32 +1,17 @@
-variable "proj" {
-  type = string
-}
+variable "proj" {}
 
-variable "account_id" {
-  type = string
-}
-variable "environment" {
-  type = string
-}
+variable "account_id" {}
 
-variable "region" {
-  type = string
-}
+variable "environment" {}
 
-variable "artifact_store" {
-  type = string
-}
+variable "region" {}
 
-variable "ec2_instance_type" {
-  type = string
-}
+variable "artifact_store" {}
 
-variable "ec2_ami_type" {
-  type = string
-}
+variable "ec2_instance_type" {}
 
-variable "eks_version" {
-  type = string
-}
+variable "ec2_ami_type" {}
+
+variable "eks_version" {}
 
 
