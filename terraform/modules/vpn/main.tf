@@ -39,6 +39,11 @@ resource "aws_ec2_client_vpn_authorization_rule" "this" {
   client_vpn_endpoint_id = aws_ec2_client_vpn_endpoint.this.id
   target_network_cidr    = var.target_network_cidr
   authorize_all_groups   = true
+
+  timeouts {
+    create = "15m"
+    delete = "15m"
+  }
 }
 
 resource "aws_ec2_client_vpn_route" "this" {
@@ -49,5 +54,6 @@ resource "aws_ec2_client_vpn_route" "this" {
 
   timeouts {
     create = "20m"
+    delete = "20m"
   }
 }
