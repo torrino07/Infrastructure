@@ -549,19 +549,19 @@ module "s3" {
 }
 
 ########### EC2 ############
-# module "ec2" {
-#   depends_on    = [module.iam]
-#   source        = "./modules/ec2"
-#   proj          = var.proj
-#   environment   = var.environment
-#   name          = "trading-server"
-#   subnet_id     = module.subnets.ids["tradingbot-${var.environment}-ec2-private-1c-1"]
-#   sg_id         = module.sg.ids["tradingbot-${var.environment}-ec2-sg"]
-#   instance_type = var.ec2_instance_type
-#   ami           = var.ec2_ami_type
-#   role_arn_name = "AmazonEC2Role"
-#   access_level  = "readwrite"
-# }
+module "ec2" {
+  depends_on    = [module.iam]
+  source        = "./modules/ec2"
+  proj          = var.proj
+  environment   = var.environment
+  name          = "trading-server"
+  subnet_id     = module.subnets.ids["tradingbot-${var.environment}-ec2-private-1c-1"]
+  sg_id         = module.sg.ids["tradingbot-${var.environment}-ec2-sg"]
+  instance_type = var.ec2_instance_type
+  ami           = var.ec2_ami_type
+  role_arn_name = "AmazonEC2Role"
+  access_level  = "readwrite"
+}
 
 module "bastion" {
   depends_on    = [module.iam]
@@ -619,12 +619,12 @@ module "bastion" {
 # }
 
 ###### COGNITO ##########
-# module "cognito" {
-#   source      = "./modules/cognito"
-#   proj        = var.proj
-#   environment = var.environment
-#   name        = "x-turbo"
-# }
+module "cognito" {
+  source      = "./modules/cognito"
+  proj        = var.proj
+  environment = var.environment
+  name        = "x-turbo"
+}
 
 # ######### ECR ##########
 # module "ecr" {
@@ -672,11 +672,11 @@ module "bastion" {
 # }
 
 ########### ACM ##############
-# module "acm" {
-#   source      = "./modules/acm"
-#   proj        = var.proj
-#   environment = var.environment
-# }
+module "acm" {
+  source      = "./modules/acm"
+  proj        = var.proj
+  environment = var.environment
+}
 
 ########### VPN ##############
 # module "vpn" {
