@@ -448,7 +448,7 @@ module "endpoints" {
     {
       service_name      = "com.amazonaws.${var.region}.s3"
       vpc_endpoint_type = "Gateway"
-      route_table_ids   = [for tag, id in module.routes.ids : id if contains(["tradingbot-${var.environment}-eks-private-1a-1-rt", "tradingbot-${var.environment}-eks-private-1b-1-rt", "tradingbot-${var.environment}-ec2-private-1c-1-rt"], tag)]
+      route_table_ids   = [for tag, id in module.routes.ids : id if contains(["tradingbot-${var.environment}-eks-private-1a-1-rt", "tradingbot-${var.environment}-eks-private-1b-1-rt", "tradingbot-${var.environment}-ec2-private-1c-1-rt", "tradingbot-${var.environment}-ec2-private-1d-1-rt"], tag)]
       tag               = "s3"
     }
   ]
@@ -505,7 +505,7 @@ module "iam" {
       actions     = ["sts:AssumeRole"]
       policy_arns = [
         "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
-        
+        "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"
       ],
       access_level = "readwrite"
     }
