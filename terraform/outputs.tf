@@ -7,7 +7,7 @@ output "client_id" {
 }
 
 output "bastion_host_id" {
-  value = module.ec2.id
+  value = module.bastion.id
 }
 
 output "trade_server_id" {
