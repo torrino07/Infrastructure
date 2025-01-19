@@ -343,12 +343,6 @@ module "routes" {
       subnet_id = module.subnets.ids["tradingbot-${var.environment}-eks-private-1b-1"]
     },
     {
-      name      = "tradingbot-${var.environment}-ec2-private-1d-1"
-      type      = "private"
-      internet  = false
-      subnet_id = module.subnets.ids["tradingbot-${var.environment}-ec2-private-1d-1"]
-    },
-    {
       name                   = "tradingbot-${var.environment}-ec2-private-1c-1"
       type                   = "private"
       internet               = true
@@ -510,7 +504,8 @@ module "iam" {
       identifiers = ["ec2.amazonaws.com"]
       actions     = ["sts:AssumeRole"]
       policy_arns = [
-        "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+        "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
+        
       ],
       access_level = "readwrite"
     }
@@ -626,57 +621,57 @@ module "cognito" {
   name        = "x-turbo"
 }
 
-# ######### ECR ##########
-# module "ecr" {
-#   source      = "./modules/ecr"
-#   proj        = var.proj
-#   environment = var.environment
-#   repositories = [
-#     {
-#       name                 = "fastapi-app"
-#       scan_on_push         = true
-#       image_tag_mutability = "MUTABLE"
-#     },
-#     {
-#       name                 = "react-app"
-#       scan_on_push         = true
-#       image_tag_mutability = "MUTABLE"
-#     }
-#     ,
-#     {
-#       name                 = "postgresql-server"
-#       scan_on_push         = true
-#       image_tag_mutability = "MUTABLE"
-#     },
-#     {
-#       name                 = "metrics-scraper"
-#       scan_on_push         = true
-#       image_tag_mutability = "MUTABLE"
-#     },
-#     {
-#       name                 = "dashboard"
-#       scan_on_push         = true
-#       image_tag_mutability = "MUTABLE"
-#     },
-#     {
-#       name                 = "controller"
-#       scan_on_push         = true
-#       image_tag_mutability = "MUTABLE"
-#     },
-#     {
-#       name                 = "kube-webhook-certgen"
-#       scan_on_push         = true
-#       image_tag_mutability = "MUTABLE"
-#     }
-#   ]
-# }
-
-########### ACM ##############
-module "acm" {
-  source      = "./modules/acm"
+######### ECR ##########
+module "ecr" {
+  source      = "./modules/ecr"
   proj        = var.proj
   environment = var.environment
+  repositories = [
+    {
+      name                 = "fastapi-app"
+      scan_on_push         = true
+      image_tag_mutability = "MUTABLE"
+    },
+    {
+      name                 = "react-app"
+      scan_on_push         = true
+      image_tag_mutability = "MUTABLE"
+    }
+    ,
+    {
+      name                 = "postgresql-server"
+      scan_on_push         = true
+      image_tag_mutability = "MUTABLE"
+    },
+    {
+      name                 = "metrics-scraper"
+      scan_on_push         = true
+      image_tag_mutability = "MUTABLE"
+    },
+    {
+      name                 = "dashboard"
+      scan_on_push         = true
+      image_tag_mutability = "MUTABLE"
+    },
+    {
+      name                 = "controller"
+      scan_on_push         = true
+      image_tag_mutability = "MUTABLE"
+    },
+    {
+      name                 = "kube-webhook-certgen"
+      scan_on_push         = true
+      image_tag_mutability = "MUTABLE"
+    }
+  ]
 }
+
+########### ACM ##############
+# module "acm" {
+#   source      = "./modules/acm"
+#   proj        = var.proj
+#   environment = var.environment
+# }
 
 ########### VPN ##############
 # module "vpn" {
