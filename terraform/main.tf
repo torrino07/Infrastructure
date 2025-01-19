@@ -52,13 +52,13 @@ module "subnets" {
       number           = "1"
       cidr_block       = "10.1.0.0/24"
     },
-    {
-      client_name_type = "codebuild"
+     {
+      client_name_type = "ec2"
       route_type       = "private"
       az               = "1d"
       number           = "1"
       cidr_block       = "10.1.176.0/23"
-    }
+    },
   ]
 }
 
@@ -151,16 +151,28 @@ module "sg" {
       ]
     },
     {
-      name = "codebuild"
+      name = "ec2-bastion-host"
       ingress_rules = [
         {
           from_port   = 443,
           to_port     = 443,
           protocol    = "tcp",
           cidr_blocks = ["0.0.0.0/0"]
-        }
+        },
       ]
       egress_rules = [
+        {
+          from_port   = 443,
+          to_port     = 443,
+          protocol    = "tcp",
+          cidr_blocks = ["0.0.0.0/0"]
+        },
+        {
+          from_port   = 0,
+          to_port     = 0,
+          protocol    = "-1",
+          cidr_blocks = ["0.0.0.0/0"]
+        },
         {
           from_port   = 443,
           to_port     = 443,
@@ -231,7 +243,7 @@ module "sg" {
           from_port   = 443,
           to_port     = 443,
           protocol    = "tcp",
-          cidr_blocks = ["10.1.128.0/23", "10.1.144.0/23", "10.1.160.0/23"]
+          cidr_blocks = ["10.1.128.0/23", "10.1.144.0/23", "10.1.160.0/23", "10.1.176.0/23"]
         }
       ]
       egress_rules = [
@@ -250,7 +262,7 @@ module "sg" {
           from_port   = 443,
           to_port     = 443,
           protocol    = "tcp",
-          cidr_blocks = ["10.1.128.0/23", "10.1.144.0/23", "10.1.160.0/23"]
+          cidr_blocks = ["10.1.128.0/23", "10.1.144.0/23", "10.1.160.0/23", "10.1.176.0/23"]
         }
       ]
       egress_rules = [
@@ -269,7 +281,7 @@ module "sg" {
           from_port   = 443,
           to_port     = 443,
           protocol    = "tcp",
-          cidr_blocks = ["10.1.128.0/23", "10.1.144.0/23", "10.1.160.0/23"]
+          cidr_blocks = ["10.1.128.0/23", "10.1.144.0/23", "10.1.160.0/23", "10.1.176.0/23"]
         }
       ]
       egress_rules = [
@@ -331,6 +343,12 @@ module "routes" {
       subnet_id = module.subnets.ids["tradingbot-${var.environment}-eks-private-1b-1"]
     },
     {
+      name      = "tradingbot-${var.environment}-ec2-private-1d-1"
+      type      = "private"
+      internet  = false
+      subnet_id = module.subnets.ids["tradingbot-${var.environment}-ec2-private-1d-1"]
+    },
+    {
       name                   = "tradingbot-${var.environment}-ec2-private-1c-1"
       type                   = "private"
       internet               = true
@@ -339,21 +357,21 @@ module "routes" {
       subnet_id              = module.subnets.ids["tradingbot-${var.environment}-ec2-private-1c-1"]
     },
     {
+      name                   = "tradingbot-${var.environment}-ec2-private-1d-1"
+      type                   = "private"
+      internet               = true
+      destination_cidr_block = "0.0.0.0/0"
+      gateway_id             = module.gw.nat_gateway_id
+      subnet_id              = module.subnets.ids["tradingbot-${var.environment}-ec2-private-1d-1"]
+    },
+    {
       name                   = "tradingbot-${var.environment}-nat-public-1c-1"
       type                   = "public"
       internet               = true
       destination_cidr_block = "0.0.0.0/0"
       gateway_id             = module.gw.internet_gateway_id
       subnet_id              = module.subnets.ids["tradingbot-${var.environment}-nat-public-1c-1"]
-    },
-    {
-      name                   = "tradingbot-${var.environment}-codebuild-private-1d-1"
-      type                   = "private"
-      internet               = true
-      destination_cidr_block = "0.0.0.0/0"
-      gateway_id             = module.gw.nat_gateway_id
-      subnet_id              = module.subnets.ids["tradingbot-${var.environment}-codebuild-private-1d-1"]
-    },
+    }
   ]
 }
 
@@ -404,7 +422,7 @@ module "endpoints" {
       service_name       = "com.amazonaws.${var.region}.ec2messages"
       vpc_endpoint_type  = "Interface"
       security_group_ids = [for tag, id in module.sg.ids : id if tag == "tradingbot-${var.environment}-ec2messages-endpoint-sg"]
-      subnet_ids         = [for tag, id in module.subnets.ids : id if contains(["tradingbot-${var.environment}-eks-private-1a-1", "tradingbot-${var.environment}-eks-private-1b-1", "tradingbot-${var.environment}-ec2-private-1c-1"], tag)]
+      subnet_ids         = [for tag, id in module.subnets.ids : id if contains(["tradingbot-${var.environment}-eks-private-1a-1", "tradingbot-${var.environment}-eks-private-1b-1", "tradingbot-${var.environment}-ec2-private-1c-1", "tradingbot-${var.environment}-ec2-private-1d-1"], tag)]
       ip_address_type    = "ipv4"
       tag                = "ec2messages"
     },
@@ -412,7 +430,7 @@ module "endpoints" {
       service_name       = "com.amazonaws.${var.region}.ssm"
       vpc_endpoint_type  = "Interface"
       security_group_ids = [for tag, id in module.sg.ids : id if tag == "tradingbot-${var.environment}-ssm-endpoint-sg"]
-      subnet_ids         = [for tag, id in module.subnets.ids : id if contains(["tradingbot-${var.environment}-eks-private-1a-1", "tradingbot-${var.environment}-eks-private-1b-1", "tradingbot-${var.environment}-ec2-private-1c-1"], tag)]
+      subnet_ids         = [for tag, id in module.subnets.ids : id if contains(["tradingbot-${var.environment}-eks-private-1a-1", "tradingbot-${var.environment}-eks-private-1b-1", "tradingbot-${var.environment}-ec2-private-1c-1", "tradingbot-${var.environment}-ec2-private-1d-1"], tag)]
       ip_address_type    = "ipv4"
       tag                = "ssm"
     },
@@ -421,7 +439,7 @@ module "endpoints" {
       service_name       = "com.amazonaws.${var.region}.ssmmessages"
       vpc_endpoint_type  = "Interface"
       security_group_ids = [for tag, id in module.sg.ids : id if tag == "tradingbot-${var.environment}-ssmmessages-endpoint-sg"]
-      subnet_ids         = [for tag, id in module.subnets.ids : id if contains(["tradingbot-${var.environment}-eks-private-1a-1", "tradingbot-${var.environment}-eks-private-1b-1", "tradingbot-${var.environment}-ec2-private-1c-1"], tag)]
+      subnet_ids         = [for tag, id in module.subnets.ids : id if contains(["tradingbot-${var.environment}-eks-private-1a-1", "tradingbot-${var.environment}-eks-private-1b-1", "tradingbot-${var.environment}-ec2-private-1c-1", "tradingbot-${var.environment}-ec2-private-1d-1"], tag)]
       ip_address_type    = "ipv4"
       tag                = "ssmmessages"
     },
@@ -486,15 +504,13 @@ module "iam" {
       access_level = "readwrite"
     },
     {
-      name        = "AmazonCodeBuildRole"
+      name        = "AmazonEC2BastionHostRole"
       effect      = "Allow"
       type        = "Service"
-      identifiers = ["codebuild.amazonaws.com"]
+      identifiers = ["ec2.amazonaws.com"]
       actions     = ["sts:AssumeRole"]
       policy_arns = [
-        "arn:aws:iam::aws:policy/AWSCodeBuildAdminAccess",
-        "arn:aws:iam::aws:policy/CloudWatchLogsFullAccess",
-        "arn:aws:iam::${var.account_id}:policy/AWSCodeBuildNetworkInterfaces"
+        "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
       ],
       access_level = "readwrite"
     }
@@ -533,145 +549,147 @@ module "s3" {
 }
 
 ########### EC2 ############
-module "ec2" {
+# module "ec2" {
+#   depends_on    = [module.iam]
+#   source        = "./modules/ec2"
+#   proj          = var.proj
+#   environment   = var.environment
+#   name          = "trading-server"
+#   subnet_id     = module.subnets.ids["tradingbot-${var.environment}-ec2-private-1c-1"]
+#   sg_id         = module.sg.ids["tradingbot-${var.environment}-ec2-sg"]
+#   instance_type = var.ec2_instance_type
+#   ami           = var.ec2_ami_type
+#   role_arn_name = "AmazonEC2Role"
+#   access_level  = "readwrite"
+# }
+
+module "bastion" {
   depends_on    = [module.iam]
   source        = "./modules/ec2"
   proj          = var.proj
   environment   = var.environment
-  name          = "trading-server"
-  subnet_id     = module.subnets.ids["tradingbot-${var.environment}-ec2-private-1c-1"]
-  sg_id         = module.sg.ids["tradingbot-${var.environment}-ec2-sg"]
-  instance_type = var.ec2_instance_type
+  name          = "bastion-host"
+  subnet_id     = module.subnets.ids["tradingbot-${var.environment}-ec2-private-1d-1"]
+  sg_id         = module.sg.ids["tradingbot-${var.environment}-ec2-bastion-host-sg"]
+  instance_type = "t2.micro"
   ami           = var.ec2_ami_type
-  role_arn_name = "AmazonEC2Role"
+  role_arn_name = "AmazonEC2BastionHostRole"
   access_level  = "readwrite"
 }
 
 ########## EBS ############
-module "ebs" {
-  depends_on        = [module.iam]
-  source            = "./modules/ebs"
-  proj              = var.proj
-  environment       = var.environment
-  ebs_volume_size   = 20
-  ebs_volume_type   = "gp3"
-  availability_zone = "${var.region}a"
-}
+# module "ebs" {
+#   depends_on        = [module.iam]
+#   source            = "./modules/ebs"
+#   proj              = var.proj
+#   environment       = var.environment
+#   ebs_volume_size   = 20
+#   ebs_volume_type   = "gp3"
+#   availability_zone = "${var.region}a"
+# }
 
 ########### EKS ############
-module "eks" {
-  depends_on                   = [module.iam]
-  source                       = "./modules/eks"
-  proj                         = var.proj
-  environment                  = var.environment
-  account_id                   = var.account_id
-  name                         = "node"
-  eks_cluster_role_arn_name    = "AmazonEKSClusterRole"
-  eks_node_group_role_arn_name = "AmazonEKSNodeRole"
-  eks_version                  = var.eks_version
-  subnet_ids                   = [for tag, id in module.subnets.ids : id if contains(["tradingbot-${var.environment}-eks-private-1a-1", "tradingbot-${var.environment}-eks-private-1b-1"], tag)]
-  security_ids                 = [module.sg.ids["tradingbot-${var.environment}-eks-sg"]]
-  max_size                     = 3
-  min_size                     = 1
-  desired_size                 = 3
-  eks_users = [
-    {
-      name          = "dorian"
-      policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
-      principal_arn = "arn:aws:iam::${var.account_id}:user/dorian"
-    },
-    {
-      name          = "cicd-pipeline"
-      policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
-      principal_arn = "arn:aws:iam::${var.account_id}:user/cicd-pipeline"
-    }
-  ]
-}
+# module "eks" {
+#   depends_on                   = [module.iam]
+#   source                       = "./modules/eks"
+#   proj                         = var.proj
+#   environment                  = var.environment
+#   account_id                   = var.account_id
+#   name                         = "node"
+#   eks_cluster_role_arn_name    = "AmazonEKSClusterRole"
+#   eks_node_group_role_arn_name = "AmazonEKSNodeRole"
+#   eks_version                  = var.eks_version
+#   subnet_ids                   = [for tag, id in module.subnets.ids : id if contains(["tradingbot-${var.environment}-eks-private-1a-1", "tradingbot-${var.environment}-eks-private-1b-1"], tag)]
+#   security_ids                 = [module.sg.ids["tradingbot-${var.environment}-eks-sg"]]
+#   max_size                     = 3
+#   min_size                     = 1
+#   desired_size                 = 3
+#   eks_users = [
+#     {
+#       name          = "dorian"
+#       policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+#       principal_arn = "arn:aws:iam::${var.account_id}:user/dorian"
+#     },
+#     {
+#       name          = "cicd-pipeline"
+#       policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+#       principal_arn = "arn:aws:iam::${var.account_id}:user/cicd-pipeline"
+#     }
+#   ]
+# }
 
 ###### COGNITO ##########
-module "cognito" {
-  source      = "./modules/cognito"
-  proj        = var.proj
-  environment = var.environment
-  name        = "x-turbo"
-}
+# module "cognito" {
+#   source      = "./modules/cognito"
+#   proj        = var.proj
+#   environment = var.environment
+#   name        = "x-turbo"
+# }
 
-######### ECR ##########
-module "ecr" {
-  source      = "./modules/ecr"
-  proj        = var.proj
-  environment = var.environment
-  repositories = [
-    {
-      name                 = "fastapi-app"
-      scan_on_push         = true
-      image_tag_mutability = "MUTABLE"
-    },
-    {
-      name                 = "react-app"
-      scan_on_push         = true
-      image_tag_mutability = "MUTABLE"
-    }
-    ,
-    {
-      name                 = "postgresql-server"
-      scan_on_push         = true
-      image_tag_mutability = "MUTABLE"
-    },
-    {
-      name                 = "metrics-scraper"
-      scan_on_push         = true
-      image_tag_mutability = "MUTABLE"
-    },
-    {
-      name                 = "dashboard"
-      scan_on_push         = true
-      image_tag_mutability = "MUTABLE"
-    },
-    {
-      name                 = "controller"
-      scan_on_push         = true
-      image_tag_mutability = "MUTABLE"
-    },
-    {
-      name                 = "kube-webhook-certgen"
-      scan_on_push         = true
-      image_tag_mutability = "MUTABLE"
-    }
-  ]
-}
-
-########### CODE BUILD ##############
-module "codebuild" {
-  depends_on    = [module.iam]
-  source        = "./modules/codebuild"
-  proj          = var.proj
-  vpc_id        = module.vpc.id
-  subnet_ids    = [module.subnets.ids["tradingbot-${var.environment}-codebuild-private-1d-1"]]
-  sg_ids        = [module.sg.ids["tradingbot-${var.environment}-codebuild-sg"]]
-  environment   = var.environment
-  role_arn_name = "AmazonCodeBuildRole"
-}
+# ######### ECR ##########
+# module "ecr" {
+#   source      = "./modules/ecr"
+#   proj        = var.proj
+#   environment = var.environment
+#   repositories = [
+#     {
+#       name                 = "fastapi-app"
+#       scan_on_push         = true
+#       image_tag_mutability = "MUTABLE"
+#     },
+#     {
+#       name                 = "react-app"
+#       scan_on_push         = true
+#       image_tag_mutability = "MUTABLE"
+#     }
+#     ,
+#     {
+#       name                 = "postgresql-server"
+#       scan_on_push         = true
+#       image_tag_mutability = "MUTABLE"
+#     },
+#     {
+#       name                 = "metrics-scraper"
+#       scan_on_push         = true
+#       image_tag_mutability = "MUTABLE"
+#     },
+#     {
+#       name                 = "dashboard"
+#       scan_on_push         = true
+#       image_tag_mutability = "MUTABLE"
+#     },
+#     {
+#       name                 = "controller"
+#       scan_on_push         = true
+#       image_tag_mutability = "MUTABLE"
+#     },
+#     {
+#       name                 = "kube-webhook-certgen"
+#       scan_on_push         = true
+#       image_tag_mutability = "MUTABLE"
+#     }
+#   ]
+# }
 
 ########### ACM ##############
-module "acm" {
-  source      = "./modules/acm"
-  proj        = var.proj
-  environment = var.environment
-}
+# module "acm" {
+#   source      = "./modules/acm"
+#   proj        = var.proj
+#   environment = var.environment
+# }
 
 ########### VPN ##############
-module "vpn" {
-  depends_on              = [module.acm]
-  source                  = "./modules/vpn"
-  proj                    = var.proj
-  vpc_id                  = module.vpc.id
-  client_cidr_block       = "172.16.0.0/22"
-  target_network_cidr     = "10.1.0.0/16"
-  destination_cidr_blocks = ["10.1.128.0/23", "10.1.144.0/23"]
-  sg_id                   = module.sg.ids["tradingbot-${var.environment}-vpn-endpoint-sg"]
-  environment             = var.environment
-  subnet_id               = module.subnets.ids["tradingbot-${var.environment}-vpn-private-1a-1"]
-  client_arn              = module.acm.client_certificate
-  server_arn              = module.acm.server_certificate
-}
+# module "vpn" {
+#   depends_on              = [module.acm]
+#   source                  = "./modules/vpn"
+#   proj                    = var.proj
+#   vpc_id                  = module.vpc.id
+#   client_cidr_block       = "172.16.0.0/22"
+#   target_network_cidr     = "10.1.0.0/16"
+#   destination_cidr_blocks = ["10.1.128.0/23", "10.1.144.0/23"]
+#   sg_id                   = module.sg.ids["tradingbot-${var.environment}-vpn-endpoint-sg"]
+#   environment             = var.environment
+#   subnet_id               = module.subnets.ids["tradingbot-${var.environment}-vpn-private-1a-1"]
+#   client_arn              = module.acm.client_certificate
+#   server_arn              = module.acm.server_certificate
+# }

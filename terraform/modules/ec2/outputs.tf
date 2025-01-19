@@ -1,7 +1,7 @@
-output "trade_server_id" {
+output "id" {
   value = aws_instance.this.id
 }
 
-output "trade_server_private_ip" {
+output "private_ip" {
   value = aws_instance.this.private_ip
 }
