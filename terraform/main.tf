@@ -572,7 +572,7 @@ module "bastion" {
   subnet_id     = module.subnets.ids["tradingbot-${var.environment}-ec2-private-1d-1"]
   sg_id         = module.sg.ids["tradingbot-${var.environment}-ec2-bastion-host-sg"]
   instance_type = "t2.micro"
-  ami           = var.ec2_ami_type
+  ami           = "ami-04b4f1a9cf54c11d0"
   role_arn_name = "AmazonEC2BastionHostRole"
   access_level  = "readwrite"
 }
