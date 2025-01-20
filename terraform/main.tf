@@ -572,46 +572,46 @@ module "bastion" {
   access_level  = "readwrite"
 }
 
-########## EBS ############
-# module "ebs" {
-#   depends_on        = [module.iam]
-#   source            = "./modules/ebs"
-#   proj              = var.proj
-#   environment       = var.environment
-#   ebs_volume_size   = 20
-#   ebs_volume_type   = "gp3"
-#   availability_zone = "${var.region}a"
-# }
+######### EBS ############
+module "ebs" {
+  depends_on        = [module.iam]
+  source            = "./modules/ebs"
+  proj              = var.proj
+  environment       = var.environment
+  ebs_volume_size   = 20
+  ebs_volume_type   = "gp3"
+  availability_zone = "${var.region}a"
+}
 
-########### EKS ############
-# module "eks" {
-#   depends_on                   = [module.iam]
-#   source                       = "./modules/eks"
-#   proj                         = var.proj
-#   environment                  = var.environment
-#   account_id                   = var.account_id
-#   name                         = "node"
-#   eks_cluster_role_arn_name    = "AmazonEKSClusterRole"
-#   eks_node_group_role_arn_name = "AmazonEKSNodeRole"
-#   eks_version                  = var.eks_version
-#   subnet_ids                   = [for tag, id in module.subnets.ids : id if contains(["tradingbot-${var.environment}-eks-private-1a-1", "tradingbot-${var.environment}-eks-private-1b-1"], tag)]
-#   security_ids                 = [module.sg.ids["tradingbot-${var.environment}-eks-sg"]]
-#   max_size                     = 3
-#   min_size                     = 1
-#   desired_size                 = 3
-#   eks_users = [
-#     {
-#       name          = "dorian"
-#       policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
-#       principal_arn = "arn:aws:iam::${var.account_id}:user/dorian"
-#     },
-#     {
-#       name          = "cicd-pipeline"
-#       policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
-#       principal_arn = "arn:aws:iam::${var.account_id}:user/cicd-pipeline"
-#     }
-#   ]
-# }
+########## EKS ############
+module "eks" {
+  depends_on                   = [module.iam]
+  source                       = "./modules/eks"
+  proj                         = var.proj
+  environment                  = var.environment
+  account_id                   = var.account_id
+  name                         = "node"
+  eks_cluster_role_arn_name    = "AmazonEKSClusterRole"
+  eks_node_group_role_arn_name = "AmazonEKSNodeRole"
+  eks_version                  = var.eks_version
+  subnet_ids                   = [for tag, id in module.subnets.ids : id if contains(["tradingbot-${var.environment}-eks-private-1a-1", "tradingbot-${var.environment}-eks-private-1b-1"], tag)]
+  security_ids                 = [module.sg.ids["tradingbot-${var.environment}-eks-sg"]]
+  max_size                     = 3
+  min_size                     = 1
+  desired_size                 = 3
+  eks_users = [
+    {
+      name          = "dorian"
+      policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+      principal_arn = "arn:aws:iam::${var.account_id}:user/dorian"
+    },
+    {
+      name          = "cicd-pipeline"
+      policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+      principal_arn = "arn:aws:iam::${var.account_id}:user/cicd-pipeline"
+    }
+  ]
+}
 
 ###### COGNITO ##########
 module "cognito" {
@@ -666,25 +666,25 @@ module "ecr" {
   ]
 }
 
-########### ACM ##############
-# module "acm" {
-#   source      = "./modules/acm"
-#   proj        = var.proj
-#   environment = var.environment
-# }
+########## ACM ##############
+module "acm" {
+  source      = "./modules/acm"
+  proj        = var.proj
+  environment = var.environment
+}
 
-########### VPN ##############
-# module "vpn" {
-#   depends_on              = [module.acm]
-#   source                  = "./modules/vpn"
-#   proj                    = var.proj
-#   vpc_id                  = module.vpc.id
-#   client_cidr_block       = "172.16.0.0/22"
-#   target_network_cidr     = "10.1.0.0/16"
-#   destination_cidr_blocks = ["10.1.128.0/23", "10.1.144.0/23"]
-#   sg_id                   = module.sg.ids["tradingbot-${var.environment}-vpn-endpoint-sg"]
-#   environment             = var.environment
-#   subnet_id               = module.subnets.ids["tradingbot-${var.environment}-vpn-private-1a-1"]
-#   client_arn              = module.acm.client_certificate
-#   server_arn              = module.acm.server_certificate
-# }
+########## VPN ##############
+module "vpn" {
+  depends_on              = [module.acm]
+  source                  = "./modules/vpn"
+  proj                    = var.proj
+  vpc_id                  = module.vpc.id
+  client_cidr_block       = "172.16.0.0/22"
+  target_network_cidr     = "10.1.0.0/16"
+  destination_cidr_blocks = ["10.1.128.0/23", "10.1.144.0/23"]
+  sg_id                   = module.sg.ids["tradingbot-${var.environment}-vpn-endpoint-sg"]
+  environment             = var.environment
+  subnet_id               = module.subnets.ids["tradingbot-${var.environment}-vpn-private-1a-1"]
+  client_arn              = module.acm.client_certificate
+  server_arn              = module.acm.server_certificate
+}
