@@ -1,146 +1,276 @@
-name: CI/CD Release Pipeline
+name: CI/CD Release Pipeline (infrastructure)
 
 on:
   push:
     branches:
-      - feature/*
       - dev
       - main
+    paths:
+      - 'terraform/**'
+      - '.github/workflows/**'
   pull_request:
-    branches:
-      - dev
-      - main
+    branches: [ dev, main ]
+    paths:
+      - 'terraform/**'
 
 env:
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  ARTIFACT: terraform
+  AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+  AWS_REGION: ${{ github.event.inputs.region || 'us-east-1' }}
+  PLATFORM: linux/amd64
+
+  TAG_PREFIX: terraform-v
+
+defaults:
+  run:
+    shell: bash
+    working-directory: terraform
+
+concurrency:
+  group: terraform-${{ github.ref_name }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
 
 jobs:
   ci:
     name: ci
     runs-on: ${{ vars.RUNNER }}
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
 
-      - name: Lint code
+      - name: Install minimal deps
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y --no-install-recommends gettext-base
+
+      - name: Lint
         run: echo "lint"
 
-      - name: Test code
+      - name: Test
         run: echo "test"
-
-      - name: compress
-        run: |
-          mkdir -p dist
-          zip -r ${{ env.ARTIFACT }}.zip ${{ env.ARTIFACT }}
-          mv ${{ env.ARTIFACT }}.zip dist/
-
-      - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ env.ARTIFACT }}
-          path: dist/*
 
   cd:
     name: cd
-    if: ${{ github.ref_name == 'dev' || github.ref_name == 'main'}}
+    if: ${{ github.event_name == 'push' && (github.ref_name == 'dev' || github.ref_name == 'main') }}
     needs: ci
     runs-on: ${{ vars.RUNNER }}
-    
+
     steps:
-      - name: Checkout Repository
+      - name: Checkout
         uses: actions/checkout@v4
         with:
           persist-credentials: true
           fetch-depth: 0
+          fetch-tags: true
           ref: ${{ github.ref }}
 
-      - name: Get commits since last tag
+      - name: Configure Git identity
+        working-directory: ${{ github.workspace }}
+        run: |
+          git config --global user.name  "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
+      - name: Install deps (envsubst)
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y --no-install-recommends gettext-base
+
+      # -------- versioning ----------
+      - name: Get commits since last STABLE terraform tag
         id: get_commits
+        env:
+          TAG_PREFIX: ${{ env.TAG_PREFIX }}
         run: |
-          # Determine the last tag, if none found, assume initial version
-          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
-          if [ -z "$LAST_TAG" ]; then
-            # No previous tags, consider all history
-            COMMITS=$(git log --pretty=format:"%s")
+          set -euo pipefail
+          # latest tag WITHOUT "-beta.*"
+          LAST_STABLE_TAG="$(git tag --list "${TAG_PREFIX}[0-9]*" --sort=-v:refname | grep -v -- '-beta\.' | head -n1 || true)"
+          echo "last_tag=${LAST_STABLE_TAG}" >> "$GITHUB_OUTPUT"
+
+          # we're inside terraform/, so use "."
+          if [[ -z "${LAST_STABLE_TAG}" ]]; then
+            COMMITS="$(git log --pretty=format:'%s' -- . || true)"
           else
-            COMMITS=$(git log ${LAST_TAG}..HEAD --pretty=format:"%s")
-          fi
-          echo "commits<<EOF" >> $GITHUB_OUTPUT
-          echo "$COMMITS" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
-      
-      - name: Determine new version
-        id: determine_version
-        run: |
-          MAJOR_PATTERN='BREAKING'
-          MINOR_PATTERN='feat'
-          PATCH_PATTERN='fix'
-          
-          COMMITS="${{ steps.get_commits.outputs.commits }}"
-          
-          BUMP_TYPE="patch" # default
-          if echo "$COMMITS" | grep -Eq "$MAJOR_PATTERN"; then
-            BUMP_TYPE="major"
-          elif echo "$COMMITS" | grep -Eq "$MINOR_PATTERN"; then
-            BUMP_TYPE="minor"
+            COMMITS="$(git log "${LAST_STABLE_TAG}..HEAD" --pretty=format:'%s' -- . || true)"
           fi
 
+          {
+            echo "commits<<EOF"
+            printf '%s\n' "${COMMITS:-}"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Decide bump or skip
+        id: decide
+        env:
+          COMMITS: ${{ steps.get_commits.outputs.commits }}
+        run: |
+          set -euo pipefail
+          if [[ -z "${COMMITS}" ]]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "No terraform commits since last tag. Skipping version bump and tag."
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Determine bump type (semver)
+        if: ${{ steps.decide.outputs.skip != 'true' }}
+        id: determine_bump
+        env:
+          COMMITS: ${{ steps.get_commits.outputs.commits }}
+        run: |
+          set -euo pipefail
+          MAJOR_PATTERN='(^|[^a-zA-Z])(BREAKING|:boom:)'
+          MINOR_PATTERN='(^|[^a-zA-Z])(feat|:sparkles:)'
+          PATCH_PATTERN='(^|[^a-zA-Z])(fix|:bug:)'
+          BUMP_TYPE=patch
+          if echo "$COMMITS" | grep -Eiq "$MAJOR_PATTERN"; then
+            BUMP_TYPE=major
+          elif echo "$COMMITS" | grep -Eiq "$MINOR_PATTERN"; then
+            BUMP_TYPE=minor
+          elif echo "$COMMITS" | grep -Eiq "$PATCH_PATTERN"; then
+            BUMP_TYPE=patch
+          fi
+          echo "bump_type=$BUMP_TYPE" >> "$GITHUB_OUTPUT"
           echo "Bump type: $BUMP_TYPE"
-          
-          VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
-          VERSION_NUM=${VERSION#v}
-          IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION_NUM"
-          
-          if [ "$BUMP_TYPE" == "major" ]; then
-            MAJOR=$((MAJOR + 1))
-            MINOR=0
-            PATCH=0
-          elif [ "$BUMP_TYPE" == "minor" ]; then
-            MINOR=$((MINOR + 1))
-            PATCH=0
-          else
-            PATCH=$((PATCH + 1))
+      
+      - name: Bump VERSION file (semver)
+        if: ${{ steps.decide.outputs.skip != 'true' }}
+        id: bump_version
+        run: |
+          set -euo pipefail
+          python - << 'PY'
+          import os, re, pathlib
+          vf = pathlib.Path("VERSION")  # we're already inside terraform/
+          cur = "0.1.0"
+          if vf.exists():
+              line = vf.read_text(encoding="utf-8").splitlines()[0].strip()
+              m = re.search(r'(\d+)\.(\d+)\.(\d+)', line)
+              if m:
+                  cur = ".".join(m.groups())
+
+          a, b, c = map(int, cur.split("."))
+          kind = os.environ.get("BUMP_TYPE", "patch").lower()
+          if kind == "major":
+              a, b, c = a+1, 0, 0
+          elif kind == "minor":
+              b, c = b+1, 0
+          else:
+              c = c+1
+
+          newv = f"{a}.{b}.{c}"
+          vf.write_text(newv + "\n", encoding="utf-8")
+          print(f"::notice::Bumped VERSION: {cur} -> {newv}")
+          print(f"new_version={newv}")
+          PY
+
+          NEW_VERSION=$(sed -n '1s/[^0-9.]*//gp' VERSION)
+          echo "new_version=$NEW_VERSION" >> "$GITHUB_OUTPUT"
+
+          if [[ "${GITHUB_REF_NAME}" == "dev" ]]; then
+            echo "pre_release_version=${NEW_VERSION}-beta.${GITHUB_RUN_NUMBER}" >> "$GITHUB_OUTPUT"
           fi
 
-          NEW_VERSION="$MAJOR.$MINOR.$PATCH"
-          echo "new_version=${NEW_VERSION}" >> $GITHUB_OUTPUT
-  
-      - name: Push tag
-        if: ${{ github.ref_name == 'main' }}
+      - name: Commit VERSION (main only)
+        if: ${{ steps.decide.outputs.skip != 'true' && github.ref_name == 'main' }}
         run: |
-          NEW_VERSION="${{ steps.determine_version.outputs.new_version }}"
-          git tag "v${NEW_VERSION}"
-          git push origin "v${NEW_VERSION}"
+          set -e
+          git add VERSION || true
+          git commit -m "chore(terraform): bump version to ${{ steps.bump_version.outputs.new_version }}" || echo "No changes"
+          git push origin "${GITHUB_REF_NAME}"
 
-      - name: Download artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: ${{ env.ARTIFACT }}
-          path: dist
+      - name: Push tag (main)
+        if: ${{ steps.decide.outputs.skip != 'true' && github.ref_name == 'main' }}
+        env:
+          TAG_PREFIX: ${{ env.TAG_PREFIX }}
+        run: |
+          set -e
+          TAG="${TAG_PREFIX}${{ steps.bump_version.outputs.new_version }}"
+          git tag -a "$TAG" -m "terraform release $TAG"
+          git push origin "$TAG"
 
-      - name: Create GitHub Release
-        if: ${{ github.ref_name == 'dev' || github.ref_name == 'main' }}
-        id: create_release
-        uses: actions/create-release@v1
+      - name: Push pre-release tag (dev)
+        if: ${{ steps.decide.outputs.skip != 'true' && github.ref_name == 'dev' }}
+        env:
+          TAG_PREFIX: ${{ env.TAG_PREFIX }}
+        run: |
+          set -e
+          TAG="${TAG_PREFIX}${{ steps.bump_version.outputs.pre_release_version }}"
+          git tag -a "$TAG" -m "terraform pre-release $TAG"
+          git push origin "$TAG"
+
+      - name: Set RELEASE_VERSION env
+        if: ${{ steps.decide.outputs.skip != 'true' }}
+        run: |
+          if [ "${GITHUB_REF_NAME}" = "main" ]; then
+            echo "RELEASE_VERSION=${{ steps.bump_version.outputs.new_version }}" >> "$GITHUB_ENV"
+          else
+            echo "RELEASE_VERSION=${{ steps.bump_version.outputs.pre_release_version }}" >> "$GITHUB_ENV"
+          fi
+
+      - name: Package terraform (zip + tar.gz)
+        id: pkg
+        run: |
+          set -e
+          ZIP="terraform.zip"
+          TGZ="terraform.tar.gz"
+
+          echo "📦 Packaging full terraform folder..."
+
+          # Zip (ignore missing excludes)
+          zip -r "$ZIP" . \
+            -x ".git/" "../.git/" "../.github/*" \
+              ".venv/" "_pycache_/" ".mypy_cache/" ".ruff_cache/" \
+              ".terraform/" "/.terraform/" ".tfstate*" ".terraform.lock.hcl" \
+            || true
+
+          # Tar (ignore missing paths, suppress warnings)
+          tar --exclude="$ZIP" --ignore-failed-read -czf "$TGZ" \
+            --exclude-vcs \
+            --exclude='.venv' \
+            --exclude='_pycache_' \
+            --exclude='.mypy_cache' \
+            --exclude='.ruff_cache' \
+            --exclude='.terraform' \
+            --exclude='.tfstate' \
+            --exclude='.terraform.lock.hcl' \
+            . || true
+
+          echo "✅ Done packaging"
+          echo "zip=terraform/$ZIP" >> "$GITHUB_OUTPUT"
+          echo "tgz=terraform/$TGZ" >> "$GITHUB_OUTPUT"
+
+      - name: Create GitHub Release (main)
+        if: ${{ steps.decide.outputs.skip != 'true' && github.ref_name == 'main' }}
+        uses: softprops/action-gh-release@v2
         with:
-          tag_name: v${{ steps.determine_version.outputs.new_version }}
-          release_name: v${{ steps.determine_version.outputs.new_version }}
+          tag_name: ${{ env.TAG_PREFIX }}${{ steps.bump_version.outputs.new_version }}
+          name: v${{ steps.bump_version.outputs.new_version }}
           body: |
-            This is the release notes for ${{ github.ref_name }}
+            Automated terraform release for ${{ github.sha }}.
+          prerelease: false
           draft: false
-          prerelease: ${{ github.ref_name == 'dev' }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  
-      - name: Upload asset to the release
-        if: ${{ github.ref_name == 'dev' || github.ref_name == 'main' }}
-        uses: actions/upload-release-asset@v1
+          files: |
+            ${{ steps.pkg.outputs.zip }}
+            ${{ steps.pkg.outputs.tgz }}
+
+      - name: Create GitHub Pre-release (dev)
+        if: ${{ steps.decide.outputs.skip != 'true' && github.ref_name == 'dev' }}
+        uses: softprops/action-gh-release@v2
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: dist/${{ env.ARTIFACT }}.zip
-          asset_name: ${{ env.ARTIFACT }}.zip
-          asset_content_type: application/octet-stream
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          tag_name: ${{ env.TAG_PREFIX }}${{ steps.bump_version.outputs.pre_release_version }}
+          name: v${{ steps.bump_version.outputs.pre_release_version }}
+          body: |
+            Automated terraform pre-release for ${{ github.sha }}.
+          prerelease: true
+          draft: false
+          files: |
+            ${{ steps.pkg.outputs.zip }}
+            ${{ steps.pkg.outputs.tgz }}
