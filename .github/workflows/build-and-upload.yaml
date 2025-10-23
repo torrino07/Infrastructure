@@ -20,7 +20,7 @@ env:
   AWS_REGION: ${{ github.event.inputs.region || 'us-east-1' }}
   PLATFORM: linux/amd64
 
-  TAG_PREFIX: terraform-v
+  TAG_PREFIX: v
 
 defaults:
   run:
