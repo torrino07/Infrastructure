@@ -1,0 +1,15 @@
+variable "app" {
+  type = string
+}
+
+variable "environment" {
+  type = string
+}
+
+variable "region" {
+  type = string
+}
+
+variable "tags" {
+  type = string
+}
