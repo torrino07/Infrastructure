@@ -11,5 +11,5 @@ variable "region" {
 }
 
 variable "tags" {
-  type = string
+  type = map(string)
 }
