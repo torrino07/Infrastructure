@@ -24,7 +24,7 @@ output "resource_group_name_computed" {
 }
 
 output "resource_group" {
-  value       = {
+  value = {
     id       = azurerm_resource_group.this.id
     name     = azurerm_resource_group.this.name
     location = azurerm_resource_group.this.location
