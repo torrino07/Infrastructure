@@ -9,7 +9,7 @@ resource "google_project" "this" {
 }
 
 resource "google_project_service" "this" {
-  for_each                   = toset([
+  for_each = toset([
     "compute.googleapis.com",
     "container.googleapis.com",
   ])
