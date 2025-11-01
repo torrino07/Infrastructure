@@ -18,7 +18,7 @@ resource "google_project_service" "this" {
     "compute.googleapis.com",
     "container.googleapis.com",
   ])
-  project                    = google_project.this.project_id
+  project                    = var.project_id
   service                    = each.key
   disable_dependent_services = true
 }
