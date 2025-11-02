@@ -9,9 +9,9 @@ resource "azurerm_servicebus_namespace" "ns" {
 }
 
 resource "azurerm_servicebus_queue" "queues" {
-  for_each    = toset(var.queues)
-  name        = each.key
-  namespace_id= azurerm_servicebus_namespace.ns.id
+  for_each     = toset(var.queues)
+  name         = each.key
+  namespace_id = azurerm_servicebus_namespace.ns.id
 }
 
 resource "azurerm_private_endpoint" "pe" {
@@ -29,7 +29,7 @@ resource "azurerm_private_endpoint" "pe" {
 
   private_dns_zone_group {
     name                 = "sb-dns"
-    private_dns_zone_ids = [var.pdz_sb_id]     # privatelink.servicebus.windows.net
+    private_dns_zone_ids = [var.pdz_sb_id] # privatelink.servicebus.windows.net
   }
 
   tags = var.tags

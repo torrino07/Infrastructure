@@ -2,7 +2,7 @@ resource "azurerm_container_registry" "acr" {
   name                          = replace(var.name, "-", "")
   location                      = var.location
   resource_group_name           = var.resource_group_name
-  sku                           = var.sku      # "Premium" recommended
+  sku                           = var.sku # "Premium" recommended
   admin_enabled                 = false
   public_network_access_enabled = false
   tags                          = var.tags
@@ -23,7 +23,7 @@ resource "azurerm_private_endpoint" "pe" {
 
   private_dns_zone_group {
     name                 = "acr-dns"
-    private_dns_zone_ids = [var.pdz_acr_id]   # privatelink.azurecr.io
+    private_dns_zone_ids = [var.pdz_acr_id] # privatelink.azurecr.io
   }
 
   tags = var.tags

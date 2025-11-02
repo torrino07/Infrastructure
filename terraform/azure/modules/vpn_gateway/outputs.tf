@@ -1,3 +1,3 @@
-output "id"        { value = azurerm_virtual_network_gateway.this.id }
+output "id" { value = azurerm_virtual_network_gateway.this.id }
 output "public_ip" { value = azurerm_public_ip.this.ip_address }
-output "bgp_asn"   { value = var.bgp_asn }
+output "bgp_asn" { value = var.bgp_asn }

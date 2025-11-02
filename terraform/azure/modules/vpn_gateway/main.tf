@@ -13,7 +13,7 @@ resource "azurerm_virtual_network_gateway" "this" {
   resource_group_name = var.resource_group_name
   type                = "Vpn"
   vpn_type            = "RouteBased"
-  sku                 = var.sku                      # e.g., "VpnGw2"
+  sku                 = var.sku # e.g., "VpnGw2"
   active_active       = false
   enable_bgp          = true
 
@@ -21,7 +21,7 @@ resource "azurerm_virtual_network_gateway" "this" {
     name                          = "default"
     public_ip_address_id          = azurerm_public_ip.this.id
     private_ip_address_allocation = "Dynamic"
-    subnet_id                     = var.gateway_subnet_id        # must be "GatewaySubnet"
+    subnet_id                     = var.gateway_subnet_id # must be "GatewaySubnet"
   }
 
   bgp_settings {

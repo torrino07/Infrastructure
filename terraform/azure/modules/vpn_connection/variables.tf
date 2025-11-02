@@ -1,9 +1,9 @@
-variable "name"                { type = string }
+variable "name" { type = string }
 variable "resource_group_name" { type = string }
-variable "location"            { type = string }
-variable "vpn_gateway_id"      { type = string }
-variable "peer_public_ip"      { type = string }  # AWS/GCP VPN IP
-variable "peer_bgp_asn"        { type = number }  # e.g., AWS TGW 64512, GCP router 64513
-variable "peer_bgp_peering_address" { type = string }  # e.g., AWS TGW 10.0.0.1, GCP router 10.0.0.2
-variable "ipsec_psk"           { type = string }  # set via TF var/secret
-variable "tags"                { type = map(string) }
+variable "location" { type = string }
+variable "vpn_gateway_id" { type = string }
+variable "peer_public_ip" { type = string }           # AWS/GCP VPN IP
+variable "peer_bgp_asn" { type = number }             # e.g., AWS TGW 64512, GCP router 64513
+variable "peer_bgp_peering_address" { type = string } # e.g., AWS TGW 10.0.0.1, GCP router 10.0.0.2
+variable "ipsec_psk" { type = string }                # set via TF var/secret
+variable "tags" { type = map(string) }

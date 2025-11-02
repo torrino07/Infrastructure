@@ -1,11 +1,11 @@
 resource "azurerm_key_vault" "kv" {
-  name                            = var.name
-  location                        = var.location
-  resource_group_name             = var.resource_group_name
-  tenant_id                       = var.tenant_id
-  sku_name                        = "standard"
-  purge_protection_enabled        = true
-  public_network_access_enabled   = false
+  name                          = var.name
+  location                      = var.location
+  resource_group_name           = var.resource_group_name
+  tenant_id                     = var.tenant_id
+  sku_name                      = "standard"
+  purge_protection_enabled      = true
+  public_network_access_enabled = false
   network_acls {
     bypass         = "AzureServices"
     default_action = "Deny"
@@ -28,7 +28,7 @@ resource "azurerm_private_endpoint" "pe" {
 
   private_dns_zone_group {
     name                 = "kv-dns"
-    private_dns_zone_ids = [var.pdz_vaultcore_id]  # privatelink.vaultcore.azure.net
+    private_dns_zone_ids = [var.pdz_vaultcore_id] # privatelink.vaultcore.azure.net
   }
 
   tags = var.tags
