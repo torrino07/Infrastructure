@@ -6,11 +6,11 @@ resource "azurerm_subnet" "this" {
   address_prefixes     = each.value.address_prefixes
 
   # service endpoints (optional if you also do Private Endpoints)
-  service_endpoints    = try(each.value.service_endpoints, [])
+  service_endpoints = try(each.value.service_endpoints, [])
   delegation {
     name = try(each.value.delegation.name, null)
     service_delegation {
-      name = try(each.value.delegation.service, null)
+      name    = try(each.value.delegation.service, null)
       actions = try(each.value.delegation.actions, [])
     }
   }
@@ -25,7 +25,7 @@ resource "azurerm_subnet_network_security_group_association" "nsg_assoc" {
 
 # UDR association (optional)
 resource "azurerm_subnet_route_table_association" "rt_assoc" {
-  for_each      = { for s in var.subnets : s.name => s if try(s.route_table_id, null) != null }
-  subnet_id     = azurerm_subnet.this[each.key].id
-  route_table_id= each.value.route_table_id
+  for_each       = { for s in var.subnets : s.name => s if try(s.route_table_id, null) != null }
+  subnet_id      = azurerm_subnet.this[each.key].id
+  route_table_id = each.value.route_table_id
 }
