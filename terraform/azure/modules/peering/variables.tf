@@ -1,0 +1,11 @@
+variable "hub_rg" { type = string }
+variable "hub_vnet_name" { type = string }
+variable "hub_vnet_id" { type = string }
+variable "spoke_rg" { type = string }
+variable "spoke_vnet_name" { type = string }
+variable "spoke_vnet_id" { type = string }
+variable "allow_forwarded_traffic" { type = bool }
+variable "allow_gateway_transit_hub" { type = bool }
+variable "use_remote_gateways_hub" { type = bool }
+variable "allow_gateway_transit_spoke" { type = bool }
+variable "use_remote_gateways_spoke" { type = bool }
