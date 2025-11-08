@@ -4,28 +4,29 @@ resource "azurerm_cognitive_account" "this" {
   location                      = var.location
   kind                          = "OpenAI"
   sku_name                      = "S0"
-  public_network_access_enabled = false
   custom_subdomain_name         = var.custom_subdomain_name
+  public_network_access_enabled = false
   tags                          = var.tags
+
+  # ► Assign UAMI(s) so CMK can be used
+  dynamic "identity" {
+    for_each = length(var.identity_ids) > 0 ? [1] : []
+    content {
+      type         = "UserAssigned"
+      identity_ids = var.identity_ids
+    }
+  }
 }
 
-# RBAC (prefer MI/AAD over API keys)
+# RBAC for callers (apps/MI)
 resource "azurerm_role_assignment" "rbac" {
   for_each             = { for p in var.rbac_principals : p.object_id => p }
   scope                = azurerm_cognitive_account.this.id
-  role_definition_name = each.value.role # e.g., "Cognitive Services OpenAI User"
+  role_definition_name = each.value.role
   principal_id         = each.value.object_id
 }
 
-# Optional CMK
-resource "azurerm_cognitive_account_customer_managed_key" "cmk" {
-  count                = var.key_vault_key_id == null ? 0 : 1
-  cognitive_account_id = azurerm_cognitive_account.this.id
-  key_vault_key_id     = var.key_vault_key_id
-  identity_client_id   = var.cmk_identity_client_id
-}
-
-# Private Endpoint + DNS zone group
+# ► Private Endpoint + zone group (unchanged)
 resource "azurerm_private_endpoint" "pe" {
   name                = "${var.name}-pe"
   location            = var.location
@@ -42,6 +43,14 @@ resource "azurerm_private_endpoint" "pe" {
 
   private_dns_zone_group {
     name                 = "aoai-dns"
-    private_dns_zone_ids = [var.pdz_openai_id] # privatelink.openai.azure.com
+    private_dns_zone_ids = [var.pdz_openai_id]
   }
+}
+
+# ► Bind CMK (only if both values provided)
+resource "azurerm_cognitive_account_customer_managed_key" "cmk" {
+  count                = (var.key_vault_key_id != null && var.cmk_identity_client_id != null) ? 1 : 0
+  cognitive_account_id = azurerm_cognitive_account.this.id
+  key_vault_key_id     = var.key_vault_key_id
+  identity_client_id   = var.cmk_identity_client_id
 }
