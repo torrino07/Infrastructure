@@ -1,7 +1,7 @@
 variable "name" {
   type = string
 }
-variable "location" {
+variable "region" {
   type = string
 }
 variable "resource_group_name" {

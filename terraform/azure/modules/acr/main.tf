@@ -1,6 +1,6 @@
 resource "azurerm_container_registry" "acr" {
   name                          = replace(var.name, "-", "")
-  location                      = var.location
+  location                      = var.region
   resource_group_name           = var.resource_group_name
   sku                           = var.sku # "Premium" recommended
   admin_enabled                 = false
@@ -10,7 +10,7 @@ resource "azurerm_container_registry" "acr" {
 
 resource "azurerm_private_endpoint" "pe" {
   name                = "${var.name}-pe"
-  location            = var.location
+  location            = var.region
   resource_group_name = var.resource_group_name
   subnet_id           = var.privatelink_subnet_id
 

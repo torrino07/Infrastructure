@@ -1,7 +1,7 @@
 resource "azurerm_public_ip" "this" {
   name                = "${var.name}-pip"
   resource_group_name = var.resource_group_name
-  location            = var.location
+  location            = var.region
   allocation_method   = "Static"
   sku                 = "Standard"
   tags                = var.tags
@@ -9,7 +9,7 @@ resource "azurerm_public_ip" "this" {
 
 resource "azurerm_virtual_network_gateway" "this" {
   name                = var.name
-  location            = var.location
+  location            = var.region
   resource_group_name = var.resource_group_name
   type                = "Vpn"
   vpn_type            = "RouteBased"
