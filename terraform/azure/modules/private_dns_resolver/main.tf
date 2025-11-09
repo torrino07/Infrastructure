@@ -24,11 +24,11 @@ resource "azurerm_private_dns_resolver_outbound_endpoint" "outbound" {
 
 # Only create ruleset if there are forward rules
 resource "azurerm_private_dns_resolver_dns_forwarding_ruleset" "ruleset" {
-  name                                         = "${var.name}-ruleset"
-  resource_group_name                          = var.resource_group_name
-  location                                     = var.region
-  private_dns_resolver_outbound_endpoint_ids   = [azurerm_private_dns_resolver_outbound_endpoint.outbound.id]
-  tags                                         = var.tags
+  name                                       = "${var.name}-ruleset"
+  resource_group_name                        = var.resource_group_name
+  location                                   = var.region
+  private_dns_resolver_outbound_endpoint_ids = [azurerm_private_dns_resolver_outbound_endpoint.outbound.id]
+  tags                                       = var.tags
 }
 # N rules only if ruleset exists
 resource "azurerm_private_dns_resolver_forwarding_rule" "rule" {
