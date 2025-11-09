@@ -10,9 +10,7 @@ resource "azurerm_private_dns_resolver_inbound_endpoint" "inbound" {
   name                    = "${var.name}-in"
   private_dns_resolver_id = azurerm_private_dns_resolver.this.id
   location                = var.region
-  ip_configurations {
-    subnet_id = var.inbound_subnet_id
-  }
+  ip_configurations { subnet_id = var.inbound_subnet_id }
   tags = var.tags
 }
 
@@ -24,22 +22,30 @@ resource "azurerm_private_dns_resolver_outbound_endpoint" "outbound" {
   tags                    = var.tags
 }
 
+# Only create ruleset if there are forward rules
+resource "azurerm_private_dns_resolver_dns_forwarding_ruleset" "ruleset" {
+  name                                         = "${var.name}-ruleset"
+  resource_group_name                          = var.resource_group_name
+  location                                     = var.region
+  private_dns_resolver_outbound_endpoint_ids   = [azurerm_private_dns_resolver_outbound_endpoint.outbound.id]
+  tags                                         = var.tags
+}
+# N rules only if ruleset exists
 resource "azurerm_private_dns_resolver_forwarding_rule" "rule" {
-  for_each                  = { for r in var.forward_rules : r.domain => r }
-  name                      = replace(each.value.domain, ".", "-")
+  count                     = length(var.forward_rules) > 0 ? length(var.forward_rules) : 0
+  name                      = replace(var.forward_rules[count.index].domain, ".", "-")
   dns_forwarding_ruleset_id = azurerm_private_dns_resolver_dns_forwarding_ruleset.ruleset[0].id
-  domain_name               = each.value.domain
+  domain_name               = var.forward_rules[count.index].domain
   enabled                   = true
   target_dns_servers {
-    ip_address = each.value.target_ip
+    ip_address = var.forward_rules[count.index].target_ip
     port       = 53
   }
 }
 
-# Link ruleset to VNets that should use it (usually hub + spokes)
 resource "azurerm_private_dns_resolver_virtual_network_link" "link" {
-  for_each                  = { for id in var.ruleset_vnet_ids : id => id }
-  name                      = "link-${replace(each.value, "/", "-")}"
+  count                     = length(var.forward_rules) > 0 ? length(var.ruleset_vnet_ids) : 0
+  name                      = "link-${count.index}"
   dns_forwarding_ruleset_id = azurerm_private_dns_resolver_dns_forwarding_ruleset.ruleset[0].id
-  virtual_network_id        = each.value
+  virtual_network_id        = var.ruleset_vnet_ids[count.index]
 }
