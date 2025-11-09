@@ -1,6 +1,6 @@
 variable "uami_name" { type = string }
 variable "resource_group_name" { type = string }
-variable "location" { type = string }
+variable "region" { type = string }
 variable "key_vault_id" { type = string } # existing KV (hub)
 variable "key_name" {
   type    = string
