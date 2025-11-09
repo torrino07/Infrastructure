@@ -1,7 +1,7 @@
 # UAMI used by the service (e.g., AOAI) for CMK operations
 resource "azurerm_user_assigned_identity" "cmk" {
   name                = var.uami_name
-  location            = var.location
+  location            = var.region
   resource_group_name = var.resource_group_name
   tags                = var.tags
 }
