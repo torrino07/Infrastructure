@@ -1,6 +1,6 @@
 resource "azurerm_servicebus_namespace" "ns" {
   name                          = var.name
-  location                      = var.region
+  location                      = var.location
   resource_group_name           = var.resource_group_name
   sku                           = "Premium"
   public_network_access_enabled = false
@@ -16,7 +16,7 @@ resource "azurerm_servicebus_queue" "queues" {
 
 resource "azurerm_private_endpoint" "pe" {
   name                = "${var.name}-pe"
-  location            = var.region
+  location            = var.location
   resource_group_name = var.resource_group_name
   subnet_id           = var.privatelink_subnet_id
 
