@@ -6,7 +6,7 @@ variable "environment" {
   type = string
 }
 
-variable "region" {
+variable "location" {
   type = string
 }
 
