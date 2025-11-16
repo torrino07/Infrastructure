@@ -1,7 +1,7 @@
 resource "azurerm_private_dns_resolver" "this" {
   name                = var.name
   resource_group_name = var.resource_group_name
-  location            = var.region
+  location            = var.location
   virtual_network_id  = var.vnet_id
   tags                = var.tags
 }
@@ -9,7 +9,7 @@ resource "azurerm_private_dns_resolver" "this" {
 resource "azurerm_private_dns_resolver_inbound_endpoint" "inbound" {
   name                    = "${var.name}-in"
   private_dns_resolver_id = azurerm_private_dns_resolver.this.id
-  location                = var.region
+  location                = var.location
   ip_configurations { subnet_id = var.inbound_subnet_id }
   tags = var.tags
 }
@@ -17,7 +17,7 @@ resource "azurerm_private_dns_resolver_inbound_endpoint" "inbound" {
 resource "azurerm_private_dns_resolver_outbound_endpoint" "outbound" {
   name                    = "${var.name}-out"
   private_dns_resolver_id = azurerm_private_dns_resolver.this.id
-  location                = var.region
+  location                = var.location
   subnet_id               = var.outbound_subnet_id
   tags                    = var.tags
 }
@@ -26,7 +26,7 @@ resource "azurerm_private_dns_resolver_outbound_endpoint" "outbound" {
 resource "azurerm_private_dns_resolver_dns_forwarding_ruleset" "ruleset" {
   name                                       = "${var.name}-ruleset"
   resource_group_name                        = var.resource_group_name
-  location                                   = var.region
+  location                                   = var.location
   private_dns_resolver_outbound_endpoint_ids = [azurerm_private_dns_resolver_outbound_endpoint.outbound.id]
   tags                                       = var.tags
 }
