@@ -1,6 +1,6 @@
 variable "name" { type = string }
 variable "resource_group_name" { type = string }
-variable "region" { type = string }
+variable "location" { type = string }
 variable "vpn_gateway_id" { type = string }
 variable "peer_public_ip" { type = string }           # AWS/GCP VPN IP
 variable "peer_bgp_asn" { type = number }             # e.g., AWS TGW 64512, GCP router 64513

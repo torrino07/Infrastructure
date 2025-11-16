@@ -1,7 +1,7 @@
 resource "azurerm_local_network_gateway" "peer" {
   name                = "${var.name}-lngw"
   resource_group_name = var.resource_group_name
-  location            = var.region
+  location            = var.location
   gateway_address     = var.peer_public_ip
   bgp_settings {
     asn                 = var.peer_bgp_asn
@@ -13,7 +13,7 @@ resource "azurerm_local_network_gateway" "peer" {
 resource "azurerm_virtual_network_gateway_connection" "conn" {
   name                       = var.name
   resource_group_name        = var.resource_group_name
-  location                   = var.region
+  location                   = var.location
   type                       = "IPsec"
   virtual_network_gateway_id = var.vpn_gateway_id
   local_network_gateway_id   = azurerm_local_network_gateway.peer.id
