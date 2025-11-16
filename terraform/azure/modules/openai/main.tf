@@ -1,7 +1,7 @@
 resource "azurerm_cognitive_account" "this" {
   name                          = var.name
   resource_group_name           = var.resource_group_name
-  location                      = var.region
+  location                      = var.location
   kind                          = "OpenAI"
   sku_name                      = "S0"
   custom_subdomain_name         = var.custom_subdomain_name
@@ -29,7 +29,7 @@ resource "azurerm_role_assignment" "rbac" {
 # ► Private Endpoint + zone group (unchanged)
 resource "azurerm_private_endpoint" "pe" {
   name                = "${var.name}-pe"
-  location            = var.region
+  location            = var.location
   resource_group_name = var.resource_group_name
   subnet_id           = var.privatelink_subnet_id
   tags                = var.tags
