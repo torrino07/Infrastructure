@@ -1,21 +1,29 @@
 resource "azurerm_subnet" "this" {
-  for_each             = { for s in var.subnets : s.name => s }
+  for_each = { for s in var.subnets : s.name => s }
+
   name                 = each.value.name
   resource_group_name  = var.resource_group_name
   virtual_network_name = var.vnet_name
   address_prefixes     = each.value.address_prefixes
 
-  # service endpoints (optional if you also do Private Endpoints)
+  # Service endpoints (optional)
   service_endpoints = try(each.value.service_endpoints, [])
-  delegation {
-    name = try(each.value.delegation.name, null)
-    service_delegation {
-      name    = try(each.value.delegation.service, null)
-      actions = try(each.value.delegation.actions, [])
+
+  # Delegation (optional)
+  dynamic "delegation" {
+    # Only create a delegation block if delegation is provided for this subnet
+    for_each = try(each.value.delegation, null) == null ? [] : [each.value.delegation]
+
+    content {
+      name = delegation.value.name
+
+      service_delegation {
+        name    = delegation.value.service
+        actions = try(delegation.value.actions, [])
+      }
     }
   }
 }
-
 # NSG association (optional)
 resource "azurerm_subnet_network_security_group_association" "nsg_assoc" {
   for_each                  = { for s in var.subnets : s.name => s if try(s.nsg_id, null) != null }
