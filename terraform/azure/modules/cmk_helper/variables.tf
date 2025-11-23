@@ -12,7 +12,7 @@ variable "key_size" {
 }
 variable "key_ops" {
   type    = list(string)
-  default = ["WrapKey", "UnwrapKey", "Encrypt", "Decrypt", "Sign", "Verify"]
+  default = ["wrapKey", "unwrapKey", "encrypt", "decrypt", "sign", "verify"]
 }
 
 # If your KV is using legacy Access Policies instead of RBAC, flip this to true and pass tenant_id.
