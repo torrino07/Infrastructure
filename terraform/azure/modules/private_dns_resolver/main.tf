@@ -34,7 +34,7 @@ resource "azurerm_private_dns_resolver_dns_forwarding_ruleset" "ruleset" {
 resource "azurerm_private_dns_resolver_forwarding_rule" "rule" {
   count                     = length(var.forward_rules) > 0 ? length(var.forward_rules) : 0
   name                      = replace(var.forward_rules[count.index].domain, ".", "-")
-  dns_forwarding_ruleset_id = azurerm_private_dns_resolver_dns_forwarding_ruleset.id
+  dns_forwarding_ruleset_id = azurerm_private_dns_resolver_dns_forwarding_ruleset.ruleset.id
   domain_name               = var.forward_rules[count.index].domain
   enabled                   = true
   target_dns_servers {
@@ -46,6 +46,6 @@ resource "azurerm_private_dns_resolver_forwarding_rule" "rule" {
 resource "azurerm_private_dns_resolver_virtual_network_link" "link" {
   count                     = length(var.forward_rules) > 0 ? length(var.ruleset_vnet_ids) : 0
   name                      = "link-${count.index}"
-  dns_forwarding_ruleset_id = azurerm_private_dns_resolver_dns_forwarding_ruleset.id
+  dns_forwarding_ruleset_id = azurerm_private_dns_resolver_dns_forwarding_ruleset.ruleset.id
   virtual_network_id        = var.ruleset_vnet_ids[count.index]
 }
