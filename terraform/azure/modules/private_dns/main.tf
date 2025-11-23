@@ -1,4 +1,3 @@
-# modules/private_dns/main.tf
 locals {
   zones_map = { for z in var.zones : z.name => z }
 }
@@ -35,13 +34,12 @@ resource "azurerm_private_dns_zone_virtual_network_link" "links" {
   tags                  = var.tags
 }
 
-# Optional A records (rarely needed for Private Endpoints if zone groups are used,
-# but handy for bootstrap or custom names)
+# Optional A records
 resource "azurerm_private_dns_a_record" "records" {
   for_each = {
     for r in flatten([
       for z in var.zones : [
-        for r in try(z.a_records, []) : {
+        for r in coalesce(try(z.a_records, []), []) : {
           key       = "${z.name}:${r.name}"
           zone_name = z.name
           name      = r.name
