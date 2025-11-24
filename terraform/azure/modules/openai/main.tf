@@ -49,7 +49,8 @@ resource "azurerm_private_endpoint" "pe" {
 
 # ► Bind CMK (only if both values provided)
 resource "azurerm_cognitive_account_customer_managed_key" "cmk" {
-  count                = (var.key_vault_key_id != null && var.cmk_identity_client_id != null) ? 1 : 0
+  count = var.enable_cmk ? 1 : 0
+
   cognitive_account_id = azurerm_cognitive_account.this.id
   key_vault_key_id     = var.key_vault_key_id
   identity_client_id   = var.cmk_identity_client_id

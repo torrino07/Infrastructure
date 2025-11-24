@@ -31,3 +31,8 @@ variable "cmk_identity_client_id" {
   type    = string
   default = null
 } # e.g., azurerm_user_assigned_identity.aoai_cmk.client_id
+
+variable "enable_cmk" {
+  type    = bool
+  default = false
+}
