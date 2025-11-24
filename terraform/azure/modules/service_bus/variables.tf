@@ -5,3 +5,4 @@ variable "privatelink_subnet_id" { type = string }
 variable "queues" { type = list(string) }
 variable "pdz_sb_id" { type = string }
 variable "tags" { type = map(string) }
+variable "capacity" { type = number }
