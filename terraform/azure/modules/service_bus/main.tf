@@ -14,6 +14,7 @@ resource "azurerm_servicebus_queue" "queues" {
   for_each     = toset(var.queues)
   name         = each.key
   namespace_id = azurerm_servicebus_namespace.ns.id
+  partitioning_enabled = true
 }
 
 resource "azurerm_private_endpoint" "pe" {
