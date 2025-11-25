@@ -21,18 +21,3 @@ variable "identity_ids" {
   type        = list(string)
   default     = []
 }
-
-# ► CMK parameters (required for robust solution)
-variable "key_vault_key_id" {
-  type    = string
-  default = null
-} # e.g., azurerm_key_vault_key.aoai_key.id
-variable "cmk_identity_client_id" {
-  type    = string
-  default = null
-} # e.g., azurerm_user_assigned_identity.aoai_cmk.client_id
-
-variable "enable_cmk" {
-  type    = bool
-  default = false
-}
