@@ -6,7 +6,7 @@ resource "azurerm_servicebus_namespace" "ns" {
   public_network_access_enabled = false
   minimum_tls_version           = "1.2"
   tags                          = var.tags
-  capacity                      = var.capacity
+  premium_messaging_partitions  = var.sb_premium_partitions
 }
 
 resource "azurerm_servicebus_queue" "queues" {
