@@ -46,16 +46,3 @@ variable "rbac_principals" {
   type        = list(object({ object_id = string, role = string }))
   default     = []
 }
-
-# Managed Identity
-variable "identity_type" {
-  description = "Identity type for Search: 'SystemAssigned', 'UserAssigned', 'SystemAssigned, UserAssigned', or 'None'."
-  type        = string
-  default     = "SystemAssigned"
-}
-
-variable "identity_ids" {
-  description = "List of UAMI IDs if using UserAssigned or combo identity."
-  type        = list(string)
-  default     = []
-}
