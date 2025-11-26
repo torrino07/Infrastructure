@@ -11,14 +11,6 @@ resource "azurerm_search_service" "this" {
   local_authentication_enabled  = false
 
   tags = var.tags
-
-  dynamic "identity" {
-    for_each = var.identity_type == "None" ? [] : [1]
-    content {
-      type         = var.identity_type   # e.g. "SystemAssigned" or "UserAssigned"
-      identity_ids = var.identity_ids
-    }
-  }
 }
 
 # RBAC for callers (apps/MI) – e.g. ACA MI, agent MI, admin group
