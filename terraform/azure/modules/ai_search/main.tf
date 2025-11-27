@@ -15,10 +15,11 @@ resource "azurerm_search_service" "this" {
 
 # RBAC for callers (apps/MI) – e.g. ACA MI, agent MI, admin group
 resource "azurerm_role_assignment" "rbac" {
-  for_each             = { for p in var.rbac_principals : p.object_id => p }
+  count = length(var.rbac_principals)
+
   scope                = azurerm_search_service.this.id
-  role_definition_name = each.value.role
-  principal_id         = each.value.object_id
+  role_definition_name = var.rbac_principals[count.index].role
+  principal_id         = var.rbac_principals[count.index].object_id
 }
 
 # Private Endpoint for Azure AI Search
