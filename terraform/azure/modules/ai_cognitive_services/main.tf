@@ -21,12 +21,11 @@ resource "azurerm_cognitive_account" "this" {
 }
 
 resource "azurerm_role_assignment" "rbac" {
-  for_each             = { for p in var.rbac_principals : p.object_id => p }
+  count = length(var.rbac_principals)
   scope                = azurerm_cognitive_account.this.id
-  role_definition_name = each.value.role
-  principal_id         = each.value.object_id
+  role_definition_name = var.rbac_principals[count.index].role
+  principal_id         = var.rbac_principals[count.index].object_id
 }
-
 resource "azurerm_private_endpoint" "pe" {
   name                = "${var.name}-pe"
   location            = var.location

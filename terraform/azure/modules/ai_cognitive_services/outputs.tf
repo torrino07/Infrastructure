@@ -2,15 +2,14 @@ output "id" {
   value = azurerm_cognitive_account.this.id
 }
 
+output "name" {
+  value = azurerm_cognitive_account.this.name
+}
+
 output "endpoint" {
-  value = azurerm_cognitive_account.this.endpoint
+  value = "https://${azurerm_cognitive_account.this.name}.cognitiveservices.azure.com"
 }
 
 output "pe_id" {
   value = azurerm_private_endpoint.pe.id
-}
-
-output "identity_principal_id" {
-  value       = try(azurerm_cognitive_account.this.identity[0].principal_id, null)
-  description = "Principal ID of the cognitive account MI, if enabled."
 }
