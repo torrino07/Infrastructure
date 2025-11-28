@@ -22,10 +22,7 @@ resource "azurerm_storage_account" "this" {
 resource "azurerm_storage_container" "containers" {
   for_each               = toset(var.containers)
   name                   = each.value
-
-  # MUST use this — storage_account_name is still required
   storage_account_name   = azurerm_storage_account.this.name
-
   container_access_type = "private"
 }
 
