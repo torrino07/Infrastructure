@@ -10,7 +10,7 @@ resource "azurerm_storage_account" "this" {
   min_tls_version                 = "TLS1_2"
   public_network_access_enabled   = false
   allow_nested_items_to_be_public = false
-  shared_access_key_enabled       = true   # turn off later if going strict RBAC
+  shared_access_key_enabled       = true
 
   identity {
     type = "SystemAssigned"
@@ -19,24 +19,20 @@ resource "azurerm_storage_account" "this" {
   tags = var.tags
 }
 
-# Modern API: use storage_account_id instead of name
 resource "azurerm_storage_container" "containers" {
-  for_each             = toset(var.containers)
-  name                 = each.value
-  storage_account_id   = azurerm_storage_account.this.id
+  for_each               = toset(var.containers)
+  name                   = each.value
+  storage_account_name   = azurerm_storage_account.this.name
   container_access_type = "private"
 }
 
-# RBAC for callers (e.g. ACA hub MI)
 resource "azurerm_role_assignment" "rbac" {
-  count = length(var.rbac_principals)
-
+  count                = length(var.rbac_principals)
   scope                = azurerm_storage_account.this.id
   role_definition_name = var.rbac_principals[count.index].role
   principal_id         = var.rbac_principals[count.index].object_id
 }
 
-# Private endpoint for Blob
 resource "azurerm_private_endpoint" "pe" {
   name                = "${var.name}-blob-pe"
   location            = var.location
