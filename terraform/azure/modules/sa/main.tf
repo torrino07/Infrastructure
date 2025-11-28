@@ -1,3 +1,10 @@
+resource "azurerm_role_assignment" "rbac" {
+  count = length(var.rbac_principals)
+
+  scope                = azurerm_storage_account.this.id
+  role_definition_name = var.rbac_principals[count.index].role
+  principal_id         = var.rbac_principals[count.index].object_id
+}
 resource "azurerm_storage_account" "this" {
   name                = var.name
   resource_group_name = var.resource_group_name
