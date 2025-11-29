@@ -25,7 +25,6 @@ resource "azurerm_role_assignment" "kv_secrets" {
 resource "azurerm_container_app" "app" {
   name                = var.name
   resource_group_name = var.resource_group_name
-  location            = var.location
 
   container_app_environment_id = azurerm_container_app_environment.env.id
   revision_mode                = var.revision_mode
