@@ -29,8 +29,8 @@ variable "key_vault_id" {
 variable "image" {
   description = "Container image to run (e.g. ACR image)."
   type        = string
+  default     = "mcr.microsoft.com/azuredocs/containerapps-helloworld:latest"
 }
-
 variable "container_name" {
   description = "Logical container name inside the Container App."
   type        = string
