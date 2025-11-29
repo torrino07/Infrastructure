@@ -27,6 +27,12 @@ variable "containers" {
   default     = []
 }
 
+variable "manage_containers" {
+  description = "If true, Terraform creates blob containers (data-plane). If false, containers are not managed."
+  type        = bool
+  default     = false
+}
+
 variable "tags" {
   type    = map(string)
   default = {}
