@@ -1,11 +1,3 @@
-########### Managed Identity for the app ###########
-resource "azurerm_user_assigned_identity" "app" {
-  name                = "${var.name}-mi"
-  resource_group_name = var.resource_group_name
-  location            = var.location
-  tags                = var.tags
-}
-
 ########### Container Apps Environment (VNet, private) ###########
 resource "azurerm_container_app_environment" "env" {
   name                = "${var.name}-env"
@@ -13,10 +5,10 @@ resource "azurerm_container_app_environment" "env" {
   location            = var.location
 
   # VNet integration → private only
-  infrastructure_subnet_id        = var.subnet_id
-  internal_load_balancer_enabled  = true
+  infrastructure_subnet_id       = var.subnet_id
+  internal_load_balancer_enabled = true
 
-  # Logging – simplest: require a workspace id from caller
+  # Logging
   log_analytics_workspace_id = var.log_analytics_workspace_id
 
   tags = var.tags
@@ -26,7 +18,7 @@ resource "azurerm_container_app_environment" "env" {
 resource "azurerm_role_assignment" "kv_secrets" {
   scope                = var.key_vault_id
   role_definition_name = "Key Vault Secrets User"
-  principal_id         = azurerm_user_assigned_identity.app.principal_id
+  principal_id         = var.identity_principal_id
 }
 
 ########### Container App (internal only, with MI) ###########
@@ -36,15 +28,13 @@ resource "azurerm_container_app" "app" {
   location            = var.location
 
   container_app_environment_id = azurerm_container_app_environment.env.id
-
-  # NEW: required by provider
-  revision_mode = var.revision_mode  # e.g. "Single"
+  revision_mode                = var.revision_mode
 
   tags = var.tags
 
   identity {
     type         = "UserAssigned"
-    identity_ids = [azurerm_user_assigned_identity.app.id]
+    identity_ids = [var.identity_id]
   }
 
   ingress {
@@ -52,7 +42,6 @@ resource "azurerm_container_app" "app" {
     target_port      = var.target_port
     transport        = "auto"
 
-    # NEW: required by provider – route 100% traffic to latest revision
     traffic_weight {
       latest_revision = true
       percentage      = 100
@@ -75,4 +64,28 @@ resource "azurerm_container_app" "app" {
       }
     }
   }
+}
+
+########### Private Endpoint for ACA Environment (optional) ###########
+resource "azurerm_private_endpoint" "aca_env" {
+  count               = var.enable_private_endpoint ? 1 : 0
+
+  name                = "${var.name}-pe"
+  resource_group_name = var.resource_group_name
+  location            = var.location
+  subnet_id           = var.privatelink_subnet_id
+
+  private_service_connection {
+    name                           = "${var.name}-psc"
+    private_connection_resource_id = azurerm_container_app_environment.env.id
+    subresource_names              = ["managedEnvironment"]
+    is_manual_connection           = false
+  }
+
+  private_dns_zone_group {
+    name                 = "aca-env-dns"
+    private_dns_zone_ids = [var.pdz_containerapps_id]
+  }
+
+  tags = var.tags
 }

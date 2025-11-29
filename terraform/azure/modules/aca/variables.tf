@@ -1,5 +1,5 @@
 variable "name" {
-  description = "Base name for the Container App (also used for MI and env)."
+  description = "Base name for the Container App (also used for env)."
   type        = string
 }
 
@@ -78,4 +78,34 @@ variable "revision_mode" {
   description = "Revision mode for the Container App. Valid values: \"Single\" or \"Multiple\"."
   type        = string
   default     = "Single"
+}
+
+# ── Identity is provided by the caller (hub / spoke)
+variable "identity_id" {
+  description = "Resource ID of the user-assigned managed identity used by the app."
+  type        = string
+}
+
+variable "identity_principal_id" {
+  description = "Principal ID of the user-assigned managed identity (for RBAC)."
+  type        = string
+}
+
+# ── Private Endpoint support for the ACA environment
+variable "enable_private_endpoint" {
+  description = "Whether to create a Private Endpoint for the Container App Environment."
+  type        = bool
+  default     = false
+}
+
+variable "privatelink_subnet_id" {
+  description = "Subnet ID where the Private Endpoint NIC will live (usually snet-privatelink)."
+  type        = string
+  default     = null
+}
+
+variable "pdz_containerapps_id" {
+  description = "Private DNS Zone ID for privatelink.<region>.azurecontainerapps.io."
+  type        = string
+  default     = null
 }

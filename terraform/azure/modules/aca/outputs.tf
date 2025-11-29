@@ -17,10 +17,15 @@ output "app_fqdn" {
 
 output "identity_id" {
   description = "Resource ID of the user-assigned MI used by the app."
-  value       = azurerm_user_assigned_identity.app.id
+  value       = var.identity_id
 }
 
 output "identity_principal_id" {
   description = "Principal ID of the user-assigned MI (for extra RBAC if needed)."
-  value       = azurerm_user_assigned_identity.app.principal_id
+  value       = var.identity_principal_id
+}
+
+output "private_endpoint_id" {
+  description = "ID of the private endpoint for the ACA environment (if created)."
+  value       = try(azurerm_private_endpoint.aca_env[0].id, null)
 }
