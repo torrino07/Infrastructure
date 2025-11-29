@@ -1,18 +1,21 @@
 output "environment_id" {
-  value = azurerm_container_app_environment.env.id
+  description = "ID of the Container App Environment."
+  value       = azurerm_container_app_environment.env.id
 }
 
 output "app_name" {
-  value = azurerm_container_app.app.name
+  description = "Name of the Container App."
+  value       = azurerm_container_app.app.name
 }
 
 output "app_id" {
-  value = azurerm_container_app.app.id
+  description = "ID of the Container App."
+  value       = azurerm_container_app.app.id
 }
 
 output "app_fqdn" {
-  # internal FQDN used inside the VNet
-  value = azurerm_container_app.app.ingress[0].fqdn
+  description = "Internal FQDN of the Container App (used inside the VNet)."
+  value       = azurerm_container_app.app.ingress[0].fqdn
 }
 
 output "identity_id" {
