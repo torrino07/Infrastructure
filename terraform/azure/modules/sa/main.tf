@@ -28,15 +28,13 @@ resource "azurerm_role_assignment" "rbac" {
 }
 
 resource "azurerm_storage_container" "containers" {
-  for_each = var.manage_containers ? toset(var.containers) : {}
-
-  name                 = each.value
-  storage_account_name = azurerm_storage_account.this.name
+  for_each = var.manage_containers? { for c in var.containers : c => c }: {}
+  name                  = each.value
+  storage_account_name  = azurerm_storage_account.this.name
   container_access_type = "private"
-
+  
   depends_on = [azurerm_role_assignment.rbac]
 }
-
 resource "azurerm_private_endpoint" "pe" {
   name                = "${var.name}-blob-pe"
   location            = var.location
