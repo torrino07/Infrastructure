@@ -13,7 +13,7 @@ variable "location" {
 variable "sku" {
   description = "Search SKU, e.g. 'standard', 'standard3', 'basic'. Check allowed values per region."
   type        = string
-  default     = "standard"
+  default     = "basic"
 }
 
 variable "partition_count" {

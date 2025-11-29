@@ -2,7 +2,7 @@ resource "azurerm_servicebus_namespace" "ns" {
   name                          = var.name
   location                      = var.location
   resource_group_name           = var.resource_group_name
-  sku                           = "Premium"
+  sku                           = "Standard" #"Premium"
   public_network_access_enabled = false
   minimum_tls_version           = "1.2"
   tags                          = var.tags
