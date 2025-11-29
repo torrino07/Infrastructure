@@ -110,10 +110,13 @@ variable "pdz_containerapps_id" {
   default     = null
 }
 
+# ── ACR / registry integration
 variable "registry_server" {
-  type = string
+  description = "Container registry server FQDN (e.g. hubeudevacr.azurecr.io)."
+  type        = string
 }
 
 variable "registry_identity_id" {
-  type = string
+  description = "Resource ID of the managed identity used to authenticate to the registry."
+  type        = string
 }
