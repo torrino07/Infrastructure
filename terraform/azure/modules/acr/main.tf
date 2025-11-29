@@ -1,3 +1,10 @@
+resource "azurerm_role_assignment" "rbac" {
+  count               = length(var.rbac_principals)
+  scope               = azurerm_container_registry.acr.id
+  role_definition_name = var.rbac_principals[count.index].role
+  principal_id         = var.rbac_principals[count.index].object_id
+}
+
 resource "azurerm_container_registry" "acr" {
   name                          = replace(var.name, "-", "")
   location                      = var.location

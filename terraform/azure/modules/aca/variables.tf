@@ -109,3 +109,11 @@ variable "pdz_containerapps_id" {
   type        = string
   default     = null
 }
+
+variable "registry_server" {
+  type = string
+}
+
+variable "registry_identity_id" {
+  type = string
+}
