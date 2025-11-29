@@ -20,3 +20,12 @@ variable "pdz_acr_id" {
 variable "tags" {
   type = map(string)
 }
+
+variable "rbac_principals" {
+  description = "Principals to give roles on the ACR"
+  type = list(object({
+    object_id = string
+    role      = string
+  }))
+  default = []
+}

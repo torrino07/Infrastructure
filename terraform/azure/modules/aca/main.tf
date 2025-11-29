@@ -36,6 +36,11 @@ resource "azurerm_container_app" "app" {
     identity_ids = [var.identity_id]
   }
 
+  registry {
+    server   = var.registry_server
+    identity = var.registry_identity_id
+  }
+
   ingress {
     external_enabled = false
     target_port      = var.target_port
@@ -77,7 +82,7 @@ resource "azurerm_private_endpoint" "aca_env" {
   private_service_connection {
     name                           = "${var.name}-psc"
     private_connection_resource_id = azurerm_container_app_environment.env.id
-    subresource_names              = ["managedEnvironment"]
+    subresource_names              = ["managedEnvironments"]
     is_manual_connection           = false
   }
 
