@@ -21,28 +21,31 @@ resource "azurerm_role_assignment" "kv_secrets" {
   principal_id         = var.identity_principal_id
 }
 
-########### Container App (internal only, with MI) ###########
+########### Container App (internal only, with MI + ACR registry) ###########
 resource "azurerm_container_app" "app" {
   name                = var.name
   resource_group_name = var.resource_group_name
 
+  # Location comes from the environment, do NOT set "location" here
   container_app_environment_id = azurerm_container_app_environment.env.id
   revision_mode                = var.revision_mode
 
   tags = var.tags
 
+  # User-assigned identity for runtime + ACR + Key Vault
   identity {
     type         = "UserAssigned"
     identity_ids = [var.identity_id]
   }
 
+  # ACR integration via managed identity (no creds)
   registry {
     server   = var.registry_server
     identity = var.registry_identity_id
   }
 
   ingress {
-    external_enabled = false
+    external_enabled = false               # internal-only, no public endpoint
     target_port      = var.target_port
     transport        = "auto"
 
@@ -71,6 +74,8 @@ resource "azurerm_container_app" "app" {
 }
 
 ########### Private Endpoint for ACA Environment (optional) ###########
+# NOTE: Azure only supports this for Workload Profiles environments.
+# For Consumption-only envs, keep enable_private_endpoint = false in the caller.
 resource "azurerm_private_endpoint" "aca_env" {
   count               = var.enable_private_endpoint ? 1 : 0
 
